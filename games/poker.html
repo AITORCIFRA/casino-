@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Texas Poker Bonus — Arcade Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body {
+  background: #0f0c1b;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+}
+
+/* ==========================================================================
+   TOP BAR (ESTILO LOBBY PREMIUM)
+   ========================================================================== */
+.top-hud {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 15px;
+  background: linear-gradient(180deg, #161920 0%, #0b0c10 100%);
+  border-bottom: 2px solid #2d323f;
+  z-index: 10;
+  height: 45px;
+}
+.lobby-back-btn {
+  background: linear-gradient(180deg, #4b5563, #1f2937);
+  border: 1px solid #6b7280;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+.stats-center {
+  display: flex;
+  gap: 20px;
+}
+.stat-pill {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #444;
+  padding: 4px 15px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.stat-lbl { color: #888; font-size: 11px; }
+.stat-val { color: #4ade80; font-weight: 900; }
+
+/* ==========================================================================
+   TAPETE Y DISPOSICIÓN DE LA MESA (DH STYLE)
+   ========================================================================== */
+.table-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding-right: 120px; /* Espacio reservado para la torre de control derecha */
+}
+.poker-felt {
+  width: 92%;
+  height: 82%;
+  background: radial-gradient(circle at 50% 50%, #297a4a 0%, #17472a 70%, #0b2616 100%);
+  border: 14px solid #4a2e1b;
+  outline: 5px solid #0f0b08;
+  border-radius: 180px;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.8);
+  position: relative;
+}
+.felt-line {
+  position: absolute;
+  inset: 10px;
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 170px;
+  pointer-events: none;
+}
+
+/* MARCADOR CENTRAL */
+.felt-center-info {
+  position: absolute;
+  top: 35%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  z-index: 2;
+}
+.pot-badge {
+  background: rgba(0,0,0,0.75);
+  border: 2px solid #eab308;
+  padding: 5px 20px;
+  border-radius: 30px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.3rem;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.pot-badge::before { content: '🪙'; font-size: 14px; }
+.status-ticker {
+  background: rgba(0,0,0,0.5);
+  padding: 3px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #ccc;
+  font-weight: bold;
+}
+
+/* CARTAS COMUNITARIAS */
+.community-cards-container {
+  position: absolute;
+  top: 55%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   JUGADORES Y CASILLAS DE ACCIÓN FLOTANTES
+   ========================================================================== */
+.player-pod {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 95px;
+  z-index: 5;
+}
+#seat0 { bottom: -10px; left: 50%; transform: translateX(-50%); } 
+#seat1 { bottom: 20%; left: 3%; }
+#seat2 { top: 8%; left: 22%; }
+#seat3 { top: 8%; right: 22%; }
+#seat4 { bottom: 20%; right: 3%; }
+
+/* Carteles de Acción Superpuestos (Check, Raise, Fold, Think) */
+.action-floating-pill {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+  text-align: center;
+  width: 80px;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.2s ease;
+}
+.action-floating-pill.visible { opacity: 1; transform: translateY(0); }
+.action-floating-pill.action-check { background: #eab308; color: #000; border: 1px solid #fff; }
+.action-floating-pill.action-raise { background: #ea580c; color: #fff; border: 1px solid #ffedd5; }
+.action-floating-pill.action-fold { background: #4b5563; color: #d1d5db; }
+.action-floating-pill.action-think { background: #16a34a; color: #fff; border: 1px solid #bbf7d0; animation: blink 1s infinite alternate; }
+
+@keyframes blink { from { opacity: 0.5; } to { opacity: 1; } }
+
+/* Contenedor Perfil Cuadrado */
+.profile-card-box {
+  width: 85px;
+  background: rgba(20, 24, 33, 0.95);
+  border: 2px solid #4b5563;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+  text-align: center;
+  position: relative;
+}
+.player-pod.active-turn .profile-card-box { border-color: #eab308; box-shadow: 0 0 12px #eab308; }
+.player-pod.folded-state { opacity: 0.5; }
+
+.pod-avatar {
+  width: 100%; height: 55px; background-size: cover; background-position: center; background-color: #111;
+  border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.pod-name { font-size: 10px; padding: 2px 4px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #11141c; }
+.pod-money { font-size: 11px; padding: 2px 4px; color: #fcd34d; font-weight: 900; background: #0b0d13; }
+
+/* Cartas Propias Levantadas y de Rivales */
+.pod-cards-back-row { position: absolute; bottom: -15px; display: flex; gap: 2px; z-index: 4; }
+.user-live-hand-row { position: absolute; top: -45px; display: flex; gap: 4px; z-index: 6; }
+
+/* FICHAS EN TAPETE */
+.pod-chips-bet-tray {
+  position: absolute; display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 10px; opacity: 0; transition: all 0.2s ease;
+}
+.pod-chips-bet-tray.active-bet { opacity: 1; }
+#tray0 { top: -42px; left: 110%; }
+#tray1 { right: -65px; top: 15px; }
+#tray2 { bottom: -35px; left: 50%; transform: translateX(-50%); }
+#tray3 { bottom: -35px; left: 50%; transform: translateX(-50%); }
+#tray4 { left: -65px; top: 15px; }
+
+.chip-stack-mesh { display: flex; flex-direction: column-reverse; width: 12px; }
+.chip-slice { height: 3.5px; width: 12px; border-radius: 50%; margin-top: -2px; border-bottom: 1px solid rgba(0,0,0,0.4); }
+.chip-slice.r { background: #ef4444; }
+.chip-slice.b { background: #3b82f6; }
+.chip-slice.g { background: #10b981; }
+.tray-val-text { font-size: 10px; font-weight: bold; color: #fff; font-family: 'Oswald', sans-serif; }
+
+.dealer-puck {
+  position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; background: #fff; color: #000; border-radius: 50%;
+  font-size: 9px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 1.5px solid #000; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* ==========================================================================
+   DISEÑO DE CARTAS RÍGIDAS CON SOMBRA
+   ========================================================================== */
+.poker-card {
+  width: 44px; height: 62px; background: #fff; border-radius: 4px; color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 3px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+.poker-card.suit-red { color: #dc2626; }
+.poker-card.card-back { background: linear-gradient(135deg, #b91c1c, #7f1d1d); border: 1px solid #fff; color: transparent; }
+.poker-card.mini { width: 18px; height: 26px; background: linear-gradient(135deg, #b91c1c, #7f1d1d); border: 1px solid #fff; border-radius: 2px; }
+
+/* ==========================================================================
+   TORRE DE APUESTA LATERAL DERECHA (DH TEXAS STYLE)
+   ========================================================================== */
+.right-betting-tower {
+  position: absolute;
+  right: 15px;
+  top: 60px;
+  bottom: 85px;
+  width: 85px;
+  background: rgba(17, 20, 28, 0.9);
+  border: 2px solid #374151;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px;
+  gap: 8px;
+  z-index: 15;
+}
+.btn-all-in {
+  width: 100%;
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  border: 1px solid #fef08a;
+  border-radius: 4px;
+  color: #000;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 6px 0;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+  text-align: center;
+}
+.vertical-slider-container {
+  flex: 1;
+  width: 24px;
+  background: #090d16;
+  border: 2px solid #4b5563;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.slider-vertical-fill {
+  position: absolute;
+  bottom: 0; width: 100%;
+  background: linear-gradient(0deg, #1e3a8a, #3b82f6);
+  border-radius: 10px;
+  height: 0%;
+}
+.slider-handle-metallic {
+  width: 32px; height: 18px;
+  background: linear-gradient(180deg, #f3f4f6, #9ca3af, #4b5563);
+  border: 1.5px solid #1f2937;
+  border-radius: 3px;
+  position: absolute;
+  left: -4px;
+  bottom: 0%;
+  cursor: pointer;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+}
+.floating-raise-bubble {
+  position: absolute;
+  left: -115px;
+  background: #f59e0b;
+  color: #000;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #fff;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+.floating-raise-bubble::after {
+  content: ''; position: absolute; right: -5px; top: 6px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 5px solid #f59e0b;
+}
+.quick-chips-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+.btn-quick-val {
+  background: #242b3d;
+  border: 1px solid #4b5563;
+  color: #fff;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 3px 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   BARRA DE ACCIONES INFERIOR (BOTONERA PRINCIPAL)
+   ========================================================================== */
+.bottom-action-bar {
+  width: 100%;
+  background: #11131a;
+  border-top: 3px solid #232836;
+  padding: 6px 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  height: 60px;
+  z-index: 10;
+}
+.btn-action-core {
+  border: none; border-radius: 4px; font-weight: 900; font-size: 13px; color: #fff; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.4); line-height: 1.1;
+}
+.btn-action-core span { font-size: 10px; color: rgba(255,255,255,0.75); margin-top: 2px; font-family: 'Oswald', sans-serif; }
+.btn-action-core.fold-red { background: linear-gradient(180deg, #b91c1c, #7f1d1d); border-bottom: 3px solid #450a0a; }
+.btn-action-core.gray-dark { background: linear-gradient(180deg, #4b5563, #1f2937); border-bottom: 3px solid #111827; }
+.btn-action-core.check-yellow { background: linear-gradient(180deg, #ca8a04, #854d0e); border-bottom: 3px solid #451a03; }
+.btn-action-core.call-gold { background: linear-gradient(180deg, #ea580c, #9a3412); border-bottom: 3px solid #431407; }
+.btn-action-core.raise-blue { background: linear-gradient(180deg, #2563eb, #1e3a8a); border-bottom: 3px solid #172554; }
+.btn-action-core:disabled { opacity: 0.15; cursor: not-allowed; border-bottom: none; }
+
+.btn-solo-lobby { grid-column: span 5; background: linear-gradient(180deg, #10b981, #065f46); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; border: none; border-radius: 4px; cursor: pointer; color: #fff; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="top-hud">
+  <button class="lobby-back-btn" onclick="window.parent.postMessage({type:'close'},'*')">🚪 SALIR</button>
+  <div class="stats-center">
+    <div class="stat-pill"><span class="stat-lbl">MIS CRÉDITOS:</span><span class="stat-val" id="myChipsTop">$0</span></div>
+    <div class="stat-pill"><span class="stat-lbl">CIEGAS:</span><span class="stat-val">10 / 20</span></div>
+  </div>
+</div>
+
+<div class="table-area">
+  <div class="poker-felt" id="tableFelt">
+    <div class="felt-line"></div>
+
+    <div class="felt-center-info">
+      <div class="pot-badge" id="potText">0</div>
+      <div class="status-ticker" id="tickerMsg">Esperando inicio...</div>
+    </div>
+
+    <div class="community-cards-container" id="commZone"></div>
+
+    <div id="podSeatsGrid" style="position:contents"></div>
+  </div>
+
+  <div class="right-betting-tower">
+    <button class="btn-all-in" onclick="triggerAllIn()">ALL IN</button>
+    <div class="vertical-slider-container" id="vTrack">
+      <div class="slider-vertical-fill" id="vFill"></div>
+      <div class="slider-handle-metallic" id="vHandle">
+        <div class="floating-raise-bubble" id="raiseBubble">$0</div>
+      </div>
+    </div>
+    <div class="quick-chips-box">
+      <button class="btn-quick-val" onclick="setQuickPct(0.25)">1/4 POT</button>
+      <button class="btn-quick-val" onclick="setQuickPct(0.50)">1/2 POT</button>
+      <button class="btn-quick-val" onclick="setQuickPct(1.00)">POT</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-action-bar" id="actionsPanel">
+  <button class="btn-solo-lobby" onclick="startGame()">🃏 EMPEZAR NUEVA MANO</button>
+</div>
+
+<script>
+const SUITS=['♠','♥','♦','♣'], VALS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const N_SEATS = 5;
+const SB=10, BB=20;
+
+const ROBOT_NAMES = ['Bot_1','Bot_2','Bot_3','Bot_4'];
+const ROBOT_AVATARS = [
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+  "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100"
+];
+
+let myCredits = 25000;
+let players=[], deck=[], community=[], pot=0, dealerIdx=0, currentIdx=-1, gameRunning=false;
+let currentBet=0, targetMinRaise=0, sliderSelectedVal=0, totalHandBet=0, myTurnResolve=null;
+
+(function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)myCredits=c;}catch(e){}})();
+
+function initPlayers() {
+  players = [];
+  players.push({idx:0, name:'Me - "bro"', chips:myCredits, isMe:true, cards:[], bet:0, folded:false, allIn:false, statusStr:''});
+  for(let i=1; i<N_SEATS; i++){
+    players.push({
+      idx:i, name:ROBOT_NAMES[i-1], chips:65000+Math.floor(Math.random()*40000), isMe:false,
+      avatar:ROBOT_AVATARS[i-1], cards:[], bet:0, folded:false, allIn:false, statusStr:''
+    });
+  }
+}
+
+function buildHtmlSeats() {
+  const g = document.getElementById('podSeatsGrid'); g.innerHTML = '';
+  players.forEach((p, i) => {
+    const pod = document.createElement('div'); pod.className = 'player-pod'; pod.id = 'seat_' + i;
+    pod.innerHTML = `
+      <div class="action-floating-pill" id="bubble_${i}">Check</div>
+      <div class="user-live-hand-row" id="myHand_${i}"></div>
+      <div class="profile-card-box">
+        <div class="pod-avatar" style="${!p.isMe?`background-image:url('${p.avatar}')`:`background:#1e3a8a`}">
+          ${p.isMe?'👤':''}
+        </div>
+        <div class="pod-name">${p.name}</div>
+        <div class="pod-money" id="moneyTxt_${i}">$0</div>
+      </div>
+      <div class="pod-chips-bet-tray" id="tray_${i}">
+        <div class="chip-stack-mesh"><div class="chip-slice r"></div><div class="chip-slice g"></div></div>
+        <span class="tray-val-text" id="trayVal_${i}">$0</span>
+      </div>
+      <div class="pod-cards-back-row" id="backCards_${i}"></div>
+    `;
+    g.appendChild(pod);
+  });
+}
+
+function syncVisualState() {
+  players.forEach((p, i) => {
+    const node = document.getElementById('seat_' + i); if(!node) return;
+    document.getElementById('moneyTxt_' + i).textContent = `$${p.chips.toLocaleString()}`;
+    
+    // Bubble Flotante de Acciones
+    const b = document.getElementById('bubble_' + i);
+    if(p.statusStr){
+      b.textContent = p.statusStr;
+      b.className = `action-floating-pill visible ` + 
+        (p.folded?'action-fold':(p.statusStr==='Check'?'action-check':(p.statusStr==='Pensando...'?'action-think':'action-raise')));
+    } else {
+      b.className = `action-floating-pill`;
+    }
+
+    // Bandeja de Fichas Apostadas en Tapete
+    const tray = document.getElementById('tray_' + i);
+    if(p.bet > 0) {
+      document.getElementById('trayVal_' + i).textContent = `$${p.bet.toLocaleString()}`;
+      tray.classList.add('active-bet');
+    } else {
+      tray.classList.remove('active-bet');
+    }
+
+    node.className = `player-pod` + (p.folded?' folded-state':'') + (i===currentIdx && gameRunning?' active-turn':'');
+    
+    // Remover e insertar botón de Dealer
+    const oldD = node.querySelector('.dealer-puck'); if(oldD) oldD.remove();
+    if(i === dealerIdx) {
+      const d = document.createElement('div'); d.className = 'dealer-puck'; d.textContent = 'D';
+      node.querySelector('.profile-card-box').appendChild(d);
+    }
+  });
+
+  document.getElementById('myChipsTop').textContent = `$${(players[0]?.chips||0).toLocaleString()}`;
+  document.getElementById('potText').textContent = `$${pot.toLocaleString()}`;
+}
+
+function makeDeck() {
+  deck = []; SUITS.forEach(s => VALS.forEach(v => deck.push({s, v})));
+  for(let i=deck.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [deck[i], deck[j]]=[deck[j], deck[i]]; }
+}
+
+function drawCard(card, isBack=false) {
+  if(isBack) return `<div class="poker-card card-back"></div>`;
+  const isRed = card.s==='♥'||card.s==='♦';
+  return `<div class="poker-card ${isRed?'suit-red':''}"><div>${card.v}${card.s}</div><div>${card.v}${card.s}</div></div>`;
+}
+
+function renderCards() {
+  players.forEach((p, i) => {
+    const liveZone = document.getElementById('myHand_' + i);
+    const backZone = document.getElementById('backCards_' + i);
+    if(liveZone) liveZone.innerHTML = '';
+    if(backZone) backZone.innerHTML = '';
+
+    if(p.folded || p.cards.length === 0) return;
+    if(p.isMe) {
+      liveZone.innerHTML = drawCard(p.cards[0]) + drawCard(p.cards[1]);
+    } else {
+      backZone.innerHTML = `<div class="poker-card mini"></div><div class="poker-card mini"></div>`;
+    }
+  });
+}
+
+function renderCommunity(revealCount = 0) {
+  const cz = document.getElementById('commZone'); cz.innerHTML = '';
+  for(let i=0; i<5; i++) {
+    if(i < community.length) {
+      cz.innerHTML += drawCard(community[i], i >= revealCount);
+    } else {
+      cz.innerHTML += `<div class="poker-card card-back" style="opacity:0.08"></div>`;
+    }
+  }
+}
+
+// LOOP DEL JUEGO PRINCIPAL
+async function startGame() {
+  if(gameRunning) return;
+  if(players.length === 0) initPlayers();
+  players = players.filter(p => p.chips > 0 || p.isMe);
+  if(players[0].chips <= 0) players[0].chips = 5000;
+  
+  buildHtmlSeats();
+  gameRunning = true; pot = 0; community = []; currentBet = 0; totalHandBet = 0;
+  document.getElementById('tickerMsg').textContent = 'Repartiendo Cartas...';
+
+  players.forEach(p => { p.cards=[]; p.bet=0; p.folded=false; p.allIn=false; p.statusStr=''; });
+  makeDeck();
+  dealerIdx = (dealerIdx + 1) % players.length;
+
+  // Forzar ciegas automáticas
+  postBlind((dealerIdx+1)%players.length, SB, 'SB');
+  postBlind((dealerIdx+2)%players.length, BB, 'BB');
+  currentBet = BB;
+
+  players.forEach(p => { p.cards = [deck.pop(), deck.pop()]; });
+  renderCards(); renderCommunity(0); syncVisualState();
+
+  // PRE-FLOP
+  await executeBettingRound((dealerIdx + 3) % players.length);
+  if(checkHandEnd()) return;
+
+  // FLOP
+  document.getElementById('tickerMsg').textContent = 'Abriendo Flop...';
+  community = [deck.pop(), deck.pop(), deck.pop()]; renderCommunity(3); clearBetsAndStatuses();
+  await executeBettingRound((dealerIdx + 1) % players.length);
+  if(checkHandEnd()) return;
+
+  // TURN
+  document.getElementById('tickerMsg').textContent = 'Abriendo Turn...';
+  community.push(deck.pop()); renderCommunity(4); clearBetsAndStatuses();
+  await executeBettingRound((dealerIdx + 1) % players.length);
+  if(checkHandEnd()) return;
+
+  // RIVER
+  document.getElementById('tickerMsg').textContent = 'Abriendo River...';
+  community.push(deck.pop()); renderCommunity(5); clearBetsAndStatuses();
+  await executeBettingRound((dealerIdx + 1) % players.length);
+  
+  resolveWinner();
+}
+
+function postBlind(idx, amt, label) {
+  const p = players[idx]; const taken = Math.min(amt, p.chips);
+  p.chips -= taken; p.bet += taken; pot += taken;
+  if(p.isMe) totalHandBet += taken;
+  p.statusStr = `${label}: $${taken}`;
+}
+
+function clearBetsAndStatuses() {
+  players.forEach(p => { p.bet = 0; if(!p.folded) p.statusStr = ''; });
+  currentBet = 0;
+}
+
+function checkHandEnd() {
+  const active = players.filter(p => !p.folded);
+  if(active.length <= 1) { resolveWinner(); return true; }
+  return false;
+}
+
+async function executeBettingRound(startSeatIdx) {
+  let actionsCount = 0, maxIterations = players.length * 3;
+  let curr = startSeatIdx % players.length;
+
+  while(actionsCount < maxIterations) {
+    const p = players[curr];
+    if(!p.folded && !p.allIn && p.chips > 0) {
+      currentIdx = curr;
+      p.statusStr = 'Pensando...'; syncVisualState();
+      
+      if(p.isMe) {
+        await handleUserTurn(p);
+      } else {
+        await new Promise(r => setTimeout(r, 1000 + Math.random()*500));
+        handleBotMove(p);
+      }
+      actionsCount++;
+      
+      const activeLive = players.filter(pp => !pp.folded);
+      const isSettled = activeLive.every(pp => pp.bet === currentBet || pp.allIn || pp.chips === 0);
+      if(isSettled && actionsCount >= activeLive.length) break;
+    }
+    curr = (curr + 1) % players.length;
+  }
+  currentIdx = -1; syncVisualState();
+}
+
+function handleBotMove(p) {
+  const toCall = currentBet - p.bet;
+  const rand = Math.random();
+  if(toCall === 0) {
+    if(rand < 0.6) { p.statusStr = 'Check'; } 
+    else {
+      const bAmt = Math.min(400, p.chips); p.chips -= bAmt; p.bet += bAmt; pot += bAmt;
+      currentBet = p.bet; p.statusStr = 'Bet';
+    }
+  } else {
+    if(rand < 0.12) { p.folded = true; p.statusStr = 'Fold'; }
+    else if(rand < 0.8 || toCall >= p.chips) {
+      const cAmt = Math.min(toCall, p.chips); p.chips -= cAmt; p.bet += cAmt; pot += cAmt;
+      if(p.chips === 0) p.allIn = true;
+      p.statusStr = 'Call';
+    } else {
+      const rAmt = Math.min(toCall + 500, p.chips); p.chips -= rAmt; p.bet += rAmt; pot += rAmt;
+      currentBet = p.bet; p.statusStr = 'Raise';
+    }
+  }
+}
+
+// MANEJO DE TURNO DEL USUARIO E INTERFAZ DH STYLE
+function handleUserTurn(p) {
+  return new Promise(resolve => {
+    myTurnResolve = resolve;
+    const toCall = currentBet - p.bet;
+    
+    targetMinRaise = currentBet + 40;
+    setupVerticalSlider(targetMinRaise, p.chips);
+
+    const bar = document.getElementById('actionsPanel');
+    bar.innerHTML = `
+      <button class="btn-action-core fold-red" onclick="userEndAction('fold')">FOLD</button>
+      <button class="btn-action-core gray-dark" onclick="userEndAction('checkfold')">CHECK/FOLD</button>
+      <button class="btn-action-core check-yellow" id="btnCheckAction" onclick="userEndAction('check')">CHECK</button>
+      <button class="btn-action-core call-gold" onclick="userEndAction('call')">CALL<br><span>$${toCall}</span></button>
+      <button class="btn-action-core raise-blue" onclick="userEndAction('raise')">RAISE TO<br><span id="raiseBtnVal">$0</span></button>
+    `;
+
+    if(toCall > 0) document.getElementById('btnCheckAction').disabled = true;
+    updateRaiseButtonText();
+  });
+}
+
+function userEndAction(type) {
+  if(!gameRunning || currentIdx !== 0) return;
+  const p = players[0];
+  const toCall = currentBet - p.bet;
+
+  if(type === 'fold') { p.folded = true; p.statusStr = 'Fold'; }
+  else if(type === 'checkfold') { if(toCall > 0) { p.folded = true; p.statusStr = 'Fold'; } else { p.statusStr = 'Check'; } }
+  else if(type === 'check') { p.statusStr = 'Check'; }
+  else if(type === 'call') {
+    const c = Math.min(toCall, p.chips); p.chips -= c; p.bet += c; pot += c; totalHandBet += c;
+    if(p.chips === 0) p.allIn = true; p.statusStr = 'Call';
+  }
+  else if(type === 'raise') {
+    const finalRaise = Math.min(Math.max(sliderSelectedVal, targetMinRaise), p.chips);
+    p.chips -= finalRaise; p.bet += finalRaise; pot += finalRaise; totalHandBet += finalRaise;
+    currentBet = p.bet; p.statusStr = 'Raise';
+  }
+
+  if(myTurnResolve) myTurnResolve();
+}
+
+function triggerAllIn() {
+  if(!gameRunning || currentIdx !== 0) return;
+  const p = players[0];
+  pot += p.chips; p.bet += p.chips; totalHandBet += p.chips;
+  p.chips = 0; p.allIn = true; if(p.bet > currentBet) currentBet = p.bet;
+  p.statusStr = 'All-In';
+  if(myTurnResolve) myTurnResolve();
+}
+
+// LOGICA DE RECONOCIMIENTO Y RESOLUCIÓN DE MANO GANADORA
+function resolveWinner() {
+  gameRunning = false;
+  const active = players.filter(p => !p.folded);
+  
+  // Forzar revelar todas las cartas
+  active.forEach(p => {
+    const el = document.getElementById('myHand_' + p.idx);
+    if(el) el.innerHTML = drawCard(p.cards[0]) + drawCard(p.cards[1]);
+  });
+
+  let winner = active[0], topRank = -1, earnings = 0;
+
+  active.forEach(p => {
+    const comb = [...p.cards, ...community];
+    const vals = comb.map(x => VALS.indexOf(x.v)).sort((a,b)=>b-a);
+    const counts = {}; vals.forEach(v => counts[v] = (counts[v]||0)+1);
+    const pairs = Object.values(counts).filter(x => x === 2).length;
+    const trios = Object.values(counts).filter(x => x === 3).length;
+    
+    let score = 0, name = 'Carta Alta';
+    if(Object.values(counts).includes(4)) { score = 7; name = 'Póker'; }
+    else if(trios > 0 && pairs > 0) { score = 6; name = 'Full House'; }
+    else if(trios > 0) { score = 3; name = 'Trío'; }
+    else if(pairs >= 2) { score = 2; name = 'Doble Pareja'; }
+    else if(pairs === 1) { score = 1; name = 'Pareja'; }
+
+    if(score > topRank || (score === topRank && vals[0] > VALS.indexOf(winner.cards[0].v))) {
+      topRank = score; winner = p; winner.handTitle = name;
+    }
+  });
+
+  if(winner) {
+    winner.chips += pot;
+    if(winner.isMe) earnings = pot;
+    document.getElementById('tickerMsg').textContent = `${winner.name} GANA con ${winner.handTitle || 'Mano Alta'} ($${pot.toLocaleString()})`;
+  }
+
+  myCredits = players[0].chips;
+  try {
+    window.parent.postMessage({type: 'credits', value: myCredits}, '*');
+    window.parent.postMessage({ type: 'round', game: 'poker', bet: totalHandBet, win: earnings, credits: myCredits }, '*');
+  } catch(e){}
+
+  syncVisualState();
+  document.getElementById('actionsPanel').innerHTML = `<button class="btn-solo-lobby" onclick="startGame()">🃏 JUGAR SIGUIENTE RONDA</button>`;
+}
+
+// CONTROL DESLIZANTE KINETIC VERTICAL RIGIDO
+let sMin = 0, sMax = 100;
+function setupVerticalSlider(min, max) {
+  sMin = min; sMax = max;
+  if(sMin >= sMax) sMin = Math.floor(sMax * 0.5);
+  updateSliderVisuals(0);
+
+  const track = document.getElementById('vTrack');
+  let isDragging = false;
+
+  track.onmousedown = () => isDragging = true;
+  window.onmouseup = () => isDragging = false;
+  window.onmousemove = (e) => { if(isDragging) calculateRatio(e); };
+
+  track.ontouchstart = () => isDragging = true;
+  window.ontouchend = () => isDragging = false;
+  window.ontouchmove = (e) => { if(isDragging) calculateRatio(e.touches[0]); };
+
+  function calculateRatio(e) {
+    const r = track.getBoundingClientRect();
+    let pct = (r.bottom - e.clientY) / r.height;
+    pct = Math.max(0, Math.min(1, pct));
+    updateSliderVisuals(pct);
+  }
+}
+
+function updateSliderVisuals(pct) {
+  document.getElementById('vFill').style.height = `${pct * 100}%`;
+  document.getElementById('vHandle').style.bottom = `calc(${pct * 100}% - 9px)`;
+  
+  sliderSelectedVal = Math.floor(sMin + (sMax - sMin) * pct);
+  document.getElementById('raiseBubble').textContent = `$${sliderSelectedVal.toLocaleString()}`;
+  updateRaiseButtonText();
+}
+
+function setQuickPct(factor) {
+  if(!gameRunning || currentIdx !== 0) return;
+  const target = Math.min(Math.max(Math.floor(pot * factor), targetMinRaise), players[0].chips);
+  const pct = (target - sMin) / (sMax - sMin);
+  updateSliderVisuals(Math.max(0, Math.min(1, pct)));
+}
+
+function updateRaiseButtonText() {
+  const lbl = document.getElementById('raiseBtnVal');
+  if(lbl) lbl.textContent = `$${sliderSelectedVal.toLocaleString()}`;
+}
+
+initPlayers(); buildHtmlSeats(); syncVisualState();
+</script>
+</body>
+</html>

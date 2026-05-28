@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ruleta Europea</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#C9A84C;--felt:#1B4D2E;--bg:#0A0A0A;--surface:#141414;--red:#C0392B;--text:#F0E6D3;--text-muted:#9A8A72;--border:rgba(201,168,76,0.3)}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1rem;display:flex;flex-direction:column;align-items:center}
+h1{font-family:'Playfair Display',serif;font-size:2rem;letter-spacing:.1em;background:linear-gradient(135deg,#E8C97A,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase;margin-bottom:.75rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:700px;width:100%;margin-bottom:.75rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.5rem;text-align:center}
+.sl{font-size:10px;letter-spacing:.12em;color:var(--text-muted);text-transform:uppercase}
+.sv{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold)}
+.main{display:grid;grid-template-columns:200px 1fr;gap:1rem;max-width:700px;width:100%}
+.wheel-col{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.wheel-wrap{position:relative;width:195px;height:195px}
+.wheel-wrap canvas{display:block;filter:drop-shadow(0 0 20px rgba(201,168,76,.25))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:14px solid var(--gold);z-index:10}
+.result-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;text-align:center;width:100%}
+.rnum{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:700;line-height:1}
+.rdesc{font-size:11px;color:var(--text-muted);margin-top:2px;letter-spacing:.08em;text-transform:uppercase}
+.msg{padding:.45rem .8rem;border-radius:8px;font-size:12px;font-weight:500;text-align:center}
+.msg.neutral{background:var(--surface);color:var(--text-muted);border:1px solid var(--border)}
+.msg.win{background:rgba(46,204,113,.1);color:#2ecc71;border:1px solid rgba(46,204,113,.3)}
+.msg.lose{background:rgba(192,57,43,.1);color:#E74C3C;border:1px solid rgba(231,76,60,.3)}
+.spin-btn{width:100%;padding:.65rem;font-family:'Playfair Display',serif;font-size:1rem;background:linear-gradient(135deg,#8A6A1E,var(--gold));color:#0A0A0A;border:none;border-radius:8px;cursor:pointer;font-weight:700;transition:opacity .2s}
+.spin-btn:disabled{opacity:.4;cursor:not-allowed}
+.clear-btn{width:100%;padding:.4rem;font-size:11px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer}
+.right{display:flex;flex-direction:column;gap:.5rem}
+.sec-t{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{width:42px;height:42px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .12s,box-shadow .12s}
+.chip:hover{transform:scale(1.1)}
+.chip.sel{box-shadow:0 0 0 3px #fff}
+.c1{background:radial-gradient(circle,#E74C3C,#922B21);border-color:#641E16;color:#fff}
+.c5{background:radial-gradient(circle,#3498DB,#1A5276);border-color:#154360;color:#fff}
+.c10{background:radial-gradient(circle,#27AE60,#145A32);border-color:#0E3E22;color:#fff}
+.c25{background:radial-gradient(circle,#D4AC0D,#784212);border-color:#5D3407;color:#fff}
+.c100{background:radial-gradient(circle,#8E44AD,#4A235A);border-color:#331940;color:#fff}
+.felt-table{background:var(--felt);border-radius:8px;padding:.6rem;display:flex;flex-direction:column;gap:4px;border:1px solid rgba(201,168,76,.2)}
+.felt-row{display:flex;gap:4px}
+.fb{flex:1;padding:.4rem .25rem;font-size:11px;font-weight:500;background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.1);border-radius:5px;cursor:pointer;text-align:center;transition:background .12s}
+.fb:hover{background:rgba(255,255,255,.14)}
+.fb.red-btn{background:rgba(192,57,43,.4);border-color:rgba(231,76,60,.4)}
+.fb.blk-btn{background:rgba(0,0,0,.7);border-color:rgba(255,255,255,.08)}
+.num-wrap{background:var(--felt);border-radius:8px;padding:.6rem;border:1px solid rgba(201,168,76,.2)}
+.zero-c{width:100%;padding:.35rem;background:rgba(46,204,113,.25);border:1px solid rgba(46,204,113,.35);border-radius:5px;color:#2ecc71;font-weight:700;font-size:12px;text-align:center;cursor:pointer;margin-bottom:4px}
+.num-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+.nc{padding:.3rem .05rem;font-size:10px;font-weight:600;text-align:center;border-radius:4px;cursor:pointer;border:1px solid transparent;color:#fff}
+.nc:hover{opacity:.75}
+.nc.is-red{background:rgba(192,57,43,.7);border-color:rgba(231,76,60,.25)}
+.nc.is-blk{background:rgba(15,15,15,.9);border-color:rgba(255,255,255,.06)}
+.nc.anb{box-shadow:0 0 0 2px var(--gold)}
+.pb-list{max-height:80px;overflow-y:auto;font-size:11px}
+.pb-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text-muted)}
+.pb-row span:last-child{color:var(--gold)}
+</style>
+</head>
+<body>
+<h1>Ruleta Europea</h1>
+<div class="stats">
+  <div class="stat"><div class="sl">Saldo</div><div class="sv" id="saldo">500</div></div>
+  <div class="stat"><div class="sl">Apostado</div><div class="sv" id="apostado">0</div></div>
+  <div class="stat"><div class="sl">Tiradas</div><div class="sv" id="tiradas">0</div></div>
+</div>
+<div class="main">
+  <div class="wheel-col">
+    <div class="wheel-wrap"><div class="pointer"></div><canvas id="wc" width="195" height="195"></canvas></div>
+    <div class="result-box"><div class="rnum" id="rnum" style="color:var(--text-muted)">—</div><div class="rdesc" id="rdesc">Haz tus apuestas</div></div>
+    <div class="msg neutral" id="msg">Selecciona fichas y apuesta</div>
+    <button class="spin-btn" id="spinBtn" onclick="spin()">Girar Ruleta</button>
+    <button class="clear-btn" onclick="clearBets()">Limpiar apuestas</button>
+  </div>
+  <div class="right">
+    <div><div class="sec-t">Ficha activa</div><div class="chips">
+      <div class="chip c1 sel" data-v="1" onclick="selChip(1)">1</div>
+      <div class="chip c5" data-v="5" onclick="selChip(5)">5</div>
+      <div class="chip c10" data-v="10" onclick="selChip(10)">10</div>
+      <div class="chip c25" data-v="25" onclick="selChip(25)">25</div>
+      <div class="chip c100" data-v="100" onclick="selChip(100)">100</div>
+    </div></div>
+    <div><div class="sec-t">Apuestas externas</div>
+    <div class="felt-table">
+      <div class="felt-row">
+        <button class="fb red-btn" onclick="bet('rojo')">🔴 Rojo</button>
+        <button class="fb blk-btn" onclick="bet('negro')">⚫ Negro</button>
+        <button class="fb" onclick="bet('par')">Par</button>
+        <button class="fb" onclick="bet('impar')">Impar</button>
+      </div>
+      <div class="felt-row">
+        <button class="fb" onclick="bet('bajo')">1–18</button>
+        <button class="fb" onclick="bet('alto')">19–36</button>
+        <button class="fb" onclick="bet('doc1')">1ª Doc.</button>
+        <button class="fb" onclick="bet('doc2')">2ª Doc.</button>
+        <button class="fb" onclick="bet('doc3')">3ª Doc.</button>
+      </div>
+      <div class="felt-row">
+        <button class="fb" onclick="bet('col1')">Col 1</button>
+        <button class="fb" onclick="bet('col2')">Col 2</button>
+        <button class="fb" onclick="bet('col3')">Col 3</button>
+      </div>
+    </div></div>
+    <div><div class="sec-t">Pleno — 35:1</div>
+    <div class="num-wrap"><div class="zero-c" id="nc_0" onclick="bet('num_0')">0</div><div class="num-grid" id="ngrid"></div></div></div>
+    <div><div class="sec-t">Apuestas pendientes</div><div class="pb-list" id="pblist"><span style="color:rgba(255,255,255,.2);font-size:11px">Sin apuestas</span></div></div>
+  </div>
+</div>
+
+<script>
+const RED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+const WO=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+let balance=500,chip=1,bets={},spinning=false,spins=0;
+
+(function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)balance=c;}catch(e){}})();
+// Grid
+(()=>{const g=document.getElementById('ngrid');for(let n=1;n<=36;n++){const d=document.createElement('div');d.className='nc '+(RED.includes(n)?'is-red':'is-blk');d.textContent=n;d.id='nc_'+n;d.onclick=()=>bet('num_'+n);g.appendChild(d);}})();
+function drawWheel(a){const c=document.getElementById('wc'),ctx=c.getContext('2d'),cx=97.5,cy=97.5,r=94,n=WO.length,sl=(2*Math.PI)/n,rad=a*Math.PI/180;ctx.clearRect(0,0,195,195);ctx.beginPath();ctx.arc(cx,cy,r+1,0,2*Math.PI);ctx.fillStyle='#8A6A1E';ctx.fill();for(let i=0;i<n;i++){const num=WO[i],s=rad+i*sl,e=s+sl;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.fillStyle=num===0?'#1B7A40':RED.includes(num)?'#8B1A1A':'#111';ctx.fill();ctx.strokeStyle='#C9A84C';ctx.lineWidth=0.6;ctx.stroke();ctx.save();ctx.translate(cx,cy);ctx.rotate(s+sl/2);ctx.translate(r*0.72,0);ctx.rotate(Math.PI/2);ctx.fillStyle='#F0E6D3';ctx.font='bold 8px sans-serif';ctx.textAlign='center';ctx.fillText(num,0,3);ctx.restore();}ctx.beginPath();ctx.arc(cx,cy,8,0,2*Math.PI);ctx.fillStyle='#C9A84C';ctx.fill();}
+drawWheel(0);
+function selChip(v){chip=v;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',+c.dataset.v===v));}
+const LABELS={rojo:'Rojo',negro:'Negro',par:'Par',impar:'Impar',bajo:'1-18',alto:'19-36',doc1:'1ª Docena',doc2:'2ª Docena',doc3:'3ª Docena',col1:'Col 1',col2:'Col 2',col3:'Col 3'};
+function betLabel(k){return LABELS[k]||(k.startsWith('num_')?'Pleno '+k.slice(4):k);}
+function bet(t){if(spinning)return;if(balance<chip){setMsg('Sin saldo','lose');return;}bets[t]=(bets[t]||0)+chip;balance-=chip;updateUI();}
+function clearBets(){if(spinning)return;const tot=Object.values(bets).reduce((a,b)=>a+b,0);balance+=tot;bets={};updateUI();}
+function calcWin(r,bets){let w=0;for(const[k,amt] of Object.entries(bets)){let p=0;if(k==='rojo'&&RED.includes(r)&&r!==0)p=amt*2;else if(k==='negro'&&!RED.includes(r)&&r!==0)p=amt*2;else if(k==='par'&&r!==0&&r%2===0)p=amt*2;else if(k==='impar'&&r%2===1)p=amt*2;else if(k==='bajo'&&r>=1&&r<=18)p=amt*2;else if(k==='alto'&&r>=19&&r<=36)p=amt*2;else if(k==='doc1'&&r>=1&&r<=12)p=amt*3;else if(k==='doc2'&&r>=13&&r<=24)p=amt*3;else if(k==='doc3'&&r>=25&&r<=36)p=amt*3;else if(k==='col1'&&r!==0&&r%3===1)p=amt*3;else if(k==='col2'&&r!==0&&r%3===2)p=amt*3;else if(k==='col3'&&r!==0&&r%3===0)p=amt*3;else if(k==='num_'+r)p=amt*36;w+=p;}return w;}
+function setMsg(t,c){const m=document.getElementById('msg');m.textContent=t;m.className='msg '+c;}
+function updateUI(){document.getElementById('saldo').textContent=balance.toLocaleString('es-ES');const tot=Object.values(bets).reduce((a,b)=>a+b,0);document.getElementById('apostado').textContent=tot;document.getElementById('tiradas').textContent=spins;const pb=document.getElementById('pblist');pb.innerHTML=Object.keys(bets).length===0?'<span style="color:rgba(255,255,255,.2);font-size:11px">Sin apuestas</span>':Object.entries(bets).map(([k,v])=>`<div class="pb-row"><span>${betLabel(k)}</span><span>${v}</span></div>`).join('');try{window.parent.postMessage({type:'credits',value:balance},'*');}catch(e){}}
+function spin(){if(spinning)return;const tot=Object.values(bets).reduce((a,b)=>a+b,0);if(tot===0){setMsg('Haz al menos una apuesta','neutral');return;}spinning=true;document.getElementById('spinBtn').disabled=true;document.getElementById('rnum').textContent='...';document.getElementById('rnum').style.color='var(--text-muted)';document.getElementById('rdesc').textContent='Girando...';const ri=Math.floor(Math.random()*37),result=WO[ri],totalRot=1800+ri*(360/37),dur=4000,st=performance.now();const anim=now=>{const el=now-st,t=Math.min(el/dur,1),ease=t<1?1-Math.pow(1-t,4):1;drawWheel((ease*totalRot)%360);if(t<1)requestAnimationFrame(anim);else finishSpin(result);};requestAnimationFrame(anim);}
+function finishSpin(result){spinning=false;spins++;const win=calcWin(result,bets),lost=Object.values(bets).reduce((a,b)=>a+b,0);bets={};balance+=win;const rn=document.getElementById('rnum'),rd=document.getElementById('rdesc');rn.textContent=result;rn.style.color=result===0?'#2ecc71':RED.includes(result)?'#E74C3C':'var(--text)';let desc=result===0?'Verde':(RED.includes(result)?'Rojo':'Negro')+(result%2===0?' · Par':' · Impar');rd.textContent=desc;win>0?setMsg(`¡Ganaste ${win} créditos!`,'win'):setMsg(`Perdiste ${lost} créditos`,'lose');if(balance===0){setMsg('Recargando saldo...','neutral');setTimeout(()=>{balance=500;updateUI();setMsg('¡Buena suerte!','neutral');},1500);}updateUI();document.getElementById('spinBtn').disabled=false;}
+updateUI();
+</script>
+</body>
+</html>

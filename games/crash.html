@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>AVIATOR LUCKIA PRO MULTIPLAYER</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  
+  .game-layout { display: flex; flex-direction: column; flex: 1; height: 100%; }
+
+  /* ARENA DE VUELO (SUPERIOR) */
+  .flight-zone { flex: 1; background: #06060c; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 48%; border-bottom: 2px solid rgba(255,255,255,0.01); }
+  .bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px); background-size: 50px 50px; background-position: center; pointer-events: none; }
+  .bg-glow { position: absolute; width: 650px; height: 650px; background: radial-gradient(circle, rgba(225,29,72,0.05) 0%, transparent 70%); bottom: -200px; left: -50px; pointer-events: none; }
+
+  /* PANTALLAS CENTRALES DE ESTADO (MULTIPLICADOR / CUENTA ATRÁS) */
+  .multiplier-counter { font-family: 'Orbitron'; font-size: 80px; font-weight: 900; color: #FFF; text-shadow: 0 0 30px rgba(255,255,255,0.1); z-index: 5; position: relative; user-select: none; transition: color 0.1s; text-align: center; }
+  .timer-box { font-family: 'Orbitron'; font-size: 26px; font-weight: 700; color: #00FF99; text-shadow: 0 0 20px rgba(0,255,153,0.3); z-index: 5; position: relative; text-align: center; background: rgba(0,0,0,0.4); padding: 12px 30px; border-radius: 30px; border: 1px solid rgba(0,255,153,0.15); display: none; }
+
+  /* COMPONENTES GRÁFICOS */
+  .game-canvas-area { position: absolute; inset: 0; pointer-events: none; }
+  .plane-wrapper { position: absolute; bottom: 15%; left: 15%; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; z-index: 6; opacity: 0; }
+  .plane-img { font-size: 58px; transform: rotate(45deg); filter: drop-shadow(0 0 25px #E11D48); animation: jetShake 0.05s infinite alternate linear; }
+  @keyframes jetShake { from { transform: rotate(43deg) translateY(0); } to { transform: rotate(47deg) translateY(-1px); } }
+  
+  svg.line-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; }
+  path.mountain-fill { fill: url(#mountainGradient); opacity: 0.25; }
+  path.flight-path { fill: none; stroke: #E11D48; stroke-width: 5; stroke-linecap: round; }
+
+  /* HISTORIAL SUPERIOR */
+  .history-line { position: absolute; top: 15px; left: 15px; display: flex; gap: 6px; z-index: 10; }
+  .hist-badge { background: #11111f; padding: 4px 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 700; color: #94a3b8; border: 1px solid rgba(255,255,255,0.04); }
+
+  /* ZONA INFERIOR SCROLLABLE CON PANELES */
+  .betting-container-scroll { flex: 1; max-height: 52%; background: #0f0f1c; border-top: 1px solid rgba(255,255,255,0.02); overflow-y: auto; padding: 15px; }
+  .dock-header { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto 12px auto; padding: 0 5px; }
+  .dock-title { font-family: 'Orbitron'; font-size: 12px; color: #64748b; letter-spacing: 1px; font-weight: 700; }
+  
+  .action-panel-btn { background: #171727; border: 1px solid rgba(255,255,255,0.08); color: #00FF99; font-family: 'Orbitron'; font-weight: 900; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; transition: 0.2s; }
+  .action-panel-btn:hover { background: #222235; border-color: #00FF99; }
+  .action-panel-btn.remove-btn { color: #ef4444; margin-right: 6px; }
+  .action-panel-btn.remove-btn:hover { border-color: #ef4444; }
+
+  .betting-dock { display: grid; grid-template-columns: repeat(auto-fill, minmax(430px, 1fr)); gap: 15px; justify-content: center; max-width: 1600px; margin: 0 auto; }
+  
+  /* CONTENEDOR INDEPENDIENTE DEL PANEL DE CONTROL */
+  .bet-box { background: #171727; border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: center; transition: all 0.2s; }
+  .bet-left-side { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  
+  .input-wrapper { position: relative; display: flex; width: 100%; align-items: center; }
+  .input-wrapper input { background: #0f0f1c; border: 1px solid rgba(255,255,255,0.06); padding: 10px; border-radius: 6px; color: #fff; font-size: 16px; font-family: 'Orbitron'; outline: none; text-align: center; width: 100%; font-weight: 700; padding-right: 35px; }
+  .clear-value-btn { position: absolute; right: 10px; color: #64748b; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; font-size: 12px; }
+  .clear-value-btn:hover { color: #ef4444; }
+
+  /* FILA DE AUTO-CASHOUT ESTILO LUCKIA */
+  .auto-row { display: flex; align-items: center; gap: 8px; background: #0f0f1c; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.02); }
+  .auto-row label { font-family: 'Orbitron'; font-size: 11px; color: #94a3b8; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .auto-row input[type="checkbox"] { transform: scale(1.15); accent-color: #E11D48; cursor: pointer; }
+  .auto-row input[type="number"] { background: #171727; border: 1px solid rgba(255,255,255,0.08); width: 75px; color: #fff; padding: 3px 5px; border-radius: 4px; text-align: center; font-family: 'Orbitron'; font-size: 12px; outline: none; font-weight: bold; }
+  .auto-row input[type="number"]:focus { border-color: #E11D48; }
+
+  /* FICHAS */
+  .chips-row { display: flex; gap: 6px; width: 100%; justify-content: space-between; }
+  .chip-item { width: 38px; height: 38px; border-radius: 50%; border: 3px dashed rgba(255,255,255,0.25); background: #222235; color: #fff; font-family: 'Orbitron'; font-size: 10px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; }
+  .chip-10 { background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%); border-color: #93c5fd; }
+  .chip-25 { background: radial-gradient(circle, #22c55e 0%, #15803d 100%); border-color: #86efac; }
+  .chip-50 { background: radial-gradient(circle, #a855f7 0%, #6b21a8 100%); border-color: #d8b4fe; }
+  .chip-100 { background: radial-gradient(circle, #eab308 0%, #a16207 100%); border-color: #fef08a; color: #000; }
+  .chip-item:hover { transform: scale(1.1) rotate(10deg); filter: brightness(1.15); }
+
+  /* BOTÓN CONTROL JUEGO */
+  .btn-control { font-family: 'Orbitron'; font-weight: 900; height: 95px; width: 130px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; letter-spacing: 0.5px; transition: 0.2s; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
+  .btn-state-bet { background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); color: #fff; box-shadow: 0 4px 12px rgba(34,197,94,0.15); }
+  .btn-state-bet:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-state-waiting { background: #222235; color: #e2e8f0; border: 1px solid #00FF99; cursor: not-allowed; }
+  .btn-state-cashout { background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%); color: #000; box-shadow: 0 4px 12px rgba(251,191,36,0.25); }
+  .btn-state-cashout:hover { filter: brightness(1.1); }
+  .btn-control span.subtext { font-size: 9px; font-weight: bold; opacity: 0.8; margin-top: 3px; }
+</style>
+</head>
+<body>
+
+  <div class="game-layout">
+    
+    <div class="flight-zone">
+      <div class="bg-grid" id="skyGrid"></div>
+      <div class="bg-glow"></div>
+      
+      <div class="history-line" id="crashHistory">
+        <div class="hist-badge" style="color:#3b82f6">2.40x</div>
+        <div class="hist-badge" style="color:#f43f5e">1.12x</div>
+        <div class="hist-badge" style="color:#c084fc">15.60x</div>
+      </div>
+      
+      <div class="multiplier-counter" id="multDisplay">1.00x</div>
+      <div class="timer-box" id="lobbyTimer">SIGUIENTE VUELO EN: 15.0s</div>
+      
+      <div class="game-canvas-area">
+        <svg class="line-container">
+          <defs>
+            <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="rgba(225,29,72,0.58)" />
+              <stop offset="100%" stop-color="rgba(225,29,72,0.0)" />
+            </linearGradient>
+          </defs>
+          <path id="svgFillPath" class="mountain-fill" d="M 0 0" />
+          <path id="svgLinePath" class="flight-path" d="M 0 0" />
+        </svg>
+        
+        <div class="plane-wrapper" id="planeNode">
+          <div class="plane-img">✈️</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="betting-container-scroll">
+      
+      <div class="dock-header">
+        <div class="dock-title">SALA DE APUESTAS MULTI-PANEL ONLINE (MÁX 8)</div>
+        <div>
+          <button class="action-panel-btn remove-btn" onclick="removeLastPanel()">− QUITAR</button>
+          <button class="action-panel-btn" onclick="addNewPanel()">+ AÑADIR PANEL</button>
+        </div>
+      </div>
+
+      <div class="betting-dock" id="bettingDockContainer">
+        </div>
+
+    </div>
+
+  </div>
+
+<script>
+  let currentMult = 1.00;
+  let crashPoint = 0;
+  let loopInterval = null;
+  let countdownInterval = null;
+  let isFlying = false;
+  let panelCounter = 0;
+  const MAX_PANELS = 8;
+
+  let startX, startY;
+  let bets = {};
+
+  function initPositions() {
+    const zone = document.querySelector('.flight-zone');
+    startX = zone.clientWidth * 0.12;
+    startY = zone.clientHeight * 0.82;
+    resetPlaneVisuals();
+  }
+
+  function resetPlaneVisuals() {
+    const p = document.getElementById('planeNode');
+    if (!p) return;
+    p.style.left = startX + 'px';
+    p.style.top = startY + 'px';
+    p.style.transform = 'translate(-50%, -50%)';
+    p.style.opacity = isFlying ? '1' : '0';
+    
+    document.getElementById('svgLinePath').setAttribute('d', `M ${startX} ${startY}`);
+    document.getElementById('svgFillPath').setAttribute('d', `M ${startX} ${startY} L ${startX} ${startY} Z`);
+    document.getElementById('skyGrid').style.backgroundPosition = "0px 0px";
+  }
+
+  // Creación dinámica de un nuevo panel idéntico a Luckia
+  function addNewPanel() {
+    if (panelCounter >= MAX_PANELS) return;
+    panelCounter++;
+    const id = panelCounter;
+    
+    bets[id] = { status: 'idle', amount: 0, autoCashoutActive: false, autoValue: 2.00 };
+
+    const dock = document.getElementById('bettingDockContainer');
+    const box = document.createElement('div');
+    box.className = 'bet-box';
+    box.id = `box${id}`;
+    box.innerHTML = `
+      <div class="bet-left-side">
+        <div class="input-wrapper">
+          <input type="number" id="betAmount${id}" value="0" min="0">
+          <span class="clear-value-btn" onclick="clearInputField(${id})">C</span>
+        </div>
+        <div class="chips-row">
+          <div class="chip-item chip-10" onclick="accumulateChip(${id}, 10)">10</div>
+          <div class="chip-item chip-25" onclick="accumulateChip(${id}, 25)">25</div>
+          <div class="chip-item chip-50" onclick="accumulateChip(${id}, 50)">50</div>
+          <div class="chip-item chip-100" onclick="accumulateChip(${id}, 100)">100</div>
+        </div>
+        <div class="auto-row">
+          <label>
+            <input type="checkbox" id="autoCheck${id}" onchange="toggleAutoCashout(${id})"> AUTO CASH
+          </label>
+          <input type="number" id="autoVal${id}" value="2.00" step="0.1" min="1.1" onchange="updateAutoValue(${id})">
+          <span style="font-size:11px; color:#64748b; font-weight:bold;">x</span>
+        </div>
+      </div>
+      <button class="btn-control btn-state-bet" id="btnBet${id}" onclick="handleBetClick(${id})">
+        APRESTAR
+        <span class="subtext" id="subBet${id}">Mete Fichas</span>
+      </button>
+    `;
+    dock.appendChild(box);
+    
+    // Si el cohete está volando, el nuevo panel recién creado nace bloqueado estéticamente en espera
+    if (isFlying) {
+      updatePanelUI(id, 'waiting-flight', 'EN CURSO', 'Espera el cierre');
+    }
+  }
+
+  function removeLastPanel() {
+    if (panelCounter <= 1) return;
+    const lastBox = document.getElementById(`box${panelCounter}`);
+    if (lastBox) {
+      lastBox.remove();
+      delete bets[panelCounter];
+      panelCounter--;
+    }
+  }
+
+  function accumulateChip(panelId, value) {
+    if (bets[panelId].status !== 'idle') return; // Bloqueado si ya apostó o vuela
+    const input = document.getElementById(`betAmount${panelId}`);
+    input.value = (parseInt(input.value) || 0) + value;
+  }
+
+  function clearInputField(panelId) {
+    if (bets[panelId].status !== 'idle') return;
+    document.getElementById(`betAmount${panelId}`).value = 0;
+  }
+
+  function toggleAutoCashout(id) {
+    bets[id].autoCashoutActive = document.getElementById(`autoCheck${id}`).checked;
+  }
+
+  function updateAutoValue(id) {
+    let val = parseFloat(document.getElementById(`autoVal${id}`).value);
+    if(isNaN(val) || val < 1.05) val = 1.05;
+    bets[id].autoValue = val;
+  }
+
+  // ACCIÓN DEL BOTÓN PRINCIPAL DEL PANEL
+  function handleBetClick(id) {
+    const b = bets[id];
+    const amountInput = document.getElementById(`betAmount${id}`);
+
+    // Si está en el lobby libre (esperando cuenta atrás) y pulsa apostar
+    if (b.status === 'idle' && !isFlying) {
+      let val = parseInt(amountInput.value);
+      if (isNaN(val) || val <= 0) { alert("Suma fichas primero bro"); return; }
+      
+      b.status = 'ready';
+      b.amount = val;
+
+      updatePanelUI(id, 'ready', 'REGISTRADO', `APUESTA: ${val}`);
+      
+      // Cobrar inmediatamente el saldo al lobby para asegurar juego limpio antes de despegar
+      window.parent.postMessage({ type: "GAME_OVER", game: "crash", win: false, bet: val, profit: -val }, "*");
+    } 
+    // Si el avión está volando y pulsa cobrar de forma manual
+    else if (b.status === 'flying' && isFlying) {
+      collectPanelReward(id);
+    }
+  }
+
+  function collectPanelReward(id) {
+    const b = bets[id];
+    b.status = 'collected';
+    
+    let won = Math.floor(b.amount * currentMult);
+    updatePanelUI(id, 'collected', '¡COBRADO!', `+${won} FICHAS`);
+
+    // Enviar saldo ganado neto al lobby principal
+    window.parent.postMessage({ type: "GAME_OVER", game: "crash", win: true, bet: b.amount, profit: won }, "*");
+  }
+
+  function updatePanelUI(id, state, mainText, subText) {
+    const btn = document.getElementById(`btnBet${id}`);
+    const sub = document.getElementById(`subBet${id}`);
+    if (!btn || !sub) return;
+
+    if (state === 'idle') {
+      btn.className = "btn-control btn-state-bet";
+      btn.innerText = mainText;
+      sub.innerText = subText;
+    } else if (state === 'ready') {
+      btn.className = "btn-control btn-state-waiting";
+      btn.innerText = mainText;
+      sub.innerText = subText;
+    } else if (state === 'flying') {
+      btn.className = "btn-control btn-state-cashout";
+      btn.innerText = mainText;
+      sub.innerText = subText;
+    } else if (state === 'collected' || state === 'waiting-flight') {
+      btn.className = "btn-control btn-state-waiting";
+      btn.innerText = mainText;
+      sub.innerText = subText;
+    }
+    btn.appendChild(sub);
+  }
+
+  // --- ARRANQUE AUTOMÁTICO DE CUENTA ATRÁS GLOBAL MULTIJUGADOR ---
+  function startLobbyCountdown() {
+    isFlying = false;
+    clearInterval(loopInterval);
+    
+    document.getElementById('multDisplay').style.display = 'none';
+    const timerBox = document.getElementById('lobbyTimer');
+    timerBox.style.display = 'block';
+    
+    let timeLeft = 15.0;
+    timerBox.innerText = `SIGUIENTE VUELO EN: ${timeLeft.toFixed(1)}s`;
+
+    resetPlaneVisuals();
+
+    countdownInterval = setInterval(() => {
+      timeLeft -= 0.1;
+      if (timeLeft <= 0) {
+        clearInterval(countdownInterval);
+        timerBox.style.display = 'none';
+        launchGlobalFlightEvent();
+      } else {
+        timerBox.innerText = `SIGUIENTE VUELO EN: ${timeLeft.toFixed(1)}s`;
+      }
+    }, 100);
+  }
+
+  // --- DISPARO DEL VUELO DE FORMA SÍNCRONA ---
+  function launchGlobalFlightEvent() {
+    isFlying = true;
+    currentMult = 1.00;
+
+    // Configuración del crash aleatorio real
+    if (Math.random() < 0.08) {
+      crashPoint = 1.00;
+    } else {
+      let rand = Math.random();
+      if (rand > 0.94) crashPoint = parseFloat((25 + Math.random() * 95).toFixed(2));
+      else if (rand > 0.65) crashPoint = parseFloat((4 + Math.random() * 21).toFixed(2));
+      else crashPoint = parseFloat((1.02 + Math.random() * 3).toFixed(2));
+    }
+
+    const display = document.getElementById('multDisplay');
+    display.style.display = 'block';
+    display.style.color = '#FFF';
+    display.innerText = "1.00x";
+
+    initPositions();
+
+    // Actualizar estados de cada panel registrado
+    for (let id in bets) {
+      if (bets[id].status === 'ready') {
+        bets[id].status = 'flying';
+        updatePanelUI(id, 'flying', 'COBRAR', `+${bets[id].amount} FICHAS`);
+      } else {
+        bets[id].status = 'spectator';
+        updatePanelUI(id, 'waiting-flight', 'EN CURSO', 'Vuelo en progreso');
+      }
+    }
+
+    // VELOCIDAD LUCKIA INSTANTÁNEA (Refresco a 30ms con turbos exponenciales)
+    loopInterval = setInterval(() => {
+      let tickIncr = 0.012; // Salida rápida directa
+      if (currentMult >= 2.00)  tickIncr = 0.025;
+      if (currentMult >= 5.00)  tickIncr = 0.058; 
+      if (currentMult >= 15.00) tickIncr = 0.135;
+      if (currentMult >= 40.00) tickIncr = 0.310;
+      
+      currentMult += tickIncr;
+      display.innerText = currentMult.toFixed(2) + "x";
+
+      // COLORES SEGÚN MULTIPLICADOR
+      if (currentMult >= 50.00) display.style.color = '#ca8a04'; 
+      else if (currentMult >= 10.00) display.style.color = '#c084fc'; 
+      else if (currentMult >= 2.00) display.style.color = '#38bdf8'; 
+
+      // CONTROL DE RECOMPENSAS EN VIVO Y COMPROBACIÓN DE AUTO CASHOUT
+      for (let id in bets) {
+        if (bets[id].status === 'flying') {
+          // 1. Validar si activa Auto Cashout y superó el umbral
+          if (bets[id].autoCashoutActive && currentMult >= bets[id].autoValue) {
+            collectPanelReward(id);
+            continue;
+          }
+          // 2. Si no, refrescar texto en vivo ordinario
+          const sub = document.getElementById(`subBet${id}`);
+          if (sub) sub.innerText = `+${Math.floor(bets[id].amount * currentMult)} FICHAS`;
+        }
+      }
+
+      // ANIMACIÓN GRÁFICA DEL VUELO
+      const zone = document.querySelector('.flight-zone');
+      let maxDeltaX = zone.clientWidth * 0.68;
+      let maxDeltaY = zone.clientHeight * 0.62;
+      
+      let progress = Math.min((currentMult - 1) / 7, 1); 
+      let curX = startX + (progress * maxDeltaX);
+      let curY = startY - (progress * maxDeltaY);
+
+      if (currentMult > 6) {
+        let gridScroll = (currentMult * 18) % 50;
+        document.getElementById('skyGrid').style.backgroundPosition = `-${gridScroll}px ${gridScroll}px`;
+        curX += Math.sin(currentMult * 3) * 2;
+        curY += Math.cos(currentMult * 3) * 2;
+      } else {
+        curY += Math.sin(currentMult * 4) * 2;
+      }
+
+      const p = document.getElementById('planeNode');
+      if (p) {
+        p.style.left = curX + 'px';
+        p.style.top = curY + 'px';
+      }
+
+      document.getElementById('svgLinePath').setAttribute('d', `M ${startX} ${startY} Q ${(startX+curX)/2} ${startY} ${curX} ${curY}`);
+      document.getElementById('svgFillPath').setAttribute('d', `M ${startX} ${startY} Q ${(startX+curX)/2} ${startY} ${curX} ${curY} L ${curX} ${startY} Z`);
+
+      // GOLPE DE IMPACTO DE CRASH
+      if (currentMult >= crashPoint) {
+        triggerGlobalCrash();
+      }
+    }, 30);
+  }
+
+  function triggerGlobalCrash() {
+    clearInterval(loopInterval);
+    isFlying = false;
+
+    const display = document.getElementById('multDisplay');
+    display.style.color = '#ef4444';
+    display.innerText = "💥 CRASH @ " + currentMult.toFixed(2) + "x";
+    
+    const p = document.getElementById('planeNode');
+    if (p) p.style.opacity = '0';
+
+    // Guardar en marcadores históricos superiores
+    const hist = document.getElementById('crashHistory');
+    let badge = document.createElement('div');
+    badge.className = 'hist-badge';
+    badge.style.color = currentMult > 10.0 ? '#c084fc' : (currentMult > 2 ? '#38bdf8' : '#ef4444');
+    badge.innerText = currentMult.toFixed(2) + "x";
+    hist.insertBefore(badge, hist.firstChild);
+    if (hist.children.length > 6) hist.removeChild(hist.lastChild);
+
+    // Limpiar estados e inicializar cuenta atrás de inmediato
+    setTimeout(() => {
+      resetAllPanelsToLobbyState();
+      startLobbyCountdown();
+    }, 1800);
+  }
+
+  function resetAllPanelsToLobbyState() {
+    for (let id in bets) {
+      bets[id].status = 'idle';
+      bets[id].amount = 0;
+      updatePanelUI(id, 'idle', 'APRESTAR', 'Mete Fichas');
+    }
+  }
+
+  window.onresize = initPositions;
+  window.onload = () => {
+    addNewPanel(); // Forzar primer panel inicial obligatoriamente
+    initPositions();
+    startLobbyCountdown(); // El reloj dinámico multijugador empieza a correr solo
+  };
+</script>
+</body>
+</html>
