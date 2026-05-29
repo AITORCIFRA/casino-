@@ -7,7 +7,100 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#C9A84C;--green:#00FF88;--red:#FF3366;--bg:#050a0f;--felt:#0d2318;--font-d:'Bebas Neue',sans-serif;--font-u:'Orbitron',sans-serif;--font-b:'Rajdhani',sans-serif}
-body{background:radial-gradient(ellipse at 50% 0%,#0a1f14,var(--bg));color:#fff;font-family:var(--font-b);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem;overflow:hidden}
+body{background:radial-gradient(ellipse at 50% 0%,#0a1f14,var(--bg));color:#fff;font-family:var(--font-b);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem;overflow:hidden;transition:box-shadow 0.2s ease}
+
+/* EFECTO BORDE ROJO PARPADEANTE (PANTALLA CRÍTICA DE CASINO) */
+body.insufficient-funds-alert {
+  box-shadow: inset 0 0 60px #ef4444, inset 0 0 20px #ef4444;
+  animation: criticalScreenPulse 0.5s infinite alternate;
+}
+@keyframes criticalScreenPulse {
+  0% { box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.6); }
+  100% { box-shadow: inset 0 0 80px rgba(239, 68, 68, 1); }
+}
+
+/* CARTEL GIGANTE EN MEDIO DE LA PANTALLA */
+.global-error-overlay {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(239, 68, 68, 0.95);
+  color: #fff;
+  font-family: var(--font-u);
+  font-size: 24px;
+  font-weight: 900;
+  padding: 15px 35px;
+  border-radius: 8px;
+  box-shadow: 0 0 30px #ef4444;
+  z-index: 100;
+  letter-spacing: 2px;
+  display: none;
+  pointer-events: none;
+  animation: overlaySlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+@keyframes overlaySlideIn {
+  0% { transform: translate(-50%, -30%) scale(0.7); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* VENTANA MODAL FLOTANTE DE COMPRA DE FICHAS PREMIUM */
+.shop-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.shop-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.shop-content {
+  background: #121f18;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
+  border-radius: 16px;
+  width: 380px;
+  padding: 25px;
+  text-align: center;
+  position: relative;
+  font-family: var(--font-u);
+}
+.shop-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.shop-close-btn:hover { color: var(--red); }
+.shop-title { color: var(--gold); font-size: 20px; margin-bottom: 20px; font-weight: 900; letter-spacing: 1px; }
+.shop-option {
+  background: #09120e;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.shop-option:hover { border-color: var(--green); background: #0c1a14; transform: scale(1.02); }
+.shop-pack-name { font-weight: bold; font-family: var(--font-b); font-size: 18px; color: #fff; }
+.shop-pack-price { color: var(--green); font-weight: 900; }
+
 h1{font-family:var(--font-d);font-size:2.5rem;letter-spacing:.2em;background:linear-gradient(90deg,var(--gold),#FFE080);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.75rem}
 .stats{display:flex;gap:2rem;font-family:var(--font-u);font-size:10px;margin-bottom:1rem}
 .stat{text-align:center}.sl{font-size:8px;letter-spacing:.15em;color:rgba(255,255,255,.4)}.sv{font-size:1.2rem}
@@ -51,15 +144,41 @@ h1{font-family:var(--font-d);font-size:2.5rem;letter-spacing:.2em;background:lin
 .bet-chip{width:40px;height:40px;border-radius:50%;border:2.5px solid;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .bet-chip:hover{transform:scale(1.1)}
 </style>
+
+<script src="../js/wallet.js"></script>
+
 </head>
 <body>
+
+<div class="global-error-overlay" id="globalErrorOverlayNode">CRÉDITOS INSUFICIENTES</div>
+
+<div class="shop-modal" id="shopModalNode">
+  <div class="shop-content">
+    <button class="shop-close-btn" onclick="closeShopModal()">✕</button>
+    <div class="shop-title">RECARGA DE CRÉDITOS</div>
+    
+    <div class="shop-option" onclick="buyCredits(5000)">
+      <span class="shop-pack-name">Bronce Pack (+5.000)</span>
+      <span class="shop-pack-price">5.00 €</span>
+    </div>
+    <div class="shop-option" onclick="buyCredits(20000)">
+      <span class="shop-pack-name">Plata Pack (+20.000)</span>
+      <span class="shop-pack-price">15.00 €</span>
+    </div>
+    <div class="shop-option" onclick="buyCredits(100000)">
+      <span class="shop-pack-name">Oro Pack (+100.000)</span>
+      <span class="shop-pack-price">50.00 €</span>
+    </div>
+  </div>
+</div>
+
 <h1>BLACKJACK</h1>
 <div class="stats">
-  <div class="stat"><div class="sl">CRÉDITOS</div><div class="sv cval" id="cred">500</div></div>
+  <div class="stat"><div class="sl">CRÉDITOS</div><div class="sv cval" id="cred">0</div></div>
   <div class="stat"><div class="sl">APUESTA</div><div class="sv bval" id="betD">0</div></div>
 </div>
 
-<div class="msg" id="msg">Selecciona tu apuesta</div>
+<div class="msg" id="msg">Cargando monedero central...</div>
 
 <div class="bet-row" id="betRow">
   <div class="bet-chip" style="background:radial-gradient(circle,#E74C3C,#922B21);border-color:#641E16;color:#fff" onclick="addBet(5)">5</div>
@@ -84,18 +203,55 @@ h1{font-family:var(--font-d);font-size:2.5rem;letter-spacing:.2em;background:lin
 </div>
 
 <div class="controls" id="ctrlRow">
-  <button class="btn btn-deal" id="dealBtn" onclick="deal()">REPARTIR</button>
+  <button class="btn btn-deal" id="dealBtn" onclick="deal()" disabled>REPARTIR</button>
   <button class="btn btn-hit" id="hitBtn" onclick="hit()" disabled>CARTA</button>
   <button class="btn btn-stand" id="standBtn" onclick="stand()" disabled>PLANTARSE</button>
   <button class="btn btn-double" id="doubleBtn" onclick="doubleDown()" disabled>DOBLAR</button>
 </div>
 
 <script>
+let credits = 0;
+let bet = 0, phase = 'bet', deck = [], dealerCards = [], playerCards = [];
 const SUITS=['♠','♥','♦','♣'];
 const VALUES=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-let deck=[], dealerCards=[], playerCards=[], credits=500, bet=0, phase='bet';
 
-(function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)credits=c;}catch(e){}})();
+// Carga asíncrona del monedero centralizado al arrancar
+async function initWallet() {
+  credits = await WalletAPI.getBalance();
+  updateUI();
+  document.getElementById('dealBtn').disabled = false;
+  setMsg('Selecciona tu apuesta');
+}
+
+async function updateGlobalWallet(amount) {
+  if (amount === 0) return;
+  const res = await WalletAPI.transaccionar('blackjack', amount);
+  if (res.success) {
+    credits = res.saldo;
+    updateUI();
+  } else {
+    if (amount < 0) triggerInsufficientFundsAlert();
+  }
+}
+
+function triggerInsufficientFundsAlert() {
+  document.body.classList.add('insufficient-funds-alert');
+  document.getElementById('globalErrorOverlayNode').style.display = 'block';
+  
+  setTimeout(() => {
+    document.getElementById('globalErrorOverlayNode').style.display = 'none';
+    document.body.classList.remove('insufficient-funds-alert');
+  }, 2500);
+
+  openShopModal();
+}
+
+function openShopModal() { document.getElementById('shopModalNode').classList.add('active'); }
+function closeShopModal() { document.getElementById('shopModalNode').classList.remove('active'); }
+async function buyCredits(amount) { 
+  await updateGlobalWallet(amount); 
+  closeShopModal(); 
+}
 
 function buildDeck(){
   deck=[];
@@ -142,7 +298,10 @@ function renderHands(showDealer=false){
 
 function addBet(v){
   if(phase!=='bet') return;
-  if(credits-bet<v) return;
+  if(credits - bet < v) {
+    triggerInsufficientFundsAlert();
+    return;
+  }
   bet+=v;
   document.getElementById('betD').textContent=bet;
 }
@@ -164,24 +323,45 @@ function setButtons(dealing){
   document.getElementById('betRow').style.pointerEvents=dealing?'none':'auto';
 }
 
-function deal(){
+async function deal(){
+  if(phase!=='bet') return;
   if(bet===0){setMsg('Haz una apuesta primero','push');return;}
   if(deck.length<15) buildDeck();
-  credits-=bet;
+  
+  if(bet > credits) {
+    triggerInsufficientFundsAlert();
+    return;
+  }
+
+  // Bloquear interfaz inmediatamente antes del fetch para evitar clicks dobles
+  document.getElementById('dealBtn').disabled = true;
+  setMsg('Procesando apuesta en servidor...');
+
+  const res = await WalletAPI.transaccionar('blackjack', -bet);
+  if (!res.success) {
+    document.getElementById('dealBtn').disabled = false;
+    setMsg('Error al verificar saldo.');
+    triggerInsufficientFundsAlert();
+    return;
+  }
+
+  credits = res.saldo;
+  updateUI();
+
   phase='play';
   dealerCards=[{...deck.pop()},{...deck.pop(),hidden:true}];
   playerCards=[deck.pop(),deck.pop()];
   renderHands();
   setButtons(true);
   setMsg('Tu turno');
-  updateUI();
-  // Check player BJ
+  
   if(handScore(playerCards)===21){
     setTimeout(()=>stand(),600);
   }
 }
 
 function hit(){
+  if(phase!=='play') return;
   playerCards.push(deck.pop());
   renderHands();
   const ps=handScore(playerCards);
@@ -191,10 +371,15 @@ function hit(){
 }
 
 function stand(){
-  // Reveal dealer
+  if(phase!=='play') return;
+  phase='dealer_turn'; // Cambiar fase para proteger interacciones
+  document.getElementById('hitBtn').disabled = true;
+  document.getElementById('standBtn').disabled = true;
+  document.getElementById('doubleBtn').disabled = true;
+
   dealerCards = dealerCards.map(c=>({...c,hidden:false}));
   renderHands(true);
-  // Dealer draws to 17
+  
   const drawDealer=()=>{
     const ds=handScore(dealerCards);
     if(ds<17){
@@ -208,24 +393,49 @@ function stand(){
   setTimeout(drawDealer,500);
 }
 
-function doubleDown(){
-  if(credits<bet){setMsg('Sin créditos para doblar','push');return;}
-  credits-=bet; bet*=2;
+async function doubleDown(){
+  if(phase!=='play') return;
+  if(credits < bet){
+    triggerInsufficientFundsAlert();
+    return;
+  }
+
+  document.getElementById('hitBtn').disabled = true;
+  document.getElementById('standBtn').disabled = true;
+  document.getElementById('doubleBtn').disabled = true;
+
+  const res = await WalletAPI.transaccionar('blackjack', -bet);
+  if(!res.success) {
+    document.getElementById('hitBtn').disabled = false;
+    document.getElementById('standBtn').disabled = false;
+    triggerInsufficientFundsAlert();
+    return;
+  }
+
+  credits = res.saldo;
+  bet*=2;
   document.getElementById('betD').textContent=bet;
+  updateUI();
+
   playerCards.push(deck.pop());
   renderHands();
-  updateUI();
   const ps=handScore(playerCards);
-  if(ps>21) endRound('bust');
-  else setTimeout(()=>stand(),400);
+  if(ps>21) {
+    endRound('bust');
+  } else {
+    // Forzar el stand automático ya que se ha doblado la apuesta
+    phase='play'; 
+    setTimeout(()=>stand(),400);
+  }
 }
 
-function determineWinner(){
+async function determineWinner(){
   const ps=handScore(playerCards);
   const ds=handScore(dealerCards);
   const pBJ=ps===21&&playerCards.length===2;
   const dBJ=ds===21&&dealerCards.length===2;
   let result, winAmt=0;
+  
   if(pBJ&&!dBJ){ result='win'; winAmt=Math.floor(bet*2.5); }
   else if(dBJ&&!pBJ){ result='lose'; winAmt=0; }
   else if(ps>21){ result='bust'; winAmt=0; }
@@ -234,31 +444,37 @@ function determineWinner(){
   else if(ps===ds){ result='push'; winAmt=bet; }
   else { result='lose'; winAmt=0; }
 
-  credits+=winAmt;
+  if(winAmt > 0) {
+    setMsg('Pagando premio...');
+    const res = await WalletAPI.transaccionar('blackjack', winAmt);
+    if(res.success) {
+      credits = res.saldo;
+    }
+    updateUI();
+  }
+  
   if(result==='win') setMsg(pBJ?'🃏 BLACKJACK! +'+winAmt:'🎉 GANASTE! +'+winAmt,'win');
   else if(result==='push') setMsg('↔ EMPATE — Apuesta devuelta','push');
   else setMsg('✗ PERDISTE','lose');
 
   bet=0; document.getElementById('betD').textContent=0;
   phase='bet'; setButtons(false);
-  updateUI();
-  if(credits===0){setTimeout(()=>{credits=500;updateUI();setMsg('Saldo recargado','push');},2000);}
 }
 
-function endRound(reason){
+async function endRound(reason){
   setButtons(false);
   phase='bet';
   bet=0; document.getElementById('betD').textContent=0;
   if(reason==='bust') setMsg('✗ PASADA DE 21 — PERDISTE','lose');
-  updateUI();
-  if(credits===0){setTimeout(()=>{credits=500;updateUI();setMsg('Saldo recargado','push');},2000);}
 }
 
 function updateUI(){
-  document.getElementById('cred').textContent=credits.toLocaleString('es-ES');
+  document.getElementById('cred').textContent = credits.toLocaleString('es-ES');
   try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}
 }
-updateUI();
+
+// Inicialización asíncrona de saldo desde la base de datos central
+initWallet();
 </script>
 </body>
 </html>
