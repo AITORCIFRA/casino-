@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCADE PREMIUM — Cyber Casino Cloud 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  
+  const firebaseConfig = {
+    apiKey: "TU_API_KEY_AQUÍ",
+    authDomain: "TU_PROJECT_ID.firebaseapp.com",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_PROJECT_ID.appspot.com",
+    messagingSenderId: "TU_SENDER_ID",
+    appId: "TU_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+</script>
+
+<style>
+/* ==========================================================================
+   ESTILOS BASE DEL LOBBY INTERACTIVO ORIGINAL (COMPLETAMENTE INTACTOS)
+   ========================================================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+  font-family: 'Rajdhani', sans-serif; 
+  background: linear-gradient(-45deg, #050508, #120626, #091526, #020204);
+  background-size: 400% 400%;
+  animation: gradientBG 14s ease infinite;
+  color: #FFF; overflow: hidden; user-select: none;
+}
+@keyframes gradientBG { 0% { background-position:0% 50% } 50% { background-position:100% 50% } 100% { background-position:0% 50% } }
+
+.bg-glow { position: absolute; border-radius: 50%; filter: blur(140px); z-index: 0; opacity: 0.4; pointer-events: none; }
+.glow1 { width: 40vw; height: 40vw; background: rgba(0, 255, 153, 0.2); top: -10%; left: -5%; }
+.glow2 { width: 45vw; height: 45vw; background: rgba(168, 85, 247, 0.2); bottom: -10%; right: -5%; }
+
+/* Ventanas de Modales */
+.panel-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 7000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(20px); }
+.panel-modal.open { opacity: 1; pointer-events: auto; }
+.panel-container { background: #0a0a12; border: 2px solid rgba(255,255,255,0.1); border-radius: 24px; width: 95%; max-width: 1000px; padding: 35px; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+.panel-close { position: absolute; top: 15px; right: 25px; font-size: 35px; color: #666; cursor: pointer; transition: 0.2s; }
+.panel-close:hover { color: #FFF; }
+
+/* Pantalla de Entrada */
+#authScreen { position: fixed; inset: 0; z-index: 2000; background: rgba(3, 3, 6, 0.95); backdrop-filter: blur(25px); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#authScreen.hidden { opacity: 0; pointer-events: none; transition: 0.5s; }
+.auth-logo { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 9vw, 5.5rem); letter-spacing: .15em; text-shadow: 0 0 30px rgba(0, 255, 153, 0.3); }
+.auth-logo span:first-child { color: #fff; }
+.auth-logo span:last-child { color: #00FF99; }
+.auth-card { background: rgba(10,10,16,0.7); border: 1px solid rgba(0,255,153,0.2); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 1rem; }
+.auth-field input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: .8rem 1rem; font-family: 'Rajdhani'; color: #fff; font-size: 16px; width: 100%; outline: none; }
+.auth-field input:focus { border-color: #00FF99; }
+.auth-btn { width: 100%; padding: .9rem; font-family: 'Orbitron'; font-weight: 900; background: linear-gradient(90deg, #00FF99, #00BFFF); color: #000; border: none; border-radius: 8px; cursor: pointer; }
+
+/* Topbar Navegacion */
+#lobbyScreen { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; z-index: 1; }
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 35px; background: rgba(4, 4, 8, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); z-index: 100; }
+.user-profile-trigger { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); padding: 6px 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; }
+.user-profile-trigger:hover { border-color: #00FF99; box-shadow: 0 0 15px rgba(0,255,153,0.2); }
+.avatar-container { position: relative; width: 44px; height: 44px; }
+.user-avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #00FF99; background: #222; }
+.lvl-badge { position: absolute; bottom: -4px; right: -4px; background: #00BFFF; color: #000; font-family: 'Orbitron'; font-weight: 900; font-size: 9px; padding: 2px 5px; border-radius: 6px; }
+.nav-menu-center { display: flex; gap: 15px; }
+.menu-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; font-weight: 700; font-size: 11px; color: #ccc; cursor: pointer; }
+.menu-btn:hover { border-color: #00BFFF; color: #FFF; }
+.menu-btn.gold { background: linear-gradient(90deg, #FF9900, #FFCC00); border: none; color: #000; font-weight: 900; }
+
+/* Historial de Estadísticas */
+.modal-profile-header { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
+.big-avatar-wrapper { position: relative; width: 90px; height: 90px; cursor: pointer; }
+.xp-track { width: 100%; height: 12px; background: #222; border-radius: 6px; margin-top: 6px; overflow: hidden; }
+.xp-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00FF99, #00BFFF); }
+.stats-grid-box { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-height: 250px; overflow-y: auto; }
+.stat-card-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; }
+
+/* Pase de Batalla */
+.bp-layout-header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #111122 0%, #1a1a36 100%); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; margin-bottom: 20px; }
+.bp-headline h2 { font-family: 'Orbitron'; font-size: 26px; font-weight: 900; background: linear-gradient(90deg, #fff 0%, #a855f7 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+
+.vip-buy-card { background: linear-gradient(135deg, #ca8a04 0%, #eab308 50%, #854d0e 100%); padding: 15px 25px; border-radius: 12px; text-align: center; border: 2px solid #fef08a; min-width: 340px; }
+.vip-buy-btn { background: #000; color: #fff; font-family: 'Orbitron'; border: none; padding: 8px 16px; font-weight: 900; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+/* Selector de Niveles */
+.buy-level-zone { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); margin-top: 10px; }
+.level-input-qty { width: 60px; background: #05050a; border: 1px solid #a855f7; border-radius: 6px; padding: 5px; color: #fff; font-family: 'Orbitron'; font-weight: bold; text-align: center; outline: none; }
+.buy-level-btn { background: #00FF99; color: #000; font-family: 'Orbitron'; font-weight: 900; border: none; padding: 6px 14px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+.bp-grid-scroll-box { max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.bp-table-labels { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 12px; font-size: 11px; font-weight: bold; color: #475569; padding: 0 10px; }
+.bp-level-row { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 12px; background: #111120; border: 1px solid rgba(255,255,255,0.03); border-radius: 10px; padding: 8px; align-items: center; }
+.bp-level-row.unlocked-row { background: #14142a; border-color: rgba(168,85,247,0.15); }
+.bp-row-num { text-align: center; font-family: 'Orbitron'; font-weight: 900; font-size: 18px; color: #64748b; background: #090912; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; }
+.bp-level-row.unlocked-row .bp-row-num { color: #fff; background: linear-gradient(180deg, #a855f7 0%, #6b21a8 100%); }
+
+.reward-box { background: #16162d; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.04); min-height: 50px; }
+.reward-box.empty-slot { background: rgba(0,0,0,0.15); border: 1px dashed rgba(255,255,255,0.04); color: #475569; font-size: 12px; }
+.reward-box.vip-slot { background: linear-gradient(90deg, #1c1912 0%, #292211 100%); border-color: rgba(234,179,8,0.15); }
+.bp-level-row.unlocked-row .reward-box.vip-slot { border-color: rgba(234,179,8,0.4); background: linear-gradient(90deg, #28200d 0%, #3a2f12 100%); }
+.reward-meta { display: flex; flex-direction: column; }
+.reward-type { font-size: 10px; text-transform: uppercase; font-weight: 700; color: #94a3b8; }
+.reward-box.vip-slot .reward-type { color: #eab308; }
+.reward-name { font-family: 'Orbitron'; font-weight: bold; font-size: 12px; }
+
+.claim-btn { background: #3b82f6; border: none; color: white; padding: 5px 10px; font-family: 'Orbitron'; font-weight: bold; font-size: 10px; border-radius: 4px; cursor: pointer; }
+.claim-btn.claimed { background: #1e293b !important; color: #64748b !important; cursor: not-allowed; }
+.claim-btn.locked { background: #27273a; color: #475569; cursor: not-allowed; }
+
+/* Tienda */
+.shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+.shop-card-item { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 20px 10px; text-align: center; }
+
+/* CARRUSEL DE JUEGOS */
+.carousel-area { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; perspective: 1800px; overflow: hidden; z-index: 10; }
+.nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 200; background: rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.2); color: #FFF; width: 60px; height: 60px; border-radius: 50%; font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+.nav-arrow:hover { border-color: #00FF99; color: #00FF99; box-shadow: 0 0 25px rgba(0,255,153,0.5); }
+.nav-left { left: 4%; } .nav-right { right: 4%; }
+
+.game-card { position: absolute; width: 290px; height: 430px; background: rgba(10, 10, 18, 0.9); border: 2px solid rgba(255,255,255,0.06); border-radius: 24px; overflow: hidden; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; cursor: pointer; box-shadow: 0 20px 50px rgba(0,0,0,0.7); backdrop-filter: blur(10px); }
+.card-art { height: 190px; position: relative; display: flex; align-items: center; justify-content: center; background-size: cover !important; background-position: center !important; }
+.card-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, rgba(10,10,18,1)); }
+.card-icon { font-size: 3.8rem; position: relative; z-index: 2; filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); }
+.card-info { padding: 18px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+.card-title { font-family: 'Orbitron'; font-weight: 900; font-size: 20px; color: #FFF; }
+.card-sub { font-family: 'Rajdhani'; font-size: 13px; color: rgba(255,255,255,0.5); }
+.game-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron'; font-size: 9px; font-weight: 900; color: #FFF; margin-bottom: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); }
+.card-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.2); padding: 10px; font-family: 'Orbitron'; font-weight: 900; font-size: 11px; border-radius: 12px; pointer-events: none; }
+
+.game-card.active { transform: translateX(0) translateZ(160px) scale(1); opacity: 1; z-index: 15; border-color: var(--theme-color); box-shadow: 0 0 30px var(--theme-color); }
+.game-card.active .card-btn { background: var(--theme-color); color: #000; opacity: 1; pointer-events: auto; border-color: #FFF; box-shadow: 0 0 15px var(--theme-color); cursor: pointer; }
+.game-card.next { transform: translateX(105%) translateZ(-150px) rotateY(-25deg) scale(0.8); opacity: 0.6; z-index: 10; }
+.game-card.prev { transform: translateX(-105%) translateZ(-150px) rotateY(25deg) scale(0.8); opacity: 0.6; z-index: 10; }
+.game-card.next2 { transform: translateX(190%) translateZ(-350px) rotateY(-40deg) scale(0.65); opacity: 0.2; z-index: 5; }
+.game-card.prev2 { transform: translateX(-190%) translateZ(-350px) rotateY(40deg) scale(0.65); opacity: 0.2; z-index: 5; }
+.game-card.hidden-card { transform: translateX(0) translateZ(-600px) scale(0.4); opacity: 0; z-index: 1; pointer-events: none; }
+
+/* Contenedor Iframe */
+#gameContainer { position: fixed; inset: 0; z-index: 6000; background: #000; display: none; flex-direction: column; }
+.game-topbar { background: #07070d; padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.back-btn { background: #EF4444; color: #FFF; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; }
+#gameFrame { width: 100%; flex: 1; border: none; }
+
+/* BOLETO RASCA Y GANA */
+.scratch-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+.scratch-ticket { background: linear-gradient(135deg, #120d2b 0%, #280936 100%); width: 480px; border-radius: 24px; border: 3px solid #00FF99; padding: 22px; box-shadow: 0 0 50px rgba(0,255,153,0.25); position: relative; text-align: center; }
+.scratch-grid-area { position: relative; background: #060512; border-radius: 16px; padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 90px); gap: 12px; overflow: hidden; margin-top: 15px; }
+
+.hidden-cell-prize { background: radial-gradient(circle, #19143a 0%, #080717 100%); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; position: relative; }
+
+/* EFECTO DESTELLO RECUADRO DE MATCHS */
+.hidden-cell-prize.match-glow {
+  border: 2px solid #ff007f !important;
+  box-shadow: 0 0 20px #ff007f, inset 0 0 10px #ff007f;
+  animation: neonPulse 0.6s infinite alternate;
+  background: radial-gradient(circle, #3a0022 0%, #12000c 100%) !important;
+}
+@keyframes neonPulse { from { opacity: 0.8; } to { opacity: 1; transform: scale(1.02); } }
+
+.cell-amt { font-family: 'Orbitron'; font-weight: 900; font-size: 11px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.cell-type-label { font-size: 9px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+.lbl-fichas { color: #00FF99; }
+.lbl-mult { color: #ffbc00; }
+
+canvas.scratch-canvas-mask { position: absolute; top: 15px; left: 15px; width: calc(100% - 30px); height: calc(100% - 30px); border-radius: 10px; cursor: none; z-index: 10; }
+
+#coinCursor { width: 34px; height: 34px; background: radial-gradient(circle, #ffe14d 0%, #c46800 100%); border: 2px dashed #fff494; border-radius: 50%; position: fixed; pointer-events: none; z-index: 100000; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.6); transform: translate(-50%, -50%); }
+#coinCursor::after { content: '€'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 15px; font-weight: 900; color: #5c3200; }
+
+.close-ticket-btn { margin-top: 18px; width: 100%; background: linear-gradient(90deg, #00FF99, #00BFFF); color: #000; font-family: 'Orbitron'; font-weight: 900; border: none; padding: 12px; border-radius: 10px; font-size: 14px; cursor: pointer; display: none; box-shadow: 0 0 20px rgba(0,255,153,0.4); }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow1"></div>
+<div class="bg-glow glow2"></div>
+<div id="coinCursor"></div>
+
+<div id="authScreen">
+  <div class="auth-logo"><span>ARCADE</span><span>PREMIUM</span></div>
+  <div style="font-family:'Orbitron'; font-size:10px; letter-spacing:4px; color:rgba(255,255,255,0.4); margin-bottom:2rem;">CLOUD SYSTEM</div>
+  <div class="auth-card">
+    <div class="auth-field"><input type="text" id="loginUser" placeholder="Introduce tu Nickname VIP..."></div>
+    <button class="auth-btn" onclick="doLogin()">CONECTAR PANEL CLOUD</button>
+  </div>
+</div>
+
+<div id="lobbyScreen" class="hidden">
+  <header class="top-bar">
+    <div class="user-profile-trigger" onclick="openModal('profileModal')">
+      <div class="avatar-container">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=default" class="user-avatar-img" id="lobbyAvatar">
+        <div class="lvl-badge" id="lobbyLevel">1</div>
+      </div>
+      <div class="profile-text">
+        <div class="name-display" id="lobbyName">Cargando...</div>
+        <div class="tag-sub">✨ MI PANEL & HISTORIAL</div>
+      </div>
+    </div>
+    
+    <div class="nav-menu-center">
+      <button class="menu-btn" onclick="openModal('bpModal')">🏆 PASE DE BATALLA (100 NIVELES)</button>
+      <button class="menu-btn gold" onclick="openModal('shopModal')">🛒 TIENDA DE RECARGA</button>
+      <button class="menu-btn" style="border-color:#EF4444; color:#EF4444" onclick="doLogout()">SALIR</button>
+    </div>
+
+    <div style="text-align: center; background: rgba(0,255,153,0.02); padding: 5px 20px; border-radius: 12px; border: 1px solid #00FF99;">
+      <div style="font-family:'Orbitron'; font-size:8px; color:rgba(0,255,153,0.6)">MIS FICHAS CLOUD</div>
+      <div style="font-family:'Orbitron'; font-size:24px; color:#00FF99; font-weight:900;" id="lobbyCredits">0</div>
+    </div>
+  </header>
+
+  <div class="carousel-area">
+    <div class="nav-arrow nav-left" onclick="moveCarousel(-1)">◀</div>
+    <div id="carouselTrack" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+      
+      <div class="game-card" data-file="fruits.html" style="--theme-color:#00FF99">
+        <div class="card-art" style="background: url('https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=600&auto=format&fit=crop');"><div class="card-icon">🍎🍊</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#00FF99; border-color:#00FF99;">SLOT EN VIVO</div><div class="card-title">FRUITS PARTY</div><div class="card-sub">Multiplicadores Salvajes</div></div>
+          <button class="card-btn" onclick="launchGame('fruits.html')">JUGAR</button>
+        </div>
+      </div>
+      
+      <div class="game-card" data-file="poker.html" style="--theme-color:#00BFFF">
+        <div class="card-art" style="background: url('https://images.unsplash.com/photo-1511193311914-0346f16efe90?q=80&w=600&auto=format&fit=crop');"><div class="card-icon">♠️❤️</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#00BFFF; border-color:#00BFFF;">ESTRATEGIA</div><div class="card-title">TEXAS HOLD'EM</div><div class="card-sub">Mesas de Poker IA</div></div>
+          <button class="card-btn" onclick="launchGame('poker.html')">ENTRAR</button>
+        </div>
+      </div>
+      
+      <div class="game-card" data-file="slots.html" style="--theme-color:#FF9900">
+        <div class="card-art" style="background: url('https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=600&auto=format&fit=crop');"><div class="card-icon">🎰🌟</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#FF9900; border-color:#FF9900;">CLASICO CASINO</div><div class="card-title">LUCKY SEVENS</div><div class="card-sub">Tragaperras Premium</div></div>
+          <button class="card-btn" onclick="launchGame('slots.html')">GIRAR</button>
+        </div>
+      </div>
+      
+      <div class="game-card" data-file="dragon_link.html" style="--theme-color:#EF4444">
+        <div class="card-art" style="background: url('https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop');"><div class="card-icon">🐉🔥</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#EF4444; border-color:#EF4444;">JACKPOT BOTE</div><div class="card-title">DRAGON LINK</div><div class="card-sub">Botes Acumulados En Nube</div></div>
+          <button class="card-btn" onclick="launchGame('dragon_link.html')">CAZAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="roulette.html" style="--theme-color:#eab308">
+        <div class="card-art" style="background: url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?q=80&w=600&auto=format&fit=crop');"><div class="card-icon">🎡🔴</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#eab308; border-color:#eab308;">RULETA EUROPA</div><div class="card-title">ROULETTE DELUXE</div><div class="card-sub">Predice la Bola</div></div>
+          <button class="card-btn" onclick="launchGame('roulette.html')">APOSTAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="blackjack.html" style="--theme-color:#a855f7">
+        <div class="card-art" style="background: url('https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=600&auto=format&fit=crop');"><div class="card-icon">🃏✋</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#a855f7; border-color:#a855f7;">CARTAS</div><div class="card-title">BLACKJACK 21</div><div class="card-sub">Bate al Crupier</div></div>
+          <button class="card-btn" onclick="launchGame('blackjack.html')">PEDIR</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="nav-arrow nav-right" onclick="moveCarousel(1)">▶</div>
+  </div>
+</div>
+
+<div id="profileModal" class="panel-modal">
+  <div class="panel-container">
+    <span class="panel-close" onclick="closeModal('profileModal')">×</span>
+    <div class="modal-profile-header">
+      <div class="big-avatar-wrapper" onclick="document.getElementById('avatarUploader').click()">
+        <img src="" class="user-avatar-img" id="profBigAvatar" style="width:100%; height:100%;">
+        <input type="file" id="avatarUploader" style="display:none;" accept="image/*" onchange="uploadCustomAvatar(this)">
+      </div>
+      <div>
+        <h2 id="profName">JUGADOR</h2>
+        <div style="font-family:'Orbitron'; font-size:12px; color:#00BFFF; margin-top:4px;" id="profLvlText">NIVEL VIP 1</div>
+        <div class="xp-track"><div class="xp-fill" id="profXpFill"></div></div>
+        <div style="font-size:11px; color:#666; text-align:right; margin-top:3px;" id="profXpNumbers">0 / 1000 XP</div>
+      </div>
+    </div>
+    <h3 style="font-family:'Bebas Neue'; font-size:2rem; color:#00FF99; margin-bottom:10px;">HISTORIAL CLOUD DE JUEGOS</h3>
+    <div class="stats-grid-box" id="statsDynamicContainer"></div>
+  </div>
+</div>
+
+<div id="bpModal" class="panel-modal">
+  <div class="panel-container" style="max-width: 950px;">
+    <span class="panel-close" onclick="closeModal('bpModal')">×</span>
+    <div class="bp-layout-header">
+      <div>
+        <h2>PASE DE BATALLA <span style="color:#A855F7;">SEASON 1</span></h2>
+        <p>Acelera tu nivel comprando lotes a tu gusto con tus créditos.</p>
+        
+        <div class="buy-level-zone">
+          <span style="font-size: 12px; font-weight: bold; color: #00FF99;">Comprar Niveles:</span>
+          <input type="number" id="levelQuantityInput" class="level-input-qty" value="1" min="1" max="50">
+          <button class="buy-level-btn" onclick="buyBattlePassLevelMulti()">ADQUIRIR LOTE <span style="color:#FFF;">(5,000 c/u)</span></button>
+        </div>
+      </div>
+
+      <div class="vip-buy-card" id="vipPromoCard">
+        <h3>¡COMPRAR PASE VIP PREMIUM!</h3>
+        <p>Acceso Total a todos los Rascas de Nivel.</p>
+        <button class="vip-buy-btn" onclick="buyVipPremiumPass()">DESBLOQUEAR POR 4.99€</button>
+      </div>
+    </div>
+
+    <div class="bp-table-labels">
+      <div style="text-align: center;">NIVEL</div>
+      <div>ZONA GRATUITA (RECOMPENSAS)</div>
+      <div>ZONA VIP (RECOMPENSAS PREMIUM)</div>
+    </div>
+    <div class="bp-grid-scroll-box" id="bpGridDynamicBox"></div>
+  </div>
+</div>
+
+<div id="shopModal" class="panel-modal">
+  <div class="panel-container">
+    <span class="panel-close" onclick="closeModal('shopModal')">×</span>
+    <h2 style="font-family:'Bebas Neue'; font-size:3rem; text-align:center;">MERCADO DE <span style="color:#FF9900;">RECARGAS</span></h2>
+    <div class="shop-grid">
+      <div class="shop-card-item"><h3>20K FICHAS</h3><button style="width:100%; padding:10px; background:#FF9900; border:none; font-family:'Orbitron'; font-weight:900; cursor:pointer;" onclick="buyCredits(20000)">5,00 €</button></div>
+      <div class="shop-card-item" style="border-color:#00FF99;"><h3>100K FICHAS</h3><button style="width:100%; padding:10px; background:#00FF99; border:none; font-family:'Orbitron'; font-weight:900; cursor:pointer;" onclick="buyCredits(100000)">15,00 €</button></div>
+      <div class="shop-card-item"><h3>250K FICHAS</h3><button style="width:100%; padding:10px; background:#FF9900; border:none; font-family:'Orbitron'; font-weight:900; cursor:pointer;" onclick="buyCredits(250000)">30,00 €</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="gameContainer">
+  <div class="game-topbar">
+    <button class="back-btn" onclick="exitGame()">← VOLVER AL LOBBY</button>
+    <div style="font-family:'Orbitron'; color:#FFF; font-size:18px;" id="gameTitleBar">SALA</div>
+    <div style="font-family:'Orbitron'; color:#00FF99; font-size:16px;" id="gameCreditsDisplay">SALDO: --</div>
+  </div>
+  <iframe id="gameFrame" src=""></iframe>
+</div>
+
+<div class="scratch-modal-overlay" id="scratchModal">
+  <div class="scratch-ticket">
+    <div class="ticket-title" id="tTitle">Rasca de Nivel</div>
+    <div class="ticket-subtitle">¡Saca la moneda! Encuentra 3 importes iguales para ganar el premio. ¡Si sacas 3 multiplicadores iguales, triplicas o revientas ese premio base!</div>
+    <div class="scratch-grid-area" id="scratchGridArea">
+      <div class="hidden-cell-prize" id="cellBox0"><span class="cell-type-label" id="tl0">--</span><span class="cell-amt" id="c0">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox1"><span class="cell-type-label" id="tl1">--</span><span class="cell-amt" id="c1">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox2"><span class="cell-type-label" id="tl2">--</span><span class="cell-amt" id="c2">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox3"><span class="cell-type-label" id="tl3">--</span><span class="cell-amt" id="c3">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox4"><span class="cell-type-label" id="tl4">--</span><span class="cell-amt" id="c4">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox5"><span class="cell-type-label" id="tl5">--</span><span class="cell-amt" id="c5">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox6"><span class="cell-type-label" id="tl6">--</span><span class="cell-amt" id="c6">--</span></div>
+      <div class="hidden-cell-prize" id="cellBox7"><span class="cell-type-label" id="tl7">--</span><span class="cell-amt" id="c7">--</span></div>
+      <canvas id="scratchCanvas" class="scratch-canvas-mask"></canvas>
+    </div>
+    <button class="close-ticket-btn" id="closeTicketBtn" onclick="closeScratchModal()">RECLAMAR EL BOTÍN EN LA NUBE</button>
+  </div>
+</div>
+
+<script>
+// ==========================================================================
+// VARIABLES LÓGICAS GLOBALES DEL JUEGO (UNIFICADAS Y SIN DUPLICADOS)
+// ==========================================================================
+let userData = {
+  name: "", credits: 50000, level: 1, xp: 0, avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=default",
+  isVipUser: false, claimedRewards: {}, stats: {}
+};
+
+const RASCA_TIERS = [
+  { max: 2500000, label: '2.5 Millones', pool: [50000, 100000, 500000, 2500000] },
+  { max: 50000000, label: '50 Millones', pool: [1000000, 5000000, 20000000, 50000000] },
+  { max: 100000000, label: '100 Millones', pool: [5000000, 20000000, 50000000, 100000000] },
+  { max: 500000000, label: '500 Millones', pool: [10000000, 100000000, 300000000, 500000000] },
+  { max: 2000000000, label: '2 Billones', pool: [50000000, 500000000, 1000000000, 2000000000] },
+  { max: 1000000000000, label: '1 Trillón', pool: [1000000000, 50000000000, 500000000000, 1000000000000] }
+];
+
+let battlePassRewardsConfiguration = [];
+
+const scratchModal = document.getElementById('scratchModal');
+const scratchCanvas = document.getElementById('scratchCanvas');
+const scratchCtx = scratchCanvas.getContext('2d');
+const coinCursor = document.getElementById('coinCursor');
+let isScratching = false;
+let scratchFinalPrizeWallet = 0;
+
+const cards = Array.from(document.querySelectorAll('.game-card'));
+let currentIndex = 0;
+const totalCards = cards.length;
+
+// ==========================================================================
+// MOTOR DEL PASE DE BATALLA (20 RASCAS, 20 FREE SPINS, 35 INYECCIONES, 1 MILLÓN, 24 VIP)
+// ==========================================================================
+function generateStrictBattlePassArray() {
+  battlePassRewardsConfiguration = new Array(101);
+  let rascasCount = 0;
+  let spinsCount = 0;
+  let fichasCount = 0;
+
+  for (let i = 1; i <= 100; i++) {
+    if (i === 50) {
+      battlePassRewardsConfiguration[i] = { type: 'MILLON', label: '1.000.000 FICHAS', val: 1000000, isVip: true };
+      continue;
+    }
+
+    let tierIdx = 0;
+    if (i > 85) tierIdx = 5;
+    else if (i > 70) tierIdx = 4;
+    else if (i > 55) tierIdx = 3;
+    else if (i > 35) tierIdx = 2;
+    else if (i > 15) tierIdx = 1;
+
+    if (i % 5 === 1 && rascasCount < 20) {
+      battlePassRewardsConfiguration[i] = { type: 'RASCA', label: `Rasca ${RASCA_TIERS[tierIdx].label}`, val: tierIdx, isVip: true };
+      rascasCount++;
+    } else if (i % 5 === 2 && spinsCount < 20) {
+      let slotTarget = (i % 2 === 0) ? 'fruits.html' : 'slots.html';
+      battlePassRewardsConfiguration[i] = { type: 'SPINS', label: `20 Tiradas Gratis en ${slotTarget === 'slots.html' ? 'Lucky 7s' : 'Fruits'}`, val: slotTarget, isVip: false };
+      spinsCount++;
+    } else if ((i % 5 === 3 || i % 5 === i % 2) && fichasCount < 35) {
+      battlePassRewardsConfiguration[i] = { type: 'FICHAS', label: `+${i * 1500} Fichas Directas`, val: (i * 1500), isVip: false };
+      fichasCount++;
+    } else {
+      battlePassRewardsConfiguration[i] = { type: 'SORPRESA', label: `⚡ Pack VIP Nube (Fichas + Doble XP)`, val: (i * 2000), isVip: true };
+    }
+  }
+}
+generateStrictBattlePassArray();
+
+// ==========================================================================
+// AUTENTICACIÓN Y PERSISTENCIA CLOUD
+// ==========================================================================
+async function doLogin() {
+  const userInput = document.getElementById('loginUser').value.trim().toLowerCase();
+  if (userInput.length < 3) { alert("¡Nickname inválido!"); return; }
+  userData.name = userInput;
+
+  try {
+    const userRef = doc(window.db, "players", userData.name);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      let cloudData = userSnap.data();
+      if (cloudData.isVipUser === undefined) cloudData.isVipUser = false;
+      if (!cloudData.claimedRewards) cloudData.claimedRewards = {};
+      userData = cloudData;
+    } else {
+      userData.isVipUser = false;
+      userData.claimedRewards = {};
+      userData.stats = {
+        fruits: { partidas: 0, ganadas: 0, apostado: 0 }, poker: { partidas: 0, ganadas: 0, apostado: 0 },
+        slots: { partidas: 0, ganadas: 0, apostado: 0 }, dragon_link: { partidas: 0, ganadas: 0, apostado: 0 },
+        roulette: { partidas: 0, ganadas: 0, apostado: 0 }, blackjack: { partidas: 0, ganadas: 0, apostado: 0 }
+      };
+      await setDoc(userRef, userData);
+    }
+    syncUI();
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('lobbyScreen').classList.remove('hidden');
+    initCarousel();
+  } catch (error) {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('lobbyScreen').classList.remove('hidden');
+    initCarousel();
+  }
+}
+
+async function saveToCloud() {
+  if (!userData.name) return;
+  try {
+    const userRef = doc(window.db, "players", userData.name);
+    await updateDoc(userRef, userData);
+  } catch (e) { console.log("Offline sync active."); }
+}
+
+function syncUI() {
+  document.getElementById('lobbyName').innerText = userData.name;
+  document.getElementById('lobbyLevel').innerText = userData.level;
+  document.getElementById('lobbyCredits').innerText = userData.credits.toLocaleString();
+  document.getElementById('lobbyAvatar').src = userData.avatar;
+
+  document.getElementById('profName').innerText = userData.name.toUpperCase();
+  document.getElementById('profLvlText').innerText = "NIVEL VIP " + userData.level;
+  document.getElementById('profBigAvatar').src = userData.avatar;
+
+  let xpNeeded = userData.level * 1000;
+  let pct = (userData.xp / xpNeeded) * 100;
+  document.getElementById('profXpFill').style.width = pct + "%";
+  document.getElementById('profXpNumbers').innerText = `${userData.xp} / ${xpNeeded} XP`;
+
+  const promo = document.getElementById('vipPromoCard');
+  if (userData.isVipUser) {
+    promo.style.background = "linear-gradient(135deg, #052e16 0%, #15803d 100%)";
+    promo.style.borderColor = "#22c55e";
+    promo.innerHTML = `<h3 style="color:#22c55e;">ESTADO: CUENTA VIP PREMIUM</h3><p style="color:#fff">Acceso total a las recompensas del pase de batalla.</p>`;
+  }
+
+  const container = document.getElementById('statsDynamicContainer');
+  if (container) {
+    container.innerHTML = "";
+    for (const juego in userData.stats) {
+      let gameData = userData.stats[juego];
+      let card = document.createElement('div');
+      card.className = "stat-card-item";
+      card.innerHTML = `
+        <h4>🎮 ${juego.toUpperCase()}</h4>
+        <p>Partidas: <span>${gameData.partidas || 0}</span></p>
+        <p>Ganadas: <span>${gameData.ganadas || 0}</span></p>
+        <p>Apostado: <span>${(gameData.apostado || 0).toLocaleString()}</span></p>
+      `;
+      container.appendChild(card);
+    }
+  }
+  buildBattlePassGrid();
+}
+
+// ==========================================================================
+// ACCIONES DEL PASE Y TIENDA
+// ==========================================================================
+function buyBattlePassLevelMulti() {
+  const qty = parseInt(document.getElementById('levelQuantityInput').value);
+  if (isNaN(qty) || qty < 1) { alert("¡Cantidad inválida!"); return; }
+  const totalCost = qty * 5000;
+
+  if (userData.credits < totalCost) {
+    alert(`Créditos insuficientes. Requieres ${totalCost.toLocaleString()} fichas.`);
+    return;
+  }
+  userData.credits -= totalCost;
+  userData.xp = 0; 
+  userData.level += qty;
+  alert(`⚡ ¡Comprados +${qty} Niveles por ${totalCost.toLocaleString()} Fichas!`);
+  syncUI(); saveToCloud();
+}
+
+function buyVipPremiumPass() {
+  userData.isVipUser = true;
+  syncUI(); saveToCloud();
+  alert("¡Pase VIP comprado con éxito!");
+}
+
+function buildBattlePassGrid() {
+  const gridBox = document.getElementById('bpGridDynamicBox');
+  if(!gridBox) return;
+  gridBox.innerHTML = "";
+
+  for(let i = 1; i <= 100; i++) {
+    const isUnlocked = i <= userData.level;
+    const row = document.createElement('div');
+    row.className = `bp-level-row ${isUnlocked ? 'unlocked-row' : ''}`;
+
+    let gratisRewardHtml = '<div class="reward-box empty-slot">Sin Recompensa Gratis</div>';
+    let vipRewardHtml = '<div class="reward-box empty-slot">Sin Recompensa VIP</div>';
+
+    let config = battlePassRewardsConfiguration[i];
+
+    if (!config.isVip) {
+      let labelType = config.type === 'SPINS' ? 'TIRADAS GRATIS' : 'FICHAS';
+      gratisRewardHtml = makeRewardSlotHtml('gratis', i, labelType, config.label, isUnlocked, false, config.type, config.val);
+    } else {
+      let labelType = 'VIP RECOMPENSA';
+      if(config.type === 'RASCA') labelType = 'RASCA Y GANA';
+      if(config.type === 'MILLON') labelType = 'PREMIO MILLONARIO';
+      if(config.type === 'SORPRESA') labelType = 'SORPRESA VIP';
+      
+      vipRewardHtml = makeRewardSlotHtml('vip', i, labelType, config.label, isUnlocked, true, config.type, config.val);
+    }
+
+    row.innerHTML = `<div class="bp-row-num"><span style="font-size:8px; opacity:0.5;">LVL</span>${i}</div>${gratisRewardHtml}${vipRewardHtml}`;
+    gridBox.appendChild(row);
+  }
+}
+
+function makeRewardSlotHtml(type, lvl, rType, rName, isUnlocked, isVip, actionType, actionVal) {
+  const key = `${type}_${lvl}`;
+  const isClaimed = userData.claimedRewards[key] || false;
+  let btnHtml = '';
+
+  if (isClaimed) { 
+    btnHtml = `<button class="claim-btn claimed">COBRADO</button>`; 
+  } else if (!isUnlocked) { 
+    btnHtml = `<button class="claim-btn locked">BLOQUEADO</button>`; 
+  } else if (isVip && !userData.isVipUser) { 
+    btnHtml = `<button class="claim-btn locked" style="color:#fef08a;">COMPRA VIP</button>`; 
+  } else { 
+    btnHtml = `<button class="claim-btn" onclick="executeClaimAction('${type}', ${lvl}, '${actionType}', '${actionVal}')">RECLAMAR</button>`; 
+  }
+
+  return `<div class="reward-box ${isVip ? 'vip-slot' : ''}"><div class="reward-meta"><span class="reward-type">${rType}</span><span class="reward-name">${rName}</span></div>${btnHtml}</div>`;
+}
+
+// ==========================================================================
+// REGLA MATEMÁTICA REAL DEL RASCA Y GANA (3 NÚMEROS + 3 MULTIPLICADORES)
+// ==========================================================================
+function openScratchTicketGame(tierIdx) {
+  const tier = RASCA_TIERS[tierIdx];
+  document.getElementById('tTitle').innerText = `Rasca Máximo: ${tier.label}`;
+  document.getElementById('closeTicketBtn').style.display = 'none';
+  scratchModal.style.display = 'flex';
+
+  for (let k = 0; k < 8; k++) document.getElementById(`cellBox${k}`).classList.remove('match-glow');
+
+  scratchFinalPrizeWallet = 0;
+  let moneyValues = [];
+  let multiValues = [];
+
+  let isWinnerTicket = Math.random() > 0.4;
+  let winningMoneyValue = tier.pool[Math.floor(Math.random() * tier.pool.length)];
+
+  if (isWinnerTicket) {
+    moneyValues = [winningMoneyValue, winningMoneyValue, winningMoneyValue];
+    while(moneyValues.length < 6) {
+      let extraVal = tier.pool[Math.floor(Math.random() * tier.pool.length)];
+      if(extraVal !== winningMoneyValue) moneyValues.push(extraVal);
+    }
+  } else {
+    for(let i=0; i<6; i++) {
+      moneyValues.push(tier.pool[Math.floor(Math.random() * tier.pool.length)]);
+    }
+  }
+
+  moneyValues.sort(() => Math.random() - 0.5);
+
+  let multiPool = [1, 2, 3, 5];
+  let isWinnerMultiplier = Math.random() > 0.6;
+  let winningMultiplier = multiPool[Math.floor(Math.random() * (multiPool.length - 1)) + 1];
+
+  if (isWinnerMultiplier) {
+    multiValues = [winningMultiplier, winningMultiplier];
+  } else {
+    multiValues = [
+      multiPool[Math.floor(Math.random() * multiPool.length)],
+      multiPool[Math.floor(Math.random() * multiPool.length)]
+    ];
+  }
+
+  let finalGridData = [];
+  for(let i=0; i<6; i++) finalGridData.push({ type: 'money', val: moneyValues[i] });
+  for(let j=0; j<2; j++) finalGridData.push({ type: 'multi', val: multiValues[j] });
+
+  finalGridData.forEach((cell, idx) => {
+    let labelEl = document.getElementById(`tl${idx}`);
+    let amtEl = document.getElementById(`c${idx}`);
+    
+    if (cell.type === 'money') {
+      labelEl.innerText = "PREMIO";
+      labelEl.className = "cell-type-label lbl-fichas";
+      amtEl.innerText = cell.val.toLocaleString() + " FCH";
+    } else {
+      labelEl.innerText = "MULTIPLICADOR";
+      labelEl.className = "cell-type-label lbl-mult";
+      amtEl.innerText = `X${cell.val}`;
+    }
+  });
+
+  let moneyCounts = {};
+  for(let i=0; i<6; i++) {
+    let val = finalGridData[i].val;
+    if(!moneyCounts[val]) moneyCounts[val] = [];
+    moneyCounts[val].push(i);
+  }
+
+  let basePrizeAwarded = 0;
+  for (let val in moneyCounts) {
+    if (moneyCounts[val].length >= 3) {
+      basePrizeAwarded = parseInt(val);
+      moneyCounts[val].forEach(cellIndex => {
+        document.getElementById(`cellBox${cellIndex}`).classList.add('match-glow');
+      });
+      break;
+    }
+  }
+
+  let finalMultiplier = 1;
+  if (finalGridData[6].val === finalGridData[7].val) {
+    finalMultiplier = finalGridData[6].val;
+    document.getElementById(`cellBox6`).classList.add('match-glow');
+    document.getElementById(`cellBox7`).classList.add('match-glow');
+  }
+
+  let totalCalculated = basePrizeAwarded * finalMultiplier;
+  if(totalCalculated > tier.max) totalCalculated = tier.max;
+  if(totalCalculated === 0 && basePrizeAwarded > 0) totalCalculated = basePrizeAwarded;
+  if(totalCalculated === 0) totalCalculated = Math.floor(tier.pool[0] * 0.1);
+
+  scratchFinalPrizeWallet = Math.floor(totalCalculated);
+
+  const area = document.getElementById('scratchGridArea');
+  scratchCanvas.width = area.clientWidth - 30;
+  scratchCanvas.height = area.clientHeight - 30;
+  scratchCtx.fillStyle = '#4b5563';
+  scratchCtx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+
+  coinCursor.style.display = 'block';
+  document.addEventListener('mousemove', handleCoinMovement);
+  bindScratchEvents();
+}
+
+function handleCoinMovement(e) {
+  coinCursor.style.left = e.clientX + 'px';
+  coinCursor.style.top = e.clientY + 'px';
+}
+
+function bindScratchEvents() {
+  function paint(e) {
+    if (!isScratching) return;
+    const rect = scratchCanvas.getBoundingClientRect();
+    const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    
+    scratchCtx.globalCompositeOperation = 'destination-out';
+    scratchCtx.beginPath(); scratchCtx.arc(cx, cy, 25, 0, Math.PI * 2); scratchCtx.fill();
+    
+    const data = scratchCtx.getImageData(0, 0, scratchCanvas.width, scratchCanvas.height).data;
+    let cleared = 0;
+    for (let i = 3; i < data.length; i += 4) { if (data[i] === 0) cleared++; }
+    if ((cleared / (data.length / 4)) * 100 > 50) {
+      document.getElementById('closeTicketBtn').style.display = 'block';
+    }
+  }
+  scratchCanvas.onmousedown = (e) => { isScratching = true; paint(e); };
+  scratchCanvas.onmousemove = paint;
+  window.onmouseup = () => { isScratching = false; };
+}
+
+function closeScratchModal() {
+  scratchModal.style.display = 'none';
+  coinCursor.style.display = 'none';
+  document.removeEventListener('mousemove', handleCoinMovement);
+  
+  userData.credits += scratchFinalPrizeWallet;
+  alert(`¡Cobrado! +${scratchFinalPrizeWallet.toLocaleString()} fichas añadidas.`);
+  syncUI(); saveToCloud();
+}
+
+function executeClaimAction(type, lvl, actionType, actionVal) {
+  const key = `${type}_${lvl}`;
+  userData.claimedRewards[key] = true;
+
+  if (actionType === 'MILLON') {
+    userData.credits += parseInt(actionVal);
+    alert("¡Qué generoso! +1.000.000 Fichas directas a tu balance.");
+  } else if (actionType === 'FICHAS' || actionType === 'SORPRESA') {
+    userData.credits += parseInt(actionVal);
+    alert(`¡Recibes +${parseInt(actionVal).toLocaleString()} fichas!`);
+  } else if (actionType === 'SPINS') {
+    alert(`🎰 ¡20 tiradas gratis activadas en la base de datos de ${actionVal}!`);
+  } else if (actionType === 'RASCA') {
+    openScratchTicketGame(parseInt(actionVal));
+    return;
+  }
+  syncUI(); saveToCloud();
+}
+
+function uploadCustomAvatar(element) {
+  const file = element.files[0];
+  const reader = new FileReader();
+  reader.onloadend = function() { userData.avatar = reader.result; syncUI(); saveToCloud(); }
+  if (file) reader.readAsDataURL(file);
+}
+
+function buyCredits(amount) { userData.credits += amount; syncUI(); saveToCloud(); closeModal('shopModal'); }
+function doLogout() { location.reload(); }
+// Corregidos los modales agregando la propiedad standard background-clip por retrocompatibilidad
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ==========================================================================
+// CONTROLADOR DEL CARRUSEL ORIGINAL INTACTO
+// ==========================================================================
+function initCarousel() { updateCarouselPositions(); }
+function moveCarousel(dir) { currentIndex = (currentIndex + dir + totalCards) % totalCards; updateCarouselPositions(); }
+
+function updateCarouselPositions() {
+  cards.forEach((card, index) => {
+    card.className = 'game-card'; card.onclick = null;
+    let diff = (index - currentIndex + totalCards) % totalCards;
+    if (diff === 0) card.classList.add('active');
+    else if (diff === 1) { card.classList.add('next'); card.onclick = () => moveCarousel(1); }
+    else if (diff === 2) { card.classList.add('next2'); card.onclick = () => moveCarousel(2); }
+    else if (diff === totalCards - 1) { card.classList.add('prev'); card.onclick = () => moveCarousel(-1); }
+    else if (diff === totalCards - 2) { card.classList.add('prev2'); card.onclick = () => moveCarousel(-2); }
+    else card.classList.add('hidden-card');
+  });
+}
+
+function launchGame(file) {
+  document.getElementById('lobbyScreen').style.display = 'none';
+  document.getElementById('gameContainer').style.display = 'flex';
+  document.getElementById('gameTitleBar').innerText = "SALA: " + file.toUpperCase();
+  document.getElementById('gameFrame').src = `games/${file}`;
+  document.getElementById('gameCreditsDisplay').innerText = "SALDO: " + userData.credits.toLocaleString();
+}
+function exitGame() { document.getElementById('gameFrame').src = ""; document.getElementById('gameContainer').style.display = 'none'; document.getElementById('lobbyScreen').style.display = 'flex'; syncUI(); }
+</script>
+</body>
+</html>

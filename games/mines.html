@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MINES ARCADE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+  
+  /* Panel de Control Lateral */
+  .sidebar { width: 300px; background: #0f0f1a; border-right: 2px solid rgba(255,255,255,0.03); padding: 25px; display: flex; flex-direction: column; gap: 20px; }
+  h2 { font-family: 'Orbitron'; font-size: 20px; color: #FFCC00; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,204,0,0.2); }
+  .input-box { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 12px; color: #666; font-weight: bold; font-family: 'Orbitron'; }
+  input, select { background: #161626; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; color: #fff; font-size: 16px; font-family: 'Orbitron'; outline: none; }
+  input:focus, select:focus { border-color: #FFCC00; }
+  
+  .btn { font-family: 'Orbitron'; font-weight: 900; padding: 15px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: 0.2s; }
+  .btn-bet { background: #FFCC00; color: #000; box-shadow: 0 4px 15px rgba(255,204,0,0.2); }
+  .btn-bet:hover { background: #ffe066; }
+  .btn-cashout { background: #00FF99; color: #000; display: none; box-shadow: 0 4px 15px rgba(0,255,153,0.2); }
+  .btn-cashout:hover { background: #66ffb3; }
+  
+  /* Tablero de Juego */
+  .game-zone { flex: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #141424 0%, #09090e 100%); position: relative; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.02); }
+  
+  .tile { width: 75px; height: 75px; background: #22223b; border-radius: 10px; border-bottom: 4px solid #141424; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: all 0.2s ease; user-select: none; }
+  .tile:hover { background: #2e2e4f; transform: translateY(-2px); }
+  .tile.revealed-gem { background: rgba(0, 255, 153, 0.15); border: 2px solid #00FF99; border-bottom: 2px solid #00FF99; cursor: default; transform: none; animation: pop 0.3s ease; }
+  .tile.revealed-bomb { background: rgba(255, 59, 48, 0.2); border: 2px solid #FF3B30; border-bottom: 2px solid #FF3B30; cursor: default; transform: none; animation: shake 0.3s ease; }
+  .tile.disabled { pointer-events: none; opacity: 0.6; }
+
+  .status-display { position: absolute; top: 30px; font-family: 'Orbitron'; font-size: 24px; font-weight: 900; color: #FFF; letter-spacing: 1px; text-align: center; }
+  
+  @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+</style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>MINES ARCADE</h2>
+    <div class="input-box">
+      <label>CANTIDAD DE APUESTA</label>
+      <input type="number" id="betAmount" value="1000" min="100">
+    </div>
+    <div class="input-box">
+      <label>NÚMERO DE MINAS</label>
+      <select id="minesCount">
+        <option value="1">1 Mina</option>
+        <option value="3" selected>3 Minas</option>
+        <option value="5">5 Minas</option>
+        <option value="10">10 Minas</option>
+        <option value="24">24 Minas</option>
+      </select>
+    </div>
+    <button class="btn btn-bet" id="btnStart" onclick="startGame()">APRESTAR / EMPEZAR</button>
+    <button class="btn btn-cashout" id="btnCashout" onclick="cashout()">RETIRARSE (1.00x)</button>
+  </div>
+
+  <div class="game-zone">
+    <div class="status-display" id="gameStatus">CONFIGURA TU APUESTA Y JUEGA</div>
+    <div class="grid" id="minesGrid"></div>
+  </div>
+
+<script>
+  let board = [];
+  let bet = 0;
+  let numMines = 3;
+  let gemsFound = 0;
+  let isPlaying = false;
+  let currentMultiplier = 1.0;
+
+  // Generar tablero visual vacío al iniciar
+  function initGrid() {
+    const grid = document.getElementById('minesGrid');
+    grid.innerHTML = '';
+    for (let i = 0; i < 25; i++) {
+      let tile = document.createElement('div');
+      tile.className = 'tile disabled';
+      tile.dataset.index = i;
+      tile.onclick = () => revealTile(tile, i);
+      grid.appendChild(tile);
+    }
+  }
+
+  function startGame() {
+    if(isPlaying) return;
+    bet = parseInt(document.getElementById('betAmount').value);
+    numMines = parseInt(document.getElementById('minesCount').value);
+    
+    if(isNaN(bet) || bet <= 0) { alert("Mete una apuesta válida bro"); return; }
+
+    isPlaying = true;
+    gemsFound = 0;
+    currentMultiplier = 1.0;
+    
+    // Crear mapa interno de bombas
+    board = Array(25).fill('gem');
+    let placedMines = 0;
+    while(placedMines < numMines) {
+      let rand = Math.floor(Math.random() * 25);
+      if(board[rand] !== 'mine') {
+        board[rand] = 'mine';
+        placedMines++;
+      }
+    }
+
+    // Activar casillas visualmente
+    document.querySelectorAll('.tile').forEach(t => {
+      t.className = 'tile';
+      t.innerText = '';
+    });
+
+    document.getElementById('btnStart').style.display = 'none';
+    document.getElementById('btnCashout').style.display = 'block';
+    updateCashoutButtonText();
+    document.getElementById('gameStatus').innerText = "¡SALA EN CURSO! BUSCA LAS GEMAS";
+  }
+
+  function revealTile(tile, index) {
+    if(!isPlaying || tile.classList.contains('revealed-gem')) return;
+
+    if(board[index] === 'mine') {
+      // PISÓ BOMBA -> PIERDE TODO
+      tile.className = 'tile revealed-bomb';
+      tile.innerText = '💣';
+      gameOver(false);
+    } else {
+      // ENCONTRÓ GEMA
+      tile.className = 'tile revealed-gem';
+      tile.innerText = '💎';
+      gemsFound++;
+      
+      // Calcular multiplicador dinámico (estilo bet365/stake)
+      let totalGems = 25 - numMines;
+      currentMultiplier = currentMultiplier * ( (25 - gemsFound + 1) / (totalGems - gemsFound + 1) );
+      if(currentMultiplier < 1.1) currentMultiplier = 1.15;
+      
+      updateCashoutButtonText();
+
+      // Si encuentra todas las gemas limpias, gana el máximo de golpe
+      if(gemsFound === totalGems) {
+        cashout();
+      }
+    }
+  }
+
+  function updateCashoutButtonText() {
+    document.getElementById('btnCashout').innerText = `RETIRARSE (${currentMultiplier.toFixed(2)}x) -> +${Math.floor(bet * currentMultiplier)} Fichas`;
+  }
+
+  function cashout() {
+    if(!isPlaying) return;
+    gameOver(true);
+  }
+
+  function gameOver(isWin) {
+    isPlaying = false;
+    document.getElementById('btnStart').style.display = 'block';
+    document.getElementById('btnCashout').style.display = 'none';
+
+    let profit = 0;
+    if(isWin) {
+      profit = Math.floor(bet * currentMultiplier) - bet;
+      document.getElementById('gameStatus').innerText = `🎉 ¡GANASTE! +${(bet * currentMultiplier).toFixed(0)} FICHAS`;
+    } else {
+      profit = -bet;
+      document.getElementById('gameStatus').innerText = `💥 ¡BOOM! PERDISTE LA APUESTA`;
+    }
+
+    // Revelar dónde estaban el resto de las minas al acabar
+    document.querySelectorAll('.tile').forEach((t, idx) => {
+      t.classList.add('disabled');
+      if(board[idx] === 'mine' && !t.classList.contains('revealed-bomb')) {
+        t.innerText = '💣';
+        t.style.opacity = '0.4';
+      }
+    });
+
+    // COMUNICAR RESULTADO EN TIEMPO REAL AL LOBBY_3D.HTML Y DB.JS
+    window.parent.postMessage({
+      type: "GAME_OVER",
+      game: "mines",
+      win: isWin,
+      bet: bet,
+      profit: profit
+    }, "*");
+  }
+
+  initGrid();
+</script>
+</body>
+</html>
