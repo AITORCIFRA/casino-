@@ -122,7 +122,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#1a1020,var(--bg));color:#fff;
 <div class="slot-title">LUCKY SEVENS</div>
 
 <div class="stats-row">
-  <div class="stat"><div class="stat-lbl">CRÉDITOS</div><div class="stat-val green" id="credEl">500</div></div>
+  <div class="stat"><div class="stat-lbl">CRÉDITOS</div><div class="stat-val green" id="credEl">0</div></div>
   <div class="stat"><div class="stat-lbl">APUESTA</div><div class="stat-val gold" id="betEl">5</div></div>
   <div class="stat"><div class="stat-lbl">GANANCIA</div><div class="stat-val red" id="winEl">—</div></div>
 </div>
@@ -170,12 +170,19 @@ const BETS   = [1,2,5,10,25,50,100];
 const REELS  = 5, ROWS = 3, CELL_H = 75;
 const MULT_STEPS = [1,2,3,5,8,15,25,50]; // multiplier ladder steps
 
-let credits = 500, betIdx = 2, spinning = false, autoRun = false, autoTimer = null;
+let credits = 0, betIdx = 2, spinning = false, autoRun = false, autoTimer = null;
+let insufficientLocked = false;
 let cutReq = false, currentMult = 1, multStreak = 0;
 let strips = [], positions = [], stripEls = [];
 
 // URL param
 (function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)credits=c;}catch(e){}})();
+
+function postInsufficientFunds(){try{window.parent.postMessage({type:'insufficient_funds',open_shop:true},'*');}catch(e){}}
+function setSpinAvailable(){document.getElementById('spinBtn').disabled=spinning||insufficientLocked;document.getElementById('autoBtn').disabled=insufficientLocked;}
+function stopAuto(){autoRun=false;if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}const btn=document.getElementById('autoBtn');btn.classList.remove('on');btn.textContent='AUTO';}
+function handleInsufficientFunds(){insufficientLocked=true;stopAuto();document.getElementById('cutBtn').disabled=true;setSpinAvailable();showBanner('Créditos insuficientes','','#EF4444');postInsufficientFunds();}
+window.addEventListener('message',e=>{const data=e.data;if(!data||data.type!=='credits')return;const value=Math.floor(Number(data.value));if(!Number.isFinite(value))return;credits=value;insufficientLocked=credits<BETS[betIdx];updUI(false);setSpinAvailable();});
 
 // Build multiplier ladder UI
 (function(){
@@ -252,7 +259,7 @@ function animReel(r,totalCells,dur,delay,cb){
 function doSpin(){
   if(spinning)return;
   const bet=BETS[betIdx];
-  if(credits<bet){showBanner('SIN SALDO','','#EF4444');return;}
+  if(insufficientLocked||credits<bet){handleInsufficientFunds();return;}
   credits-=bet;spinning=true;cutReq=false;
   document.getElementById('spinBtn').disabled=true;
   document.getElementById('cutBtn').disabled=false;
@@ -289,7 +296,6 @@ function evalResult(row){
 
 function afterSpin(){
   spinning=false;
-  document.getElementById('spinBtn').disabled=false;
   document.getElementById('cutBtn').disabled=true;
 
   const row=getMiddleRow();
@@ -327,8 +333,9 @@ function afterSpin(){
 
   document.getElementById('winEl').textContent=win>0?'+'+fmt(win):'0';
   updUI();
+  if(credits<BETS[betIdx]){handleInsufficientFunds();return;}
+  insufficientLocked=false;setSpinAvailable();
   if(autoRun)autoTimer=setTimeout(doSpin,600);
-  if(credits<=0&&!autoRun){credits=500;updUI();showBanner('SALDO RECARGADO','','#00FF88');}
 }
 
 function spawnCoins(amount){
@@ -348,17 +355,19 @@ function showBanner(txt,sub,color){
   b.classList.remove('show');void b.offsetWidth;b.classList.add('show');
 }
 
-function chBet(d){if(spinning)return;betIdx=Math.max(0,Math.min(BETS.length-1,betIdx+d));document.getElementById('betEl').textContent=BETS[betIdx];}
-function toggleAuto(){autoRun=!autoRun;const btn=document.getElementById('autoBtn');btn.classList.toggle('on',autoRun);btn.textContent=autoRun?'STOP':'AUTO';if(autoRun&&!spinning)doSpin();}
+function chBet(d){if(spinning)return;betIdx=Math.max(0,Math.min(BETS.length-1,betIdx+d));document.getElementById('betEl').textContent=BETS[betIdx];if(insufficientLocked&&credits>=BETS[betIdx])insufficientLocked=false;setSpinAvailable();}
+function toggleAuto(){if(insufficientLocked){handleInsufficientFunds();return;}autoRun=!autoRun;const btn=document.getElementById('autoBtn');btn.classList.toggle('on',autoRun);btn.textContent=autoRun?'STOP':'AUTO';if(autoRun&&!spinning)doSpin();}
 function fmt(n){return Math.floor(n).toLocaleString('es-ES');}
-function updUI(){
+function updUI(notify=true){
   document.getElementById('credEl').textContent=fmt(credits);
-  try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}
+  if(notify){try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}}
 }
 
 buildStrips();buildReelDOM();
 for(let r=0;r<REELS;r++){positions[r]=Math.floor(Math.random()*strips[r].length);snapReel(r);}
-updUI();
+updUI(false);
+if(credits<BETS[betIdx])handleInsufficientFunds();
+else{insufficientLocked=false;setSpinAvailable();}
 </script>
 </body>
 </html>
