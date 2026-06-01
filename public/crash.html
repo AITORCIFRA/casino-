@@ -303,7 +303,7 @@
   async function buyCredits(amount) {
     const res = await WalletAPI.transaccionar('crash_shop', amount);
     if (res.success) {
-      globalCredits = res.saldo;
+      globalCredits = (res.new_balance ?? res.balance);
       updateWalletUI();
     }
     closeShopModal();
@@ -429,7 +429,7 @@
         return;
       }
 
-      globalCredits = res.saldo;
+      globalCredits = (res.new_balance ?? res.balance);
       updateWalletUI();
 
       b.status = 'ready';
@@ -452,7 +452,7 @@
 
     const res = await WalletAPI.transaccionar('crash_win', won);
     if (res.success) {
-      globalCredits = res.saldo;
+      globalCredits = (res.new_balance ?? res.balance);
       updateWalletUI();
     }
     
