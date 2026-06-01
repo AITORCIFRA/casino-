@@ -431,13 +431,17 @@ function toggleChat() {
   bar.classList.toggle("expanded");
 }
 
+// *********************************************************
+// FUNCIÓN PRINCIPAL: LOGIN Y REGISTRO SEPARADOS
+// *********************************************************
 async function doLogin(action) {
-  const userField = document.getElementById("loginUser");
-  const passField = document.getElementById("loginPass");
-  const username = userField.value.trim();
-  const password = passField.value.trim();
+  const username = document.getElementById("loginUser").value.trim();
+  const password = document.getElementById("loginPass").value.trim();
 
-  if (!username || !password) { alert("Introduce usuario y contraseña."); return; }
+  if (!username || !password) {
+    alert("❌ Introduce usuario y contraseña.");
+    return;
+  }
 
   try {
     const res = await fetch(`${API_URL}/auth/${action}`, {
@@ -447,14 +451,29 @@ async function doLogin(action) {
     });
 
     const data = await res.json();
+
     if (res.ok) {
-      localStorage.setItem("arcade_user", username);
-      currentUser = username;
-      document.getElementById("authScreen").classList.add("hidden");
-      document.getElementById("lobbyScreen").classList.remove("hidden");
-      initLobby();
-    } else { alert("Error: " + (data.detail || "Fallo en el servidor")); }
-  } catch(e) { alert("No se pudo conectar con el servidor."); }
+      if (action === 'login') {
+        // Login exitoso → entrar al lobby
+        localStorage.setItem("arcade_user", username);
+        currentUser = username;
+        document.getElementById("authScreen").classList.add("hidden");
+        document.getElementById("lobbyScreen").classList.remove("hidden");
+        initLobby();
+      } else if (action === 'register') {
+        // Registro exitoso → mensaje y no iniciar sesión
+        alert(`✅ Usuario "${username}" registrado con éxito. ¡Ahora inicia sesión!`);
+        // Limpiar campos para facilitar nuevo login
+        document.getElementById("loginUser").value = "";
+        document.getElementById("loginPass").value = "";
+      }
+    } else {
+      // Error: mostrar mensaje devuelto por el backend (ej. "El usuario ya existe")
+      alert(`❌ Error: ${data.detail || data.message || "Fallo en el servidor"}`);
+    }
+  } catch(e) {
+    alert("❌ No se pudo conectar con el servidor. ¿Está ejecutándose?");
+  }
 }
 
 async function updateHUD() {

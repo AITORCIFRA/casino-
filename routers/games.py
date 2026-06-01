@@ -1,12 +1,23 @@
 # routers/games.py
 from typing import Any, Dict, List, Optional
 import random
+import json
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from core.database import DB
+from core.database import (
+    get_db_connection,
+    ensure_user,
+    get_balance,
+    set_balance,
+    add_transaction,
+    get_battlepass,
+    update_battlepass,
+    get_league,
+    update_league,
+)
 
 router = APIRouter(prefix="/api/games", tags=["Juegos Arcade"])
 
@@ -45,14 +56,6 @@ class GameResultRequest(GameBetRequest):
     win: int
 
 
-class GameProgressResponse(BaseModel):
-    new_balance: int
-    xp: int
-    battlepass_level: int
-    league_points: int
-    insufficient_funds: bool = False
-
-
 class KenoPlayRequest(GameBetRequest):
     game: str = "keno"
     numbers: List[int]
@@ -63,54 +66,43 @@ class MinesStartRequest(GameBetRequest):
     mines_count: int
 
 
-# Función interna auxiliar para recompensar el juego en el Pase de Batalla y Ligas
-def reward_activity(username: str, xp_gain: int, league_points: int):
-    if username in DB["battlepass"]:
-        DB["battlepass"][username]["xp"] += xp_gain
-        # Subida de nivel automática (ej: cada 100 XP)
-        current_xp = DB["battlepass"][username]["xp"]
-        DB["battlepass"][username]["level"] = (current_xp // 100) + 1
-
-    if username in DB["leagues"]:
-        DB["leagues"][username]["points"] += league_points
-        # Actualización de rango por puntos de liga
-        pts = DB["leagues"][username]["points"]
-        if pts > 500:
-            DB["leagues"][username]["rank"] = "Oro"
-        elif pts > 200:
-            DB["leagues"][username]["rank"] = "Plata"
-
+# ------------------------------------------------------------
+# Funciones auxiliares (usando MySQL)
+# ------------------------------------------------------------
 
 def _progress_payload(username: str) -> Dict[str, Any]:
-    battlepass = DB["battlepass"].get(username, {})
-    league = DB["leagues"].get(username, {})
+    """Devuelve el estado actual del usuario (saldo, XP, nivel, puntos de liga)."""
+    balance = get_balance(username)
+    bp = get_battlepass(username)
+    league = get_league(username)
     return {
-        "new_balance": DB["wallets"][username],
-        "xp": battlepass.get("xp", 0),
-        "battlepass_level": battlepass.get("level", 1),
+        "new_balance": balance,
+        "xp": bp.get("xp", 0),
+        "battlepass_level": bp.get("level", 1),
         "league_points": league.get("points", 0),
         "insufficient_funds": False,
     }
 
 
 def _insufficient_funds_response(username: str) -> JSONResponse:
+    balance = get_balance(username)
     return JSONResponse(
         status_code=402,
         content={
             "detail": "INSUFFICIENT_FUNDS",
             "open_shop": True,
-            "balance": DB["wallets"][username],
+            "balance": balance,
             "insufficient_funds": True,
         },
     )
 
 
 def _validate_username_and_bet(username: str, bet: int) -> Optional[JSONResponse]:
-    if username not in DB["wallets"]:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    ensure_user(username)
+    balance = get_balance(username)
     if bet <= 0:
         raise HTTPException(status_code=400, detail="La apuesta debe ser mayor que 0")
-    if DB["wallets"][username] < bet:
+    if balance < bet:
         return _insufficient_funds_response(username)
     return None
 
@@ -121,10 +113,29 @@ def _settle_bet(
     win_amount: int,
     xp_gain: int,
     league_points: int,
+    game_name: str,
+    transaction_type: str = None
 ) -> Dict[str, Any]:
-    DB["wallets"][username] -= bet
-    DB["wallets"][username] += max(win_amount, 0)
-    reward_activity(username, xp_gain=xp_gain, league_points=league_points)
+    """
+    Ejecuta la apuesta:
+      - resta la apuesta
+      - añade la ganancia
+      - registra transacción
+      - actualiza XP y puntos de liga
+    """
+    # 1. Actualizar saldo
+    current = get_balance(username)
+    new_balance = current - bet + max(win_amount, 0)
+    set_balance(username, new_balance)
+
+    # 2. Registrar transacción (si hay movimiento)
+    tipo = transaction_type or ("premio_juego" if win_amount > 0 else "gasto_juego")
+    add_transaction(username, tipo, game_name, -bet if win_amount == 0 else win_amount, new_balance)
+
+    # 3. Actualizar progreso
+    update_battlepass(username, xp_gain)
+    update_league(username, league_points)
+
     return _progress_payload(username)
 
 
@@ -139,7 +150,15 @@ def _settle_accepted_result(
     if request.win < 0:
         raise HTTPException(status_code=400, detail="La ganancia no puede ser negativa")
 
-    payload = _settle_bet(request.username, request.bet, request.win, xp_gain, league_points)
+    payload = _settle_bet(
+        request.username,
+        request.bet,
+        request.win,
+        xp_gain,
+        league_points,
+        request.game,
+        "premio_juego" if request.win > 0 else "gasto_juego"
+    )
     payload.update({"game": request.game, "win_amount": request.win})
     return payload
 
@@ -153,6 +172,10 @@ def _random_multiplier(chances: List[tuple[float, int]]) -> int:
             return multiplier
     return 0
 
+
+# ------------------------------------------------------------
+# Endpoints de juegos
+# ------------------------------------------------------------
 
 @router.post("/slots/spin")
 async def spin_slots(request: GameBetRequest):
@@ -169,7 +192,11 @@ async def spin_slots(request: GameBetRequest):
         multiplier = 0
     win_amount = request.bet * multiplier
 
-    payload = _settle_bet(request.username, request.bet, win_amount, xp_gain=10, league_points=5)
+    payload = _settle_bet(
+        request.username, request.bet, win_amount,
+        xp_gain=10, league_points=5, game_name=request.game,
+        transaction_type="premio_juego" if win_amount > 0 else "gasto_juego"
+    )
     payload.update({
         "game": request.game,
         "reels": reels,
@@ -194,7 +221,11 @@ async def spin_magic_trakka(request: GameBetRequest):
         multiplier = 0
     win_amount = request.bet * multiplier
 
-    payload = _settle_bet(request.username, request.bet, win_amount, xp_gain=12, league_points=6)
+    payload = _settle_bet(
+        request.username, request.bet, win_amount,
+        xp_gain=12, league_points=6, game_name=request.game,
+        transaction_type="premio_juego" if win_amount > 0 else "gasto_juego"
+    )
     payload.update({
         "game": request.game,
         "reels": reels,
@@ -220,7 +251,11 @@ async def spin_roulette(request: GameBetRequest):
     multiplier = 14 if number == 0 else _random_multiplier([(0.45, 2), (0.55, 0)])
     win_amount = request.bet * multiplier
 
-    payload = _settle_bet(request.username, request.bet, win_amount, xp_gain=10, league_points=5)
+    payload = _settle_bet(
+        request.username, request.bet, win_amount,
+        xp_gain=10, league_points=5, game_name=request.game,
+        transaction_type="premio_juego" if win_amount > 0 else "gasto_juego"
+    )
     payload.update({
         "game": request.game,
         "number": number,
@@ -246,7 +281,11 @@ async def play_crash(request: GameBetRequest):
     multiplier = 2 if crash_point >= 2.0 else 0
     win_amount = request.bet * multiplier
 
-    payload = _settle_bet(request.username, request.bet, win_amount, xp_gain=10, league_points=5)
+    payload = _settle_bet(
+        request.username, request.bet, win_amount,
+        xp_gain=10, league_points=5, game_name=request.game,
+        transaction_type="premio_juego" if win_amount > 0 else "gasto_juego"
+    )
     payload.update({
         "game": request.game,
         "crash_point": crash_point,
@@ -279,7 +318,11 @@ async def play_keno(request: KenoPlayRequest):
     multiplier = KENO_PAYTABLE.get(len(request.numbers), {}).get(hit_count, 0)
     win_amount = request.bet * multiplier
 
-    payload = _settle_bet(request.username, request.bet, win_amount, xp_gain=10, league_points=5)
+    payload = _settle_bet(
+        request.username, request.bet, win_amount,
+        xp_gain=10, league_points=5, game_name=request.game,
+        transaction_type="premio_juego" if win_amount > 0 else "gasto_juego"
+    )
     payload.update({
         "game": request.game,
         "winning_numbers": winning_numbers,
@@ -291,7 +334,6 @@ async def play_keno(request: KenoPlayRequest):
     return payload
 
 
-
 @router.post("/mines/start")
 async def start_mines(request: MinesStartRequest):
     validation_error = _validate_username_and_bet(request.username, request.bet)
@@ -301,10 +343,16 @@ async def start_mines(request: MinesStartRequest):
         raise HTTPException(status_code=400, detail="Número de minas inválido")
 
     mine_positions = random.sample(range(25), request.mines_count)
-    payload = _settle_bet(request.username, request.bet, win_amount=0, xp_gain=15, league_points=8)
+    # Para Mines, la apuesta se resta inmediatamente y la ganancia se calculará en el frontend
+    # Así que restamos la apuesta aquí
+    payload = _settle_bet(
+        request.username, request.bet, win_amount=0,
+        xp_gain=15, league_points=8, game_name=request.game,
+        transaction_type="gasto_juego"
+    )
     payload.update({
         "status": "success",
         "game": request.game,
-        "mine_positions_hidden_debug": mine_positions,  # Borrar o encriptar en prod
+        "mine_positions": mine_positions,  # En producción, no deberías devolver esto
     })
     return payload

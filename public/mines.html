@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>MINES ARCADE</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<link href="/css/lobby.css" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; height: 100vh; overflow: hidden; }
   
-  /* Panel de Control Lateral */
   .sidebar { width: 300px; background: #0f0f1a; border-right: 2px solid rgba(255,255,255,0.03); padding: 25px; display: flex; flex-direction: column; gap: 20px; }
   h2 { font-family: 'Orbitron'; font-size: 20px; color: #FFCC00; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,204,0,0.2); }
   .input-box { display: flex; flex-direction: column; gap: 5px; }
@@ -22,7 +21,6 @@
   .btn-cashout { background: #00FF99; color: #000; display: none; box-shadow: 0 4px 15px rgba(0,255,153,0.2); }
   .btn-cashout:hover { background: #66ffb3; }
   
-  /* Tablero de Juego */
   .game-zone { flex: 1; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #141424 0%, #09090e 100%); position: relative; }
   .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.02); }
   
@@ -37,33 +35,34 @@
   @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 </style>
+<script src="/js/wallet.js"></script>
 </head>
 <body>
 
-  <div class="sidebar">
-    <h2>MINES ARCADE</h2>
-    <div class="input-box">
-      <label>CANTIDAD DE APUESTA</label>
-      <input type="number" id="betAmount" value="1000" min="100">
-    </div>
-    <div class="input-box">
-      <label>NÚMERO DE MINAS</label>
-      <select id="minesCount">
-        <option value="1">1 Mina</option>
-        <option value="3" selected>3 Minas</option>
-        <option value="5">5 Minas</option>
-        <option value="10">10 Minas</option>
-        <option value="24">24 Minas</option>
-      </select>
-    </div>
-    <button class="btn btn-bet" id="btnStart" onclick="startGame()">APRESTAR / EMPEZAR</button>
-    <button class="btn btn-cashout" id="btnCashout" onclick="cashout()">RETIRARSE (1.00x)</button>
+<div class="sidebar">
+  <h2>MINES ARCADE</h2>
+  <div class="input-box">
+    <label>CANTIDAD DE APUESTA</label>
+    <input type="number" id="betAmount" value="100" min="10">
   </div>
+  <div class="input-box">
+    <label>NÚMERO DE MINAS</label>
+    <select id="minesCount">
+      <option value="1">1 Mina</option>
+      <option value="3" selected>3 Minas</option>
+      <option value="5">5 Minas</option>
+      <option value="10">10 Minas</option>
+      <option value="24">24 Minas</option>
+    </select>
+  </div>
+  <button class="btn btn-bet" id="btnStart" onclick="startGame()">APRESTAR / EMPEZAR</button>
+  <button class="btn btn-cashout" id="btnCashout" onclick="cashout()">RETIRARSE (1.00x)</button>
+</div>
 
-  <div class="game-zone">
-    <div class="status-display" id="gameStatus">CONFIGURA TU APUESTA Y JUEGA</div>
-    <div class="grid" id="minesGrid"></div>
-  </div>
+<div class="game-zone">
+  <div class="status-display" id="gameStatus">CONFIGURA TU APUESTA Y JUEGA</div>
+  <div class="grid" id="minesGrid"></div>
+</div>
 
 <script>
   let board = [];
@@ -72,8 +71,43 @@
   let gemsFound = 0;
   let isPlaying = false;
   let currentMultiplier = 1.0;
+  let credits = 0;
+  let insufficientLocked = false;
 
-  // Generar tablero visual vacío al iniciar
+  function getUsername() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('u') || localStorage.getItem('arcade_user') || '';
+  }
+
+  async function initCredits() {
+    credits = await WalletAPI.getBalance();
+    updateUI();
+  }
+
+  async function updateGlobalWallet(amount, gameName = 'mines') {
+    if (amount === 0) return true;
+    const res = await WalletAPI.transaccionar(gameName, amount);
+    if (res.success) {
+      credits = res.new_balance ?? res.balance;
+      updateUI();
+      return true;
+    } else {
+      if (amount < 0) handleInsufficientFunds();
+      return false;
+    }
+  }
+
+  function handleInsufficientFunds() {
+    insufficientLocked = true;
+    window.parent.postMessage({ type: 'insufficient_funds', open_shop: true }, '*');
+    document.getElementById('gameStatus').innerText = "¡CRÉDITOS INSUFICIENTES!";
+    document.getElementById('btnStart').disabled = false;
+  }
+
+  function updateUI() {
+    window.parent.postMessage({ type: 'credits', value: credits }, '*');
+  }
+
   function initGrid() {
     const grid = document.getElementById('minesGrid');
     grid.innerHTML = '';
@@ -86,18 +120,21 @@
     }
   }
 
-  function startGame() {
+  async function startGame() {
     if(isPlaying) return;
     bet = parseInt(document.getElementById('betAmount').value);
     numMines = parseInt(document.getElementById('minesCount').value);
     
-    if(isNaN(bet) || bet <= 0) { alert("Mete una apuesta válida bro"); return; }
+    if(isNaN(bet) || bet <= 0) { alert("Mete una apuesta válida"); return; }
+    if(credits < bet) { handleInsufficientFunds(); return; }
+
+    const success = await updateGlobalWallet(-bet);
+    if(!success) return;
 
     isPlaying = true;
     gemsFound = 0;
     currentMultiplier = 1.0;
     
-    // Crear mapa interno de bombas
     board = Array(25).fill('gem');
     let placedMines = 0;
     while(placedMines < numMines) {
@@ -108,7 +145,6 @@
       }
     }
 
-    // Activar casillas visualmente
     document.querySelectorAll('.tile').forEach(t => {
       t.className = 'tile';
       t.innerText = '';
@@ -117,31 +153,27 @@
     document.getElementById('btnStart').style.display = 'none';
     document.getElementById('btnCashout').style.display = 'block';
     updateCashoutButtonText();
-    document.getElementById('gameStatus').innerText = "¡SALA EN CURSO! BUSCA LAS GEMAS";
+    document.getElementById('gameStatus').innerHTML = "¡SALA EN CURSO! BUSCA LAS GEMAS 💎";
   }
 
   function revealTile(tile, index) {
     if(!isPlaying || tile.classList.contains('revealed-gem')) return;
 
     if(board[index] === 'mine') {
-      // PISÓ BOMBA -> PIERDE TODO
       tile.className = 'tile revealed-bomb';
       tile.innerText = '💣';
       gameOver(false);
     } else {
-      // ENCONTRÓ GEMA
       tile.className = 'tile revealed-gem';
       tile.innerText = '💎';
       gemsFound++;
       
-      // Calcular multiplicador dinámico (estilo bet365/stake)
       let totalGems = 25 - numMines;
       currentMultiplier = currentMultiplier * ( (25 - gemsFound + 1) / (totalGems - gemsFound + 1) );
       if(currentMultiplier < 1.1) currentMultiplier = 1.15;
       
       updateCashoutButtonText();
 
-      // Si encuentra todas las gemas limpias, gana el máximo de golpe
       if(gemsFound === totalGems) {
         cashout();
       }
@@ -149,29 +181,27 @@
   }
 
   function updateCashoutButtonText() {
-    document.getElementById('btnCashout').innerText = `RETIRARSE (${currentMultiplier.toFixed(2)}x) -> +${Math.floor(bet * currentMultiplier)} Fichas`;
+    document.getElementById('btnCashout').innerHTML = `RETIRARSE (${currentMultiplier.toFixed(2)}x) -> +${Math.floor(bet * currentMultiplier)} Fichas`;
   }
 
-  function cashout() {
+  async function cashout() {
     if(!isPlaying) return;
-    gameOver(true);
+    const winAmount = Math.floor(bet * currentMultiplier);
+    await updateGlobalWallet(winAmount, 'mines');
+    gameOver(true, winAmount);
   }
 
-  function gameOver(isWin) {
+  async function gameOver(isWin, winAmount = 0) {
     isPlaying = false;
     document.getElementById('btnStart').style.display = 'block';
     document.getElementById('btnCashout').style.display = 'none';
 
-    let profit = 0;
     if(isWin) {
-      profit = Math.floor(bet * currentMultiplier) - bet;
-      document.getElementById('gameStatus').innerText = `🎉 ¡GANASTE! +${(bet * currentMultiplier).toFixed(0)} FICHAS`;
+      document.getElementById('gameStatus').innerHTML = `🎉 ¡GANASTE! +${winAmount} FICHAS`;
     } else {
-      profit = -bet;
-      document.getElementById('gameStatus').innerText = `💥 ¡BOOM! PERDISTE LA APUESTA`;
+      document.getElementById('gameStatus').innerHTML = `💥 ¡BOOM! PERDISTE LA APUESTA`;
     }
 
-    // Revelar dónde estaban el resto de las minas al acabar
     document.querySelectorAll('.tile').forEach((t, idx) => {
       t.classList.add('disabled');
       if(board[idx] === 'mine' && !t.classList.contains('revealed-bomb')) {
@@ -180,17 +210,11 @@
       }
     });
 
-    // COMUNICAR RESULTADO EN TIEMPO REAL AL LOBBY_3D.HTML Y DB.JS
-    window.parent.postMessage({
-      type: "GAME_OVER",
-      game: "mines",
-      win: isWin,
-      bet: bet,
-      profit: profit
-    }, "*");
+    updateUI();
   }
 
   initGrid();
+  initCredits();
 </script>
 </body>
 </html>

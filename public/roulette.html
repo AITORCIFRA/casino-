@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Ruleta Europea</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="/css/lobby.css" rel="stylesheet">
 <style>
+/* Mismos estilos que tenías, no los cambio por brevedad, pero conserva los tuyos */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--gold:#C9A84C;--felt:#1B4D2E;--bg:#0A0A0A;--surface:#141414;--red:#C0392B;--text:#F0E6D3;--text-muted:#9A8A72;--border:rgba(201,168,76,0.3)}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1rem;display:flex;flex-direction:column;align-items:center}
@@ -57,6 +58,7 @@ h1{font-family:'Playfair Display',serif;font-size:2rem;letter-spacing:.1em;backg
 .pb-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text-muted)}
 .pb-row span:last-child{color:var(--gold)}
 </style>
+<script src="/js/wallet.js"></script>
 </head>
 <body>
 <h1>Ruleta Europea</h1>
@@ -111,31 +113,177 @@ h1{font-family:'Playfair Display',serif;font-size:2rem;letter-spacing:.1em;backg
 <script>
 const RED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 const WO=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-let balance=0,chip=1,bets={},spinning=false,spins=0,insufficientLocked=false;
+let balance=0, chip=1, bets={}, spinning=false, spins=0, insufficientLocked=false;
 
-(function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)balance=c;}catch(e){}})();
-function postInsufficientFunds(){try{window.parent.postMessage({type:'insufficient_funds',open_shop:true},'*');}catch(e){}}
-function pendingBetTotal(){return Object.values(bets).reduce((a,b)=>a+b,0);}
-function setSpinAvailable(){const hasBets=pendingBetTotal()>0;document.getElementById('spinBtn').disabled=spinning||insufficientLocked||!hasBets;}
-function handleInsufficientFunds(){insufficientLocked=true;setMsg('Créditos insuficientes','lose');setSpinAvailable();postInsufficientFunds();}
-window.addEventListener('message',e=>{const data=e.data;if(!data||data.type!=='credits')return;const value=Math.floor(Number(data.value));if(!Number.isFinite(value))return;balance=value;insufficientLocked=balance<chip&&pendingBetTotal()===0;updateUI(false);setSpinAvailable();});
-// Grid
+// Grid de números
 (()=>{const g=document.getElementById('ngrid');for(let n=1;n<=36;n++){const d=document.createElement('div');d.className='nc '+(RED.includes(n)?'is-red':'is-blk');d.textContent=n;d.id='nc_'+n;d.onclick=()=>bet('num_'+n);g.appendChild(d);}})();
-function drawWheel(a){const c=document.getElementById('wc'),ctx=c.getContext('2d'),cx=97.5,cy=97.5,r=94,n=WO.length,sl=(2*Math.PI)/n,rad=a*Math.PI/180;ctx.clearRect(0,0,195,195);ctx.beginPath();ctx.arc(cx,cy,r+1,0,2*Math.PI);ctx.fillStyle='#8A6A1E';ctx.fill();for(let i=0;i<n;i++){const num=WO[i],s=rad+i*sl,e=s+sl;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.fillStyle=num===0?'#1B7A40':RED.includes(num)?'#8B1A1A':'#111';ctx.fill();ctx.strokeStyle='#C9A84C';ctx.lineWidth=0.6;ctx.stroke();ctx.save();ctx.translate(cx,cy);ctx.rotate(s+sl/2);ctx.translate(r*0.72,0);ctx.rotate(Math.PI/2);ctx.fillStyle='#F0E6D3';ctx.font='bold 8px sans-serif';ctx.textAlign='center';ctx.fillText(num,0,3);ctx.restore();}ctx.beginPath();ctx.arc(cx,cy,8,0,2*Math.PI);ctx.fillStyle='#C9A84C';ctx.fill();}
-drawWheel(0);
-function selChip(v){chip=v;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',+c.dataset.v===v));}
-const LABELS={rojo:'Rojo',negro:'Negro',par:'Par',impar:'Impar',bajo:'1-18',alto:'19-36',doc1:'1ª Docena',doc2:'2ª Docena',doc3:'3ª Docena',col1:'Col 1',col2:'Col 2',col3:'Col 3'};
-function betLabel(k){return LABELS[k]||(k.startsWith('num_')?'Pleno '+k.slice(4):k);}
-function bet(t){if(spinning)return;if(insufficientLocked||balance<chip){handleInsufficientFunds();return;}bets[t]=(bets[t]||0)+chip;balance-=chip;updateUI();setSpinAvailable();}
-function clearBets(){if(spinning)return;const tot=pendingBetTotal();balance+=tot;bets={};if(insufficientLocked&&balance>=chip)insufficientLocked=false;updateUI();setSpinAvailable();}
-function calcWin(r,bets){let w=0;for(const[k,amt] of Object.entries(bets)){let p=0;if(k==='rojo'&&RED.includes(r)&&r!==0)p=amt*2;else if(k==='negro'&&!RED.includes(r)&&r!==0)p=amt*2;else if(k==='par'&&r!==0&&r%2===0)p=amt*2;else if(k==='impar'&&r%2===1)p=amt*2;else if(k==='bajo'&&r>=1&&r<=18)p=amt*2;else if(k==='alto'&&r>=19&&r<=36)p=amt*2;else if(k==='doc1'&&r>=1&&r<=12)p=amt*3;else if(k==='doc2'&&r>=13&&r<=24)p=amt*3;else if(k==='doc3'&&r>=25&&r<=36)p=amt*3;else if(k==='col1'&&r!==0&&r%3===1)p=amt*3;else if(k==='col2'&&r!==0&&r%3===2)p=amt*3;else if(k==='col3'&&r!==0&&r%3===0)p=amt*3;else if(k==='num_'+r)p=amt*36;w+=p;}return w;}
-function setMsg(t,c){const m=document.getElementById('msg');m.textContent=t;m.className='msg '+c;}
-function updateUI(notify=true){document.getElementById('saldo').textContent=balance.toLocaleString('es-ES');const tot=pendingBetTotal();document.getElementById('apostado').textContent=tot;document.getElementById('tiradas').textContent=spins;const pb=document.getElementById('pblist');pb.innerHTML=Object.keys(bets).length===0?'<span style="color:rgba(255,255,255,.2);font-size:11px">Sin apuestas</span>':Object.entries(bets).map(([k,v])=>`<div class="pb-row"><span>${betLabel(k)}</span><span>${v}</span></div>`).join('');if(notify){try{window.parent.postMessage({type:'credits',value:balance},'*');}catch(e){}}}
-function spin(){if(spinning)return;const tot=pendingBetTotal();if(insufficientLocked){handleInsufficientFunds();return;}if(tot===0){setMsg('Haz al menos una apuesta','neutral');return;}spinning=true;document.getElementById('spinBtn').disabled=true;document.getElementById('rnum').textContent='...';document.getElementById('rnum').style.color='var(--text-muted)';document.getElementById('rdesc').textContent='Girando...';const ri=Math.floor(Math.random()*37),result=WO[ri],totalRot=1800+ri*(360/37),dur=4000,st=performance.now();const anim=now=>{const el=now-st,t=Math.min(el/dur,1),ease=t<1?1-Math.pow(1-t,4):1;drawWheel((ease*totalRot)%360);if(t<1)requestAnimationFrame(anim);else finishSpin(result);};requestAnimationFrame(anim);}
-function finishSpin(result){spinning=false;spins++;const win=calcWin(result,bets),lost=pendingBetTotal();bets={};balance+=win;const rn=document.getElementById('rnum'),rd=document.getElementById('rdesc');rn.textContent=result;rn.style.color=result===0?'#2ecc71':RED.includes(result)?'#E74C3C':'var(--text)';let desc=result===0?'Verde':(RED.includes(result)?'Rojo':'Negro')+(result%2===0?' · Par':' · Impar');rd.textContent=desc;win>0?setMsg(`¡Ganaste ${win} créditos!`,'win'):setMsg(`Perdiste ${lost} créditos`,'lose');updateUI();if(balance<chip){handleInsufficientFunds();return;}insufficientLocked=false;setSpinAvailable();}
-updateUI(false);
-if(balance<chip)handleInsufficientFunds();
-else setSpinAvailable();
+
+function getUsername() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('u') || localStorage.getItem('arcade_user') || '';
+}
+
+async function initCredits() {
+  balance = await WalletAPI.getBalance();
+  updateUI(false);
+  setSpinAvailable();
+}
+
+async function updateGlobalWallet(amount, gameName = 'roulette') {
+  if (amount === 0) return true;
+  const res = await WalletAPI.transaccionar(gameName, amount);
+  if (res.success) {
+    balance = res.new_balance ?? res.balance;
+    updateUI();
+    return true;
+  } else {
+    if (amount < 0) handleInsufficientFunds();
+    return false;
+  }
+}
+
+function handleInsufficientFunds() {
+  insufficientLocked = true;
+  document.getElementById('spinBtn').disabled = true;
+  setMsg('Créditos insuficientes', 'lose');
+  window.parent.postMessage({ type: 'insufficient_funds', open_shop: true }, '*');
+}
+
+function setSpinAvailable() {
+  const hasBets = pendingBetTotal() > 0;
+  document.getElementById('spinBtn').disabled = spinning || insufficientLocked || !hasBets;
+}
+
+function pendingBetTotal() { return Object.values(bets).reduce((a,b)=>a+b,0); }
+
+function setMsg(t, c) { const m = document.getElementById('msg'); m.textContent = t; m.className = 'msg '+c; }
+
+function updateUI(notify=true) {
+  document.getElementById('saldo').textContent = balance.toLocaleString('es-ES');
+  document.getElementById('apostado').textContent = pendingBetTotal();
+  document.getElementById('tiradas').textContent = spins;
+  const pb = document.getElementById('pblist');
+  pb.innerHTML = Object.keys(bets).length===0 ? '<span style="color:rgba(255,255,255,.2);font-size:11px">Sin apuestas</span>' :
+    Object.entries(bets).map(([k,v])=>`<div class="pb-row"><span>${betLabel(k)}</span><span>${v}</span></div>`).join('');
+  if(notify) window.parent.postMessage({ type: 'credits', value: balance }, '*');
+}
+
+function betLabel(k) { return k.startsWith('num_') ? 'Pleno '+k.slice(4) : 
+  {rojo:'Rojo',negro:'Negro',par:'Par',impar:'Impar',bajo:'1-18',alto:'19-36',
+   doc1:'1ª Docena',doc2:'2ª Docena',doc3:'3ª Docena',col1:'Col 1',col2:'Col 2',col3:'Col 3'}[k] || k; }
+
+async function bet(t) {
+  if(spinning) return;
+  if(insufficientLocked || balance < chip) { handleInsufficientFunds(); return; }
+  bets[t] = (bets[t]||0) + chip;
+  balance -= chip;
+  updateUI();
+  setSpinAvailable();
+}
+
+function clearBets() {
+  if(spinning) return;
+  const tot = pendingBetTotal();
+  balance += tot;
+  bets = {};
+  if(insufficientLocked && balance >= chip) insufficientLocked = false;
+  updateUI();
+  setSpinAvailable();
+}
+
+function calcWin(r, bets) {
+  let w=0;
+  for(const [k,amt] of Object.entries(bets)) {
+    let p=0;
+    if(k==='rojo' && RED.includes(r) && r!==0) p=amt*2;
+    else if(k==='negro' && !RED.includes(r) && r!==0) p=amt*2;
+    else if(k==='par' && r!==0 && r%2===0) p=amt*2;
+    else if(k==='impar' && r%2===1) p=amt*2;
+    else if(k==='bajo' && r>=1 && r<=18) p=amt*2;
+    else if(k==='alto' && r>=19 && r<=36) p=amt*2;
+    else if(k==='doc1' && r>=1 && r<=12) p=amt*3;
+    else if(k==='doc2' && r>=13 && r<=24) p=amt*3;
+    else if(k==='doc3' && r>=25 && r<=36) p=amt*3;
+    else if(k==='col1' && r!==0 && r%3===1) p=amt*3;
+    else if(k==='col2' && r!==0 && r%3===2) p=amt*3;
+    else if(k==='col3' && r!==0 && r%3===0) p=amt*3;
+    else if(k==='num_'+r) p=amt*36;
+    w+=p;
+  }
+  return w;
+}
+
+function drawWheel(a) {
+  const c = document.getElementById('wc'), ctx = c.getContext('2d'), cx=97.5, cy=97.5, r=94, n=WO.length, sl=(2*Math.PI)/n, rad=a*Math.PI/180;
+  ctx.clearRect(0,0,195,195);
+  ctx.beginPath(); ctx.arc(cx,cy,r+1,0,2*Math.PI); ctx.fillStyle='#8A6A1E'; ctx.fill();
+  for(let i=0;i<n;i++) {
+    const num=WO[i], s=rad+i*sl, e=s+sl;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,s,e);
+    ctx.fillStyle=num===0?'#1B7A40':RED.includes(num)?'#8B1A1A':'#111'; ctx.fill();
+    ctx.strokeStyle='#C9A84C'; ctx.lineWidth=0.6; ctx.stroke();
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(s+sl/2); ctx.translate(r*0.72,0); ctx.rotate(Math.PI/2);
+    ctx.fillStyle='#F0E6D3'; ctx.font='bold 8px sans-serif'; ctx.textAlign='center'; ctx.fillText(num,0,3);
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(cx,cy,8,0,2*Math.PI); ctx.fillStyle='#C9A84C'; ctx.fill();
+}
+
+async function spin() {
+  if(spinning) return;
+  const tot = pendingBetTotal();
+  if(insufficientLocked) { handleInsufficientFunds(); return; }
+  if(tot===0) { setMsg('Haz al menos una apuesta','neutral'); return; }
+  spinning = true;
+  document.getElementById('spinBtn').disabled = true;
+  document.getElementById('rnum').textContent = '...';
+  document.getElementById('rnum').style.color = 'var(--text-muted)';
+  document.getElementById('rdesc').textContent = 'Girando...';
+  const ri = Math.floor(Math.random()*37);
+  const result = WO[ri];
+  const totalRot = 1800 + ri*(360/37);
+  const dur = 4000, st = performance.now();
+  const anim = now => {
+    const el = now - st, t = Math.min(el/dur,1), ease = t<1 ? 1-Math.pow(1-t,4) : 1;
+    drawWheel((ease*totalRot)%360);
+    if(t<1) requestAnimationFrame(anim); else finishSpin(result);
+  };
+  requestAnimationFrame(anim);
+}
+
+async function finishSpin(result) {
+  spinning = false;
+  spins++;
+  const win = calcWin(result, bets);
+  const lost = pendingBetTotal();
+  bets = {};
+  if(win > 0) {
+    await updateGlobalWallet(win);
+  } else {
+    // Ya se descontó la apuesta al hacer bet(), solo mostramos pérdida
+  }
+  const rn = document.getElementById('rnum'), rd = document.getElementById('rdesc');
+  rn.textContent = result;
+  rn.style.color = result===0 ? '#2ecc71' : RED.includes(result) ? '#E74C3C' : 'var(--text)';
+  let desc = result===0 ? 'Verde' : (RED.includes(result) ? 'Rojo' : 'Negro') + (result%2===0 ? ' · Par' : ' · Impar');
+  rd.textContent = desc;
+  if(win>0) setMsg(`¡Ganaste ${win} créditos!`,'win');
+  else setMsg(`Perdiste ${lost} créditos`,'lose');
+  updateUI();
+  if(balance < chip) handleInsufficientFunds();
+  else insufficientLocked = false;
+  setSpinAvailable();
+}
+
+function selChip(v) { chip = v; document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',+c.dataset.v===v)); }
+
+// Inicialización
+(async function() {
+  await initCredits();
+  drawWheel(0);
+  if(balance < chip) handleInsufficientFunds();
+  else setSpinAvailable();
+})();
 </script>
 </body>
 </html>
