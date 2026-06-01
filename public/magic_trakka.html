@@ -125,7 +125,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#1a0533,var(--bg));color:#fff;
 <div class="game-logo">MAGIC TRAKKA</div>
 
 <div class="stats-row">
-  <div class="stat"><div class="sl">CRÉDITOS</div><div class="sv green" id="credEl">500</div></div>
+  <div class="stat"><div class="sl">CRÉDITOS</div><div class="sv green" id="credEl">0</div></div>
   <div class="stat"><div class="sl">APUESTA</div><div class="sv pur" id="betEl">5</div></div>
   <div class="stat"><div class="sl">GANANCIA</div><div class="sv pink" id="winEl">—</div></div>
   <div class="stat"><div class="sl">BONUS</div><div class="sv pur" id="fsEl">—</div></div>
@@ -181,10 +181,16 @@ const PAYLINES=[[1,1,1,1,1,1],[0,0,0,0,0,0],[2,2,2,2,2,2],[0,1,2,1,0,1],[2,1,0,1
 const BETS=[1,2,5,10,25,50,100];
 const REELS=6,ROWS=3,CELL_H=75;
 
-let credits=500,betIdx=2,freeSpins=0,bonusMeter=0,spinning=false,autoRun=false,cutReq=false;
+let credits=0,betIdx=2,freeSpins=0,bonusMeter=0,spinning=false,autoRun=false,cutReq=false,insufficientLocked=false;
 let strips=[],positions=[],stripEls=[];
 
 (function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)credits=c;}catch(e){}})();
+
+function postInsufficientFunds(){try{window.parent.postMessage({type:'insufficient_funds',open_shop:true},'*');}catch(e){}}
+function setSpinAvailable(){document.getElementById('spinBtn').disabled=spinning||insufficientLocked;document.getElementById('autoBtn').disabled=insufficientLocked;}
+function stopAuto(){autoRun=false;const btn=document.getElementById('autoBtn');btn.classList.remove('on');btn.textContent='AUTO';}
+function handleInsufficientFunds(){insufficientLocked=true;stopAuto();document.getElementById('cutBtn').disabled=true;setSpinAvailable();showBanner('Créditos insuficientes','','#EF4444');postInsufficientFunds();}
+window.addEventListener('message',e=>{const data=e.data;if(!data||data.type!=='credits')return;const value=Math.floor(Number(data.value));if(!Number.isFinite(value))return;credits=value;insufficientLocked=credits<BETS[betIdx]&&freeSpins===0;updUI(false);setSpinAvailable();});
 
 function buildStrips(){
   for(let r=0;r<REELS;r++){
@@ -244,7 +250,7 @@ function doSpin(){
   if(spinning)return;
   const bet=BETS[betIdx];
   const isFree=freeSpins>0;
-  if(!isFree){if(credits<bet){showBanner('SIN SALDO','','#EF4444');return;}credits-=bet;}
+  if(!isFree){if(insufficientLocked||credits<bet){handleInsufficientFunds();return;}credits-=bet;}
   else{freeSpins--;updEl('fsEl',freeSpins>0?'FREE×'+freeSpins:'—');}
   spinning=true;cutReq=false;
   document.getElementById('spinBtn').disabled=true;
@@ -276,7 +282,6 @@ function evalLine(syms6){
 
 function afterSpin(){
   spinning=false;
-  document.getElementById('spinBtn').disabled=false;
   document.getElementById('cutBtn').disabled=true;
   const grid=getGrid();
   let scatters=0,totalWin=0;
@@ -310,9 +315,10 @@ function afterSpin(){
   updEl('bmVal',bonusMeter+'/5');
   document.getElementById('bmFill').style.width=(bonusMeter/5*100)+'%';
   updUI();
+  if(freeSpins>0){insufficientLocked=false;setSpinAvailable();setTimeout(doSpin,400);return;}
+  if(credits<BETS[betIdx]){handleInsufficientFunds();return;}
+  insufficientLocked=false;setSpinAvailable();
   if(autoRun)setTimeout(doSpin,500);
-  else if(freeSpins>0)setTimeout(doSpin,400);
-  if(credits<=0&&!autoRun&&freeSpins===0){credits=500;updUI();showBanner('SALDO RECARGADO','','#c084fc');}
 }
 
 // BONUS
@@ -356,15 +362,17 @@ function showBanner(txt,sub,color){
   m.textContent=txt;m.style.color=color;s.textContent=sub;
   b.classList.remove('show');void b.offsetWidth;b.classList.add('show');
 }
-function chBet(d){if(spinning)return;betIdx=Math.max(0,Math.min(BETS.length-1,betIdx+d));updEl('betEl',BETS[betIdx]);}
-function toggleAuto(){autoRun=!autoRun;const btn=document.getElementById('autoBtn');btn.classList.toggle('on',autoRun);btn.textContent=autoRun?'STOP':'AUTO';if(autoRun&&!spinning)doSpin();}
+function chBet(d){if(spinning)return;betIdx=Math.max(0,Math.min(BETS.length-1,betIdx+d));updEl('betEl',BETS[betIdx]);if(insufficientLocked&&credits>=BETS[betIdx])insufficientLocked=false;setSpinAvailable();}
+function toggleAuto(){if(insufficientLocked){handleInsufficientFunds();return;}autoRun=!autoRun;const btn=document.getElementById('autoBtn');btn.classList.toggle('on',autoRun);btn.textContent=autoRun?'STOP':'AUTO';if(autoRun&&!spinning)doSpin();}
 function fmt(n){return Math.floor(n).toLocaleString('es-ES');}
 function updEl(id,val){document.getElementById(id).textContent=val;}
-function updUI(){document.getElementById('credEl').textContent=fmt(credits);try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}}
+function updUI(notify=true){document.getElementById('credEl').textContent=fmt(credits);if(notify){try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}}}
 
 buildStrips();buildDOM();
 for(let r=0;r<REELS;r++){positions[r]=Math.floor(Math.random()*strips[r].length);snapReel(r);}
-updUI();
+updUI(false);
+if(credits<BETS[betIdx]&&freeSpins===0)handleInsufficientFunds();
+else{insufficientLocked=false;setSpinAvailable();}
 </script>
 </body>
 </html>
