@@ -175,6 +175,7 @@ body {
     <button class="cat-btn active" onclick="filterCat(this,'all')">TODOS</button>
     <button class="cat-btn" onclick="filterCat(this,'slots')">🎰 TRAGAPERRAS</button>
     <button class="cat-btn" onclick="filterCat(this,'mesa')">🃏 MESA</button>
+    <button class="cat-btn" onclick="filterCat(this,'arcade')">🕹️ ARCADE</button>
   </div>
 
   <!-- CAROUSEL DE JUEGOS -->
@@ -182,14 +183,6 @@ body {
     <div class="nav-arrow nav-left" onclick="moveCarousel(-1)">◀</div>
     <div id="carouselTrack" style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
       
-      <div class="game-card" data-file="fruits.html" data-cat="slots" style="--theme-color:#00FF99">
-        <div class="card-art" style="background:linear-gradient(45deg, #111, #222);"><div class="card-icon">🍎🍊</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#00FF99;border-color:#00FF99;">SLOT EN VIVO</div><div class="card-title">FRUITS PARTY</div><div class="card-sub">Cluster Pays · Cascada</div></div>
-          <button class="card-btn" onclick="launchGame('fruits.html')">JUGAR</button>
-        </div>
-      </div>
-
       <div class="game-card" data-file="slots.html" data-cat="slots" style="--theme-color:#FF9900">
         <div class="card-art" style="background:linear-gradient(45deg, #111, #333);"><div class="card-icon">🎰🌟</div></div>
         <div class="card-info">
@@ -198,7 +191,7 @@ body {
         </div>
       </div>
 
-      <div class="game-card" data-file="keno.html" data-cat="mesa" style="--theme-color:#00D4FF">
+      <div class="game-card" data-file="keno.html" data-cat="arcade" style="--theme-color:#00D4FF">
         <div class="card-art" style="background:linear-gradient(45deg, #051a2e, #0a0a14);"><div class="card-icon">🎱🔮</div></div>
         <div class="card-info">
           <div><div class="game-badge" style="color:#00D4FF;border-color:#00D4FF;">NUMÉRICOS</div><div class="card-title">KENO TURBO</div><div class="card-sub">Multiplicadores Rápidos</div></div>
@@ -206,11 +199,59 @@ body {
         </div>
       </div>
 
-      <div class="game-card" data-file="mines.html" data-cat="mesa" style="--theme-color:#EF4444">
+      <div class="game-card" data-file="mines.html" data-cat="arcade" style="--theme-color:#EF4444">
         <div class="card-art" style="background:linear-gradient(45deg, #2a0808, #0a0a12);"><div class="card-icon">💣💎</div></div>
         <div class="card-info">
           <div><div class="game-badge" style="color:#EF4444;border-color:#EF4444;">MINAS</div><div class="card-title">MINES ARCADE</div><div class="card-sub">Esquiva y Multiplica</div></div>
           <button class="card-btn" onclick="launchGame('mines.html')">ABRIR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="blackjack.html" data-cat="mesa" style="--theme-color:#FACC15">
+        <div class="card-art" style="background:linear-gradient(45deg, #1f1300, #0a0a12);"><div class="card-icon">🃏♠️</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#FACC15;border-color:#FACC15;">MESA</div><div class="card-title">BLACKJACK VIP</div><div class="card-sub">21 Clásico · Dealer Live</div></div>
+          <button class="card-btn" onclick="launchGame('blackjack.html')">JUGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="magic_trakka.html" data-cat="slots" style="--theme-color:#A855F7">
+        <div class="card-art" style="background:linear-gradient(45deg, #1b0838, #0a0a12);"><div class="card-icon">✨🚂</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#A855F7;border-color:#A855F7;">SLOT MÁGICA</div><div class="card-title">MAGIC TRAKKA</div><div class="card-sub">Bonos · Rieles Encantados</div></div>
+          <button class="card-btn" onclick="launchGame('magic_trakka.html')">GIRAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="crash.html" data-cat="arcade" style="--theme-color:#22C55E">
+        <div class="card-art" style="background:linear-gradient(45deg, #062a16, #0a0a12);"><div class="card-icon">🚀📈</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#22C55E;border-color:#22C55E;">CRASH</div><div class="card-title">ROCKET CRASH</div><div class="card-sub">Retira antes del impacto</div></div>
+          <button class="card-btn" onclick="launchGame('crash.html')">DESPEGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="roulette.html" data-cat="mesa" style="--theme-color:#DC2626">
+        <div class="card-art" style="background:linear-gradient(45deg, #2a0606, #0a0a12);"><div class="card-icon">🎡♦️</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#DC2626;border-color:#DC2626;">RULETA</div><div class="card-title">ROULETTE ROYALE</div><div class="card-sub">Rojo / Negro · Pleno</div></div>
+          <button class="card-btn" onclick="launchGame('roulette.html')">APOSTAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="poker.html" data-cat="mesa" style="--theme-color:#38BDF8">
+        <div class="card-art" style="background:linear-gradient(45deg, #041b2b, #0a0a12);"><div class="card-icon">♣️♥️</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#38BDF8;border-color:#38BDF8;">POKER</div><div class="card-title">POKER NIGHT</div><div class="card-sub">Cartas · Estrategia VIP</div></div>
+          <button class="card-btn" onclick="launchGame('poker.html')">JUGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-file="3_en_1.html" data-cat="slots" style="--theme-color:#FB7185">
+        <div class="card-art" style="background:linear-gradient(45deg, #3a0715, #0a0a12);"><div class="card-icon">🎰🎲</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#FB7185;border-color:#FB7185;">MULTIJUEGO</div><div class="card-title">TRIPLE 3 EN 1</div><div class="card-sub">Slots · Dados · Sorpresas</div></div>
+          <button class="card-btn" onclick="launchGame('3_en_1.html')">ENTRAR</button>
         </div>
       </div>
 
@@ -340,7 +381,9 @@ async function updateHUD() {
 
 function launchGame(file) {
   document.getElementById("gameActiveTitle").innerText = file.replace(".html","").toUpperCase();
-  document.getElementById("gameFrame").src = `/${file}`;
+  const savedCredits = localStorage.getItem("arcade_credits");
+  const creditsParam = savedCredits !== null ? `&c=${encodeURIComponent(savedCredits)}` : "";
+  document.getElementById("gameFrame").src = `/${file}?u=${encodeURIComponent(currentUser)}${creditsParam}`;
   document.getElementById("gameContainer").style.display = "flex";
 }
 
@@ -374,6 +417,19 @@ function moveCarousel(direction) {
     else if(idx === (carouselIndex - 1 + cards.length) % cards.length) card.classList.add("prev");
     else card.classList.add("hidden-card");
   });
+}
+
+function filterCat(btn, category) {
+  document.querySelectorAll('.cat-btn').forEach(catBtn => catBtn.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.game-card').forEach(card => {
+    const matchesCategory = category === 'all' || card.dataset.cat === category;
+    card.classList.toggle('cat-hidden', !matchesCategory);
+  });
+
+  carouselIndex = 0;
+  moveCarousel(0);
 }
 
 window.onload = () => {
