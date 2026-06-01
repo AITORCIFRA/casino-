@@ -182,35 +182,75 @@ body {
     <div class="nav-arrow nav-left" onclick="moveCarousel(-1)">◀</div>
     <div id="carouselTrack" style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
       
-      <div class="game-card" data-file="fruits.html" data-cat="slots" style="--theme-color:#00FF99">
-        <div class="card-art" style="background:linear-gradient(45deg, #111, #222);"><div class="card-icon">🍎🍊</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#00FF99;border-color:#00FF99;">SLOT EN VIVO</div><div class="card-title">FRUITS PARTY</div><div class="card-sub">Cluster Pays · Cascada</div></div>
-          <button class="card-btn" onclick="launchGame('fruits.html')">JUGAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-file="slots.html" data-cat="slots" style="--theme-color:#FF9900">
+      <div class="game-card" data-game="slots" data-file="slots.html" data-cat="slots" style="--theme-color:#FF9900">
         <div class="card-art" style="background:linear-gradient(45deg, #111, #333);"><div class="card-icon">🎰🌟</div></div>
         <div class="card-info">
           <div><div class="game-badge" style="color:#FF9900;border-color:#FF9900;">CLÁSICO</div><div class="card-title">LUCKY SEVENS</div><div class="card-sub">5 Rodillos · Jackpot</div></div>
-          <button class="card-btn" onclick="launchGame('slots.html')">GIRAR</button>
+          <button class="card-btn" onclick="launchGame('slots')">GIRAR</button>
         </div>
       </div>
 
-      <div class="game-card" data-file="keno.html" data-cat="mesa" style="--theme-color:#00D4FF">
+      <div class="game-card" data-game="magic_trakka" data-file="magic_trakka.html" data-cat="slots" style="--theme-color:#A855F7">
+        <div class="card-art" style="background:linear-gradient(45deg, #1a092e, #090912);"><div class="card-icon">🪄🚂</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#A855F7;border-color:#A855F7;">BONOS</div><div class="card-title">MAGIC TRAKKA</div><div class="card-sub">Slot de bonos</div></div>
+          <button class="card-btn" onclick="launchGame('magic_trakka')">JUGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-game="blackjack" data-file="blackjack.html" data-cat="mesa" style="--theme-color:#00FF99">
+        <div class="card-art" style="background:linear-gradient(45deg, #061f14, #0a0a12);"><div class="card-icon">🃏♠️</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#00FF99;border-color:#00FF99;">MESA</div><div class="card-title">BLACKJACK</div><div class="card-sub">21 · Doblar · Plantarse</div></div>
+          <button class="card-btn" onclick="launchGame('blackjack')">JUGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-game="roulette" data-file="roulette.html" data-cat="mesa" style="--theme-color:#EF4444">
+        <div class="card-art" style="background:linear-gradient(45deg, #2a0808, #0a0a12);"><div class="card-icon">🎡🔴</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#EF4444;border-color:#EF4444;">RULETA</div><div class="card-title">RULETA EUROPEA</div><div class="card-sub">37 números · Apuestas completas</div></div>
+          <button class="card-btn" onclick="launchGame('roulette')">GIRAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-game="keno" data-file="keno.html" data-cat="mesa" style="--theme-color:#00D4FF">
         <div class="card-art" style="background:linear-gradient(45deg, #051a2e, #0a0a14);"><div class="card-icon">🎱🔮</div></div>
         <div class="card-info">
-          <div><div class="game-badge" style="color:#00D4FF;border-color:#00D4FF;">NUMÉRICOS</div><div class="card-title">KENO TURBO</div><div class="card-sub">Multiplicadores Rápidos</div></div>
-          <button class="card-btn" onclick="launchGame('keno.html')">APRESTAR</button>
+          <div><div class="game-badge" style="color:#00D4FF;border-color:#00D4FF;">NUMÉRICOS</div><div class="card-title">KENO TURBO</div><div class="card-sub">Multiplicadores rápidos</div></div>
+          <button class="card-btn" onclick="launchGame('keno')">APOSTAR</button>
         </div>
       </div>
 
-      <div class="game-card" data-file="mines.html" data-cat="mesa" style="--theme-color:#EF4444">
-        <div class="card-art" style="background:linear-gradient(45deg, #2a0808, #0a0a12);"><div class="card-icon">💣💎</div></div>
+      <div class="game-card" data-game="mines" data-file="mines.html" data-cat="mesa" style="--theme-color:#FACC15">
+        <div class="card-art" style="background:linear-gradient(45deg, #2a2108, #0a0a12);"><div class="card-icon">💣💎</div></div>
         <div class="card-info">
-          <div><div class="game-badge" style="color:#EF4444;border-color:#EF4444;">MINAS</div><div class="card-title">MINES ARCADE</div><div class="card-sub">Esquiva y Multiplica</div></div>
-          <button class="card-btn" onclick="launchGame('mines.html')">ABRIR</button>
+          <div><div class="game-badge" style="color:#FACC15;border-color:#FACC15;">MINAS</div><div class="card-title">MINES ARCADE</div><div class="card-sub">Esquiva y multiplica</div></div>
+          <button class="card-btn" onclick="launchGame('mines')">ABRIR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-game="crash" data-file="crash.html" data-cat="mesa" style="--theme-color:#22C55E">
+        <div class="card-art" style="background:linear-gradient(45deg, #062510, #0a0a12);"><div class="card-icon">🚀📈</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#22C55E;border-color:#22C55E;">CRASH</div><div class="card-title">CRASH</div><div class="card-sub">Retira antes del impacto</div></div>
+          <button class="card-btn" onclick="launchGame('crash')">DESPEGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-game="poker" data-file="poker.html" data-cat="mesa" style="--theme-color:#F97316">
+        <div class="card-art" style="background:linear-gradient(45deg, #2a1205, #0a0a12);"><div class="card-icon">♣️♦️</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#F97316;border-color:#F97316;">POKER</div><div class="card-title">TEXAS HOLD'EM</div><div class="card-sub">Mesa premium</div></div>
+          <button class="card-btn" onclick="launchGame('poker')">JUGAR</button>
+        </div>
+      </div>
+
+      <div class="game-card" data-game="3_en_1" data-file="3_en_1.html" data-cat="slots" style="--theme-color:#EC4899">
+        <div class="card-art" style="background:linear-gradient(45deg, #2a0618, #0a0a12);"><div class="card-icon">🐉🍒</div></div>
+        <div class="card-info">
+          <div><div class="game-badge" style="color:#EC4899;border-color:#EC4899;">3 EN 1</div><div class="card-title">LINK TRIPLE</div><div class="card-sub">Dragon · Party · Funny</div></div>
+          <button class="card-btn" onclick="launchGame('3_en_1')">JUGAR</button>
         </div>
       </div>
 
@@ -276,11 +316,32 @@ body {
 <!-- ============ SCRIPTS CORREGIDOS ============ -->
 <script>
 const API_URL = "http://localhost:5000/api";
+
+// Fuente única de verdad del lobby: IDs canónicos -> archivos reales en /public.
+const GAME_MAP = {
+  slots: { file: "slots.html", title: "LUCKY SEVENS" },
+  magic_trakka: { file: "magic_trakka.html", title: "MAGIC TRAKKA" },
+  blackjack: { file: "blackjack.html", title: "BLACKJACK" },
+  roulette: { file: "roulette.html", title: "RULETA EUROPEA" },
+  keno: { file: "keno.html", title: "KENO TURBO" },
+  mines: { file: "mines.html", title: "MINES ARCADE" },
+  crash: { file: "crash.html", title: "CRASH" },
+  poker: { file: "poker.html", title: "TEXAS HOLD'EM" },
+  "3_en_1": { file: "3_en_1.html", title: "LINK TRIPLE 3 EN 1" }
+};
+
+const GAME_BY_FILE = Object.values(GAME_MAP).reduce((acc, game) => {
+  acc[game.file] = game;
+  return acc;
+}, {});
+
 let currentUser = localStorage.getItem("arcade_user") || null;
 let carouselIndex = 0;
+let hudInterval = null;
 
 function toggleChat() {
   const bar = document.getElementById("mainChatBar");
+  if (!bar) return;
   bar.classList.toggle("collapsed");
   bar.classList.toggle("expanded");
 }
@@ -299,7 +360,7 @@ async function doLogin(action) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
-    
+
     const data = await res.json();
     if (res.ok) {
       localStorage.setItem("arcade_user", username);
@@ -311,58 +372,68 @@ async function doLogin(action) {
   } catch(e) { alert("No se pudo conectar con el servidor."); }
 }
 
-// --- LÓGICA DE CRÉDITOS FIJOS ---
 async function updateHUD() {
-  if(!currentUser) return;
+  if(!currentUser) return Number(localStorage.getItem("arcade_credits")) || 0;
+
+  let balance = Number(localStorage.getItem("arcade_credits")) || 0;
   try {
     const resWallet = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
     if(resWallet.ok) {
       const dataW = await resWallet.json();
-      const balance = Math.floor(dataW.balance);
-      
-      // Guardamos en localStorage para persistencia
+      balance = Math.floor(dataW.balance);
       localStorage.setItem("arcade_credits", balance);
-      
+
       const creditsEl = document.getElementById("lobbyCredits");
       if(creditsEl) creditsEl.innerText = balance.toLocaleString();
     }
-    
-    // Progresión
+
     const resProg = await fetch(`${API_URL}/progression/battlepass/${currentUser}`);
     if(resProg.ok) {
       const dataP = await resProg.json();
       if(document.getElementById("lobbyLevel")) document.getElementById("lobbyLevel").innerText = dataP.level;
       if(document.getElementById("lobbyName")) document.getElementById("lobbyName").innerText = currentUser.toUpperCase();
-      // ... resto de tu lógica ...
     }
   } catch(err) { console.log("Servidor en pausa..."); }
+
+  return balance;
 }
 
-function launchGame(file) {
-  document.getElementById("gameActiveTitle").innerText = file.replace(".html","").toUpperCase();
-  document.getElementById("gameFrame").src = `/${file}`;
+function getCurrentBalance() {
+  const cached = Number(localStorage.getItem("arcade_credits"));
+  return Number.isFinite(cached) && cached >= 0 ? Math.floor(cached) : 0;
+}
+
+function resolveGame(gameIdOrFile) {
+  return GAME_MAP[gameIdOrFile] || GAME_BY_FILE[gameIdOrFile] || null;
+}
+
+function launchGame(gameIdOrFile) {
+  const game = resolveGame(gameIdOrFile);
+  if (!game) { alert("Juego no disponible."); return; }
+
+  const balance = getCurrentBalance();
+  const file = game.file;
+  document.getElementById("gameActiveTitle").innerText = game.title;
+  document.getElementById("gameFrame").src = `/${file}?u=${encodeURIComponent(currentUser)}&c=${balance}`;
   document.getElementById("gameContainer").style.display = "flex";
 }
 
 function closeGame() {
-  // OCULTAR SIN RECARGAR
   document.getElementById("gameContainer").style.display = "none";
   document.getElementById("gameFrame").src = "";
-  // Forzar actualización al volver
   updateHUD();
 }
 
 function initLobby() {
-  // Carga inicial inmediata desde caché
   const savedCredits = localStorage.getItem("arcade_credits");
   if(savedCredits) document.getElementById("lobbyCredits").innerText = parseInt(savedCredits).toLocaleString();
-  
+  if(currentUser && document.getElementById("lobbyName")) document.getElementById("lobbyName").innerText = currentUser.toUpperCase();
+
   updateHUD();
-  setInterval(updateHUD, 4000);
+  if (!hudInterval) hudInterval = setInterval(updateHUD, 4000);
   moveCarousel(0);
 }
 
-// RESTO DE FUNCIONES (moveCarousel, filterCat, etc...)
 function moveCarousel(direction) {
   const cards = Array.from(document.querySelectorAll('.game-card:not(.cat-hidden)'));
   if(cards.length === 0) return;
@@ -376,6 +447,50 @@ function moveCarousel(direction) {
   });
 }
 
+function filterCat(button, category) {
+  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+  if (button) button.classList.add('active');
+
+  document.querySelectorAll('.game-card').forEach(card => {
+    const visible = category === 'all' || card.dataset.cat === category;
+    card.classList.toggle('cat-hidden', !visible);
+  });
+
+  carouselIndex = 0;
+  moveCarousel(0);
+}
+
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add('open');
+}
+
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('open');
+}
+
+function sendChat() {
+  const input = document.getElementById('chatMsgInput');
+  const box = document.getElementById('chatBox');
+  const msg = input ? input.value.trim() : '';
+  if (!msg || !box) return;
+  const row = document.createElement('div');
+  row.textContent = `${currentUser || 'VIP'}: ${msg}`;
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+  input.value = '';
+}
+
+window.addEventListener('message', (event) => {
+  if (!event.data || event.data.type !== 'credits') return;
+  const balance = Math.floor(Number(event.data.value));
+  if (!Number.isFinite(balance) || balance < 0) return;
+  localStorage.setItem("arcade_credits", balance);
+  const creditsEl = document.getElementById("lobbyCredits");
+  if(creditsEl) creditsEl.innerText = balance.toLocaleString();
+});
+
 window.onload = () => {
   if(currentUser) {
     document.getElementById("authScreen").classList.add("hidden");
@@ -385,7 +500,6 @@ window.onload = () => {
 };
 
 function doLogout() { localStorage.clear(); window.location.reload(); }
-// Añade aquí tus funciones faltantes de openModal/closeModal/etc que no cambiaron
 </script>
 
 </body>

@@ -10,24 +10,24 @@ Plataforma de juegos de casino estilo máquina arcade (inspirada en el concepto 
 ```
 arcade-casino/
 │
-├── index.html                  ← LOBBY PRINCIPAL (pantalla de inicio)
+├── public/
+│   ├── index.html              ← LOBBY PRINCIPAL y fuente única de verdad
+│   ├── slots.html              ✅ Lucky Sevens — Video Slot 5 rodillos
+│   ├── magic_trakka.html       ✅ Magic Trakka — Slot de bonos
+│   ├── blackjack.html          ✅ Blackjack — 21 con doble y blackjack natural
+│   ├── roulette.html           ✅ Ruleta Europea — 37 números, apuestas completas
+│   ├── keno.html               ✅ Keno Turbo — 80 números, elige hasta 10
+│   ├── mines.html              ✅ Mines Arcade — esquiva minas y multiplica
+│   ├── crash.html              ✅ Crash — retira antes del impacto
+│   ├── poker.html              ✅ Texas Hold'em — mesa premium
+│   └── 3_en_1.html             ✅ Link Triple — Dragon, Fruits Party y Funny Fruits
 │
 ├── css/
-│   └── lobby.css               ← Estilos del lobby, animaciones, cards, layout
+│   └── lobby.css               ← Estilos históricos del lobby
 │
-├── js/
-│   ├── lobby.js                ← Lógica del lobby: routing, transiciones, jackpot
-│   └── particles.js            ← Sistema de partículas ambientales (canvas)
-│
-└── games/
-    ├── slots.html              ✅ Lucky Sevens — Video Slot 5 rodillos
-    ├── magic_trakka.html       🔜 Magic Trakka — Slot de bonos (placeholder)
-    ├── fruits.html             🔜 Fruits Party — Slot de cascada (placeholder)
-    ├── roulette.html           ✅ Ruleta Europea — 37 números, apuestas completas
-    ├── blackjack.html          ✅ Blackjack — 21 con doble y blackjack natural
-    ├── keno.html               ✅ Keno Turbo — 80 números, elige hasta 10
-    ├── dragon_link.html        🔜 Dragon Magic Link — Jackpot multinivel (placeholder)
-    └── funny_fruits.html       🔜 Funny Fruits Link — Jackpot multinivel (placeholder)
+└── js/
+    ├── lobby.js                ← Stub intencional para evitar lógica duplicada
+    └── particles.js            ← Sistema de partículas ambientales (canvas)
 ```
 
 ---
@@ -110,7 +110,7 @@ Los juegos envían actualizaciones de créditos al lobby mediante:
 window.parent.postMessage({ type: 'credits', value: creditsValue }, '*');
 ```
 
-El lobby escucha en `js/lobby.js` con:
+El lobby escucha en `public/index.html` con:
 
 ```javascript
 window.addEventListener('message', (e) => {
@@ -139,11 +139,11 @@ window.addEventListener('message', (e) => {
 ## 🚀 Expansión Futura
 
 ```
-games/
-├── magic_trakka.html     → Implementar slot con mecánica de bonos
-├── fruits.html           → Slot con cascada (cluster pays)
-├── dragon_link.html      → Link con jackpot acumulado compartido
-└── funny_fruits.html     → Link con multiplicadores
+public/
+├── magic_trakka.html     → Slot con mecánica de bonos
+├── mines.html            → Juego de riesgo con multiplicadores
+├── crash.html            → Juego de multiplicador creciente
+└── 3_en_1.html           → Link triple con Dragon, Party y Funny
 
 js/
 ├── credits.js            → Sistema de créditos global centralizado
