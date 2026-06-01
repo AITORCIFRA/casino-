@@ -46,9 +46,38 @@ h1{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.15em;color:var(--n
 .pt{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;max-width:600px;width:100%;margin-top:.5rem}
 .pt-cell{background:rgba(255,255,255,.04);border-radius:4px;padding:3px;text-align:center;font-size:9px;font-family:var(--font-u);color:var(--gold)}
 .pt-cell span{display:block;color:rgba(255,255,255,.5);font-size:8px;margin-bottom:1px}
+/* Shop modal */
+.shop-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.shop-modal.active{opacity:1;pointer-events:auto}
+.shop-content{background:#071823;border:2px solid var(--gold);box-shadow:0 0 40px rgba(201,168,76,.35);border-radius:16px;width:min(380px,calc(100vw - 2rem));padding:25px;text-align:center;position:relative;font-family:var(--font-u)}
+.shop-close-btn{position:absolute;top:15px;right:15px;background:none;border:none;color:rgba(255,255,255,.45);font-size:20px;cursor:pointer;font-weight:bold}
+.shop-close-btn:hover{color:var(--red)}
+.shop-title{color:var(--gold);font-size:20px;margin-bottom:20px;font-weight:900;letter-spacing:1px}
+.shop-option{background:#041018;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:.2s}
+.shop-option:hover{border-color:var(--neon);background:#082131;transform:scale(1.02)}
+.shop-pack-name{font-weight:bold;font-family:var(--font-b);font-size:18px;color:#fff}
+.shop-pack-price{color:var(--green);font-weight:900}
 </style>
 </head>
 <body>
+<div class="shop-modal" id="shopModalNode">
+  <div class="shop-content">
+    <button class="shop-close-btn" onclick="closeShopModal()">✕</button>
+    <div class="shop-title">RECARGA DE CRÉDITOS</div>
+    <div class="shop-option" onclick="buyCredits(5000)">
+      <span class="shop-pack-name">Bronce Pack (+5.000)</span>
+      <span class="shop-pack-price">5.00 €</span>
+    </div>
+    <div class="shop-option" onclick="buyCredits(20000)">
+      <span class="shop-pack-name">Plata Pack (+20.000)</span>
+      <span class="shop-pack-price">15.00 €</span>
+    </div>
+    <div class="shop-option" onclick="buyCredits(100000)">
+      <span class="shop-pack-name">Oro Pack (+100.000)</span>
+      <span class="shop-pack-price">50.00 €</span>
+    </div>
+  </div>
+</div>
 <h1>KENO TURBO</h1>
 <div class="stats-row">
   <div class="stat"><div class="stat-lbl">CRÉDITOS</div><div class="stat-val cval" id="cred">500</div></div>
@@ -87,7 +116,21 @@ const PAY_TABLE = {
 let credits=500, betIdx=3, picked=new Set(), playing=false;
 
 // Configuración de la URL de tu API del Backend
-const BACKEND_API_URL = 'http://localhost:5000/api/keno/play'; // Cambia esto por tu ruta real
+const BACKEND_API_URL = '/api/games/keno/play';
+
+function getUsername() {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const queryUser = (p.get('u') || '').trim();
+    if (queryUser) {
+      localStorage.setItem('arcade_user', queryUser);
+      return queryUser;
+    }
+    return (localStorage.getItem('arcade_user') || '').trim();
+  } catch(e) {
+    return '';
+  }
+}
 
 (function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)credits=c;}catch(e){}})();
 
@@ -161,7 +204,10 @@ function chBet(d) {
 async function playKeno() {
   if(playing||picked.size<1) return;
   const bet=BETS[betIdx];
-  if(credits<bet) return;
+  if(credits<bet) {
+    openShopModal();
+    return;
+  }
   
   playing=true;
   document.getElementById('playBtn').disabled=true;
@@ -185,14 +231,20 @@ async function playKeno() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        username: getUsername(),
         numbers: Array.from(picked),
         bet: bet
       })
     });
 
-    if (!response.ok) throw new Error('Error en el servidor');
-    
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    const serverMessage = data.detail || data.message || '';
+    const shouldOpenShop = response.status === 402 || data.open_shop === true || /saldo|cr[eé]ditos|fondos/i.test(serverMessage);
+    if (shouldOpenShop) {
+      openShopModal();
+      throw Object.assign(new Error(serverMessage || 'Créditos insuficientes'), { openShop: true });
+    }
+    if (!response.ok) throw new Error(serverMessage || 'Error en el servidor');
     
     // Asignamos las variables con lo que dictamine el Backend
     drawn = data.winning_numbers; // Array de 20 números [3, 45, ...]
@@ -201,8 +253,8 @@ async function playKeno() {
     
   } catch (error) {
     console.error("Fallo de red o servidor:", error);
-    document.getElementById('resultMsg').style.color = '#FF3366';
-    document.getElementById('resultMsg').textContent = 'ERROR DE CONEXIÓN';
+    document.getElementById('resultMsg').style.color = error.openShop ? '#C9A84C' : '#FF3366';
+    document.getElementById('resultMsg').textContent = error.openShop ? 'RECARGA CRÉDITOS PARA JUGAR' : 'ERROR DE CONEXIÓN';
     document.getElementById('hitsD').textContent = '-';
     document.getElementById('playBtn').disabled = false;
     playing = false;
@@ -243,6 +295,21 @@ async function playKeno() {
 }
 
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function openShopModal() {
+  document.getElementById('shopModalNode').classList.add('active');
+}
+
+function closeShopModal() {
+  document.getElementById('shopModalNode').classList.remove('active');
+}
+
+function buyCredits(amount) {
+  try {
+    window.parent.postMessage({type:'open_shop', amount}, '*');
+  } catch(e) {}
+  closeShopModal();
+}
 
 function updateUI(){
   document.getElementById('cred').textContent=credits.toLocaleString('es-ES');

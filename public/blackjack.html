@@ -227,7 +227,7 @@ async function updateGlobalWallet(amount) {
   if (amount === 0) return;
   const res = await WalletAPI.transaccionar('blackjack', amount);
   if (res.success) {
-    credits = res.saldo;
+    credits = (res.new_balance ?? res.balance);
     updateUI();
   } else {
     if (amount < 0) triggerInsufficientFundsAlert();
@@ -345,7 +345,7 @@ async function deal(){
     return;
   }
 
-  credits = res.saldo;
+  credits = (res.new_balance ?? res.balance);
   updateUI();
 
   phase='play';
@@ -412,7 +412,7 @@ async function doubleDown(){
     return;
   }
 
-  credits = res.saldo;
+  credits = (res.new_balance ?? res.balance);
   bet*=2;
   document.getElementById('betD').textContent=bet;
   updateUI();
@@ -448,7 +448,7 @@ async function determineWinner(){
     setMsg('Pagando premio...');
     const res = await WalletAPI.transaccionar('blackjack', winAmt);
     if(res.success) {
-      credits = res.saldo;
+      credits = (res.new_balance ?? res.balance);
     }
     updateUI();
   }

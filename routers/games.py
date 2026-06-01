@@ -10,6 +10,8 @@ from core.database import DB
 
 router = APIRouter(prefix="/api/games", tags=["Juegos Arcade"])
 
+XP_PER_LEVEL = 100
+
 KENO_PAYTABLE = {
     1: {1: 3},
     2: {2: 10, 1: 1},
@@ -287,6 +289,7 @@ async def play_keno(request: KenoPlayRequest):
         "win_amount": win_amount,
     })
     return payload
+
 
 
 @router.post("/mines/start")
