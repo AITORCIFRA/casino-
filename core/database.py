@@ -5,10 +5,11 @@ from mysql.connector.abstracts import MySQLConnectionAbstract, MySQLCursorAbstra
 import json
 from typing import Any, Dict, List, Optional, Union, cast
 
+# Configuración de la Base de Datos corregida
 DB_CONFIG = {
     'host': 'localhost',
-    'user': 'root',          # cámbialo si usas otro usuario
-    'password': 'tu_contraseña',  # pon la contraseña real
+    'user': 'casino_user',         
+    'password': 'casino123',  
     'database': 'arcade_premium_db'
 }
 
@@ -50,14 +51,14 @@ def init_db():
             )
         """)
 
-        # Tabla players (perfil)
+       # Tabla players (perfil)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS players (
                 username VARCHAR(50) PRIMARY KEY,
                 credits BIGINT DEFAULT 50000,
                 current_level INT DEFAULT 1,
                 current_xp INT DEFAULT 0,
-                avatar_url TEXT DEFAULT 'https://api.dicebear.com/7.x/bottts/svg?seed=default',
+                avatar_url VARCHAR(512) DEFAULT 'https://api.dicebear.com/7.x/bottts/svg?seed=default',
                 is_vip_user BOOLEAN DEFAULT FALSE,
                 unique_id VARCHAR(10) UNIQUE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -283,6 +284,15 @@ def get_league(username: str) -> Dict[str, Any]:
             return {"points": 0, "rank": "Bronce"}
     finally:
         conn.close()
+
+# Parche temporal para evitar el ImportError en routers/games.py
+def update_battlepass(*args, **kwargs):
+    print("WARNING: update_battlepass temporal ejecutada (no hace nada)")
+    return True
+# Parche temporal para evitar el ImportError de update_league
+def update_league(*args, **kwargs):
+    print("WARNING: update_league temporal ejecutada (no hace nada)")
+    return True
 
 # Inicializar base de datos al importar
 init_db()
