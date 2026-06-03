@@ -475,6 +475,14 @@ function updateUI(){
 
 // Inicialización asíncrona de saldo desde la base de datos central
 initWallet();
+
+// Escuchar actualizaciones de créditos desde el lobby
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'credits_updated') {
+    credits = Math.floor(event.data.balance);
+    updateUI();
+  }
+});
 </script>
 </body>
 </html>

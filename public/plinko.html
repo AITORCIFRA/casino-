@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>PLINKO EXTREME</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/js/wallet.js"></script>
+<script src="/animations.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; padding: 20px; overflow: hidden; }
+
+.header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; }
+.title { font-family: 'Orbitron'; font-size: 24px; color: #FF9F43; font-weight: 900; letter-spacing: 2px; }
+.credits-display { font-family: 'Orbitron'; font-size: 18px; color: #00FF99; }
+
+.game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+
+.plinko-board { width: 400px; height: 500px; background: radial-gradient(circle, #1a1a2e 0%, #09090e 100%); border: 3px solid #FF9F43; border-radius: 15px; position: relative; overflow: hidden; }
+.peg { position: absolute; width: 12px; height: 12px; background: #FF9F43; border-radius: 50%; box-shadow: 0 0 10px #FF9F43; }
+.ball { position: absolute; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #FFD700, #FF9F43); border-radius: 50%; box-shadow: 0 0 15px #FFD700; }
+.bucket { position: absolute; bottom: 10px; width: 50px; height: 30px; background: rgba(0,255,153,0.2); border: 2px solid #00FF99; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #00FF99; }
+
+.controls { display: flex; gap: 15px; }
+.btn { font-family: 'Orbitron'; font-weight: 900; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: all 0.3s; }
+.btn-drop { background: linear-gradient(135deg, #FF9F43, #FFD700); color: #000; box-shadow: 0 4px 15px rgba(255,159,67,0.3); }
+.btn-drop:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,159,67,0.5); }
+.btn-drop:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.result { font-family: 'Bebas Neue'; font-size: 32px; color: #00FF99; text-align: center; min-height: 40px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">🎪 PLINKO EXTREME</div>
+  <div class="credits-display">CRÉDITOS: <span id="credits">0</span></div>
+</div>
+
+<div class="game-area">
+  <div class="plinko-board" id="board">
+    <div class="result" id="result"></div>
+  </div>
+  <div class="controls">
+    <button class="btn btn-drop" id="dropBtn" onclick="dropBall()">SOLTAR BOLA</button>
+  </div>
+</div>
+
+<script>
+let credits = 0;
+let isDropping = false;
+const BET = 50;
+const winAnim = new WinAnimation();
+
+async function initCredits() {
+  credits = await WalletAPI.getBalance();
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById('credits').textContent = credits.toLocaleString();
+  window.parent.postMessage({ type: 'credits', value: credits }, '*');
+}
+
+async function dropBall() {
+  if (isDropping || credits < BET) {
+    if (credits < BET) WalletAPI.openShop();
+    return;
+  }
+  
+  isDropping = true;
+  document.getElementById('dropBtn').disabled = true;
+  
+  // Deducir apuesta
+  const res = await WalletAPI.transaccionar('plinko', -BET);
+  if (!res.success) {
+    isDropping = false;
+    document.getElementById('dropBtn').disabled = false;
+    return;
+  }
+  
+  credits = res.new_balance;
+  updateUI();
+  
+  // Simular caída y premio
+  const multipliers = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5];
+  const winMultiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+  const winAmount = Math.floor(BET * winMultiplier);
+  
+  // Animación de caída
+  setTimeout(async () => {
+    document.getElementById('result').textContent = `×${winMultiplier}`;
+    
+    if (winAmount > 0) {
+      const resWin = await WalletAPI.transaccionar('plinko', winAmount);
+      if (resWin.success) {
+        credits = resWin.new_balance;
+        updateUI();
+        winAnim.fountainEffect(winAmount);
+      }
+    }
+    
+    setTimeout(() => {
+      document.getElementById('result').textContent = '';
+      isDropping = false;
+      document.getElementById('dropBtn').disabled = false;
+    }, 1500);
+  }, 1000);
+}
+
+initCredits();
+
+// Escuchar actualizaciones de créditos desde el lobby
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'credits_updated') {
+    credits = Math.floor(event.data.balance);
+    updateUI();
+  }
+});
+</script>
+</body>
+</html>

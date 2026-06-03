@@ -283,6 +283,15 @@ function selChip(v) { chip = v; document.querySelectorAll('.chip').forEach(c=>c.
   drawWheel(0);
   if(balance < chip) handleInsufficientFunds();
   else setSpinAvailable();
+  
+  // Escuchar actualizaciones de créditos desde el lobby
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'credits_updated') {
+      balance = Math.floor(event.data.balance);
+      updateUI();
+      setSpinAvailable();
+    }
+  });
 })();
 </script>
 </body>

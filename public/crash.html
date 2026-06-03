@@ -704,6 +704,14 @@
 
   window.onresize = initPositions;
   window.onload = initGlobalWallet;
+  
+  // Escuchar actualizaciones de créditos desde el lobby
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'credits_updated') {
+      globalCredits = Math.floor(event.data.balance);
+      updateWalletUI();
+    }
+  });
 </script>
 </body>
 </html>

@@ -262,3 +262,74 @@ async def get_recommendations(username: str):
         return {"recommendations": recs}
     finally:
         conn.close()
+
+
+# ============================================================
+# Endpoints del Pase de Batalla Premium
+# ============================================================
+
+class BuyBattlePassRequest(BaseModel):
+    username: str
+
+class ClaimScratchPrizeRequest(BaseModel):
+    username: str
+    amount: int
+
+@router.post("/buy-battlepass")
+async def buy_battlepass(request: BuyBattlePassRequest):
+    """Compra el Pase de Batalla Premium (5€ = 5000 fichas)."""
+    username = request.username
+    battlepass_cost = 5000  # 5 euros en fichas
+    
+    current_balance = get_balance(username)
+    if current_balance < battlepass_cost:
+        raise HTTPException(status_code=402, detail="Fichas insuficientes")
+    
+    new_balance = current_balance - battlepass_cost
+    set_balance(username, new_balance)
+    add_transaction(username, "compra_tienda", "battlepass", -battlepass_cost, new_balance)
+    
+    return {
+        "success": True,
+        "message": "Pase de Batalla comprado",
+        "new_balance": new_balance
+    }
+
+@router.post("/claim-scratch-prize")
+async def claim_scratch_prize(request: ClaimScratchPrizeRequest):
+    """Reclama un premio del Rasca y Gana."""
+    username = request.username
+    prize_amount = request.amount
+    
+    if prize_amount <= 0:
+        return {"success": False, "message": "Premio inválido"}
+    
+    current_balance = get_balance(username)
+    new_balance = current_balance + prize_amount
+    set_balance(username, new_balance)
+    add_transaction(username, "premio_juego", "battlepass_scratch", prize_amount, new_balance)
+    
+    return {
+        "success": True,
+        "message": f"¡Ganaste {prize_amount} fichas!",
+        "new_balance": new_balance
+    }
+
+@router.post("/add-free-spins")
+async def add_free_spins(username: str, spins: int = 5):
+    """Añade tiradas gratis al usuario."""
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de base de datos")
+    try:
+        cursor = conn.cursor()
+        cursor.execute("USE arcade_premium_db")
+        cursor.execute(
+            "UPDATE battlepass SET free_spins = COALESCE(free_spins, 0) + %s WHERE username = %s",
+            (spins, username)
+        )
+        conn.commit()
+        cursor.close()
+        return {"success": True, "message": f"Se añadieron {spins} tiradas gratis"}
+    finally:
+        conn.close()
