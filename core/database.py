@@ -52,6 +52,7 @@ def init_db():
                 current_xp INT DEFAULT 0,
                 avatar_url TEXT DEFAULT 'https://api.dicebear.com/7.x/bottts/svg?seed=default',
                 is_vip_user BOOLEAN DEFAULT FALSE,
+                unique_id VARCHAR(10) UNIQUE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
@@ -128,6 +129,20 @@ def init_db():
             )
         """)
 
+        # Tabla de amigos
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS friends (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50),
+                friend_username VARCHAR(50),
+                status ENUM('pending', 'accepted') DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (username) REFERENCES players(username) ON DELETE CASCADE,
+                FOREIGN KEY (friend_username) REFERENCES players(username) ON DELETE CASCADE,
+                UNIQUE KEY unique_friendship (username, friend_username)
+            )
+        """)
+
         conn.commit()
         cursor.close()
     finally:
@@ -136,6 +151,11 @@ def init_db():
 # ------------------------------------------------------------
 # Funciones de usuario y saldo
 # ------------------------------------------------------------
+
+def generate_unique_id() -> str:
+    import random
+    import string
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 def ensure_user(username: str):
     """Crea el usuario en todas las tablas necesarias si no existe."""
@@ -149,9 +169,10 @@ def ensure_user(username: str):
 
         cursor.execute("SELECT username FROM players WHERE username = %s", (username,))
         if not cursor.fetchone():
+            uid = generate_unique_id()
             cursor.execute(
-                "INSERT INTO players (username, credits) VALUES (%s, %s)",
-                (username, 50000)
+                "INSERT INTO players (username, credits, unique_id) VALUES (%s, %s, %s)",
+                (username, 50000, uid)
             )
             cursor.execute(
                 "INSERT INTO battlepass (username, level, xp, claimed_rewards) VALUES (%s, %s, %s, %s)",

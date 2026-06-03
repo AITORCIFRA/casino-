@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 import json
+import random
 from core.database import (
     ensure_user,
     get_battlepass,
@@ -22,6 +23,9 @@ XP_PER_LEVEL = 100
 class BattlepassClaimRequest(BaseModel):
     level: int = Field(..., ge=1)
     reward_type: str = "free"
+
+class FriendActionRequest(BaseModel):
+    friend_username: str
 
 def get_battlepass_reward(level: int, reward_type: str) -> Dict[str, Any]:
     """Devuelve la recompensa del nivel solicitado."""
@@ -133,5 +137,122 @@ async def get_leaderboard():
                         "rank": str(row[2])
                     })
         return {"leaderboard": leaderboard}
+    finally:
+        conn.close()
+
+# ------------------------------------------------------------
+# Perfil y Amigos
+# ------------------------------------------------------------
+
+@router.get("/profile/{username}")
+async def get_profile(username: str):
+    ensure_user(username)
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de base de datos")
+    try:
+        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor.execute("SELECT username, unique_id, avatar_url, current_level, current_xp FROM players WHERE username = %s", (username,))
+        player = cursor.fetchone()
+        
+        if not player:
+            raise HTTPException(status_code=404, detail="Jugador no encontrado")
+            
+        league = get_league(username)
+        bp = build_battlepass_summary(username)
+        
+        return {
+            "username": player["username"],
+            "unique_id": player["unique_id"],
+            "avatar": player["avatar_url"],
+            "level": bp["level"],
+            "xp": bp["xp"],
+            "xp_needed": bp["xp_needed"],
+            "league": league["rank"],
+            "points": league["points"]
+        }
+    finally:
+        conn.close()
+
+@router.get("/friends/{username}")
+async def get_friends(username: str):
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de base de datos")
+    try:
+        cursor = conn.cursor(dictionary=True, buffered=True)
+        # Amigos aceptados
+        cursor.execute("""
+            SELECT friend_username as username, p.avatar_url, p.unique_id 
+            FROM friends f
+            JOIN players p ON f.friend_username = p.username
+            WHERE f.username = %s AND f.status = 'accepted'
+        """, (username,))
+        friends = cursor.fetchall()
+        
+        # Solicitudes pendientes
+        cursor.execute("""
+            SELECT username, created_at 
+            FROM friends 
+            WHERE friend_username = %s AND status = 'pending'
+        """, (username,))
+        pending = cursor.fetchall()
+        
+        return {"friends": friends, "pending": pending}
+    finally:
+        conn.close()
+
+@router.post("/friends/{username}/add")
+async def add_friend(username: str, request: FriendActionRequest):
+    if username == request.friend_username:
+        raise HTTPException(status_code=400, detail="No puedes agregarte a ti mismo")
+        
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de base de datos")
+    try:
+        cursor = conn.cursor(buffered=True)
+        # Verificar si el amigo existe (puede ser por username o por unique_id)
+        cursor.execute("SELECT username FROM players WHERE username = %s OR unique_id = %s", (request.friend_username, request.friend_username))
+        target = cursor.fetchone()
+        if not target:
+            raise HTTPException(status_code=404, detail="Jugador no encontrado")
+        
+        target_username = target[0]
+        
+        # Verificar si ya son amigos o hay solicitud
+        cursor.execute("SELECT status FROM friends WHERE (username = %s AND friend_username = %s) OR (username = %s AND friend_username = %s)", 
+                       (username, target_username, target_username, username))
+        existing = cursor.fetchone()
+        if existing:
+            return {"status": "already_exists", "message": "Ya existe una relación o solicitud"}
+            
+        cursor.execute("INSERT INTO friends (username, friend_username, status) VALUES (%s, %s, 'pending')", (username, target_username))
+        conn.commit()
+        return {"status": "success", "message": "Solicitud enviada"}
+    finally:
+        conn.close()
+
+@router.get("/friends/{username}/recommendations")
+async def get_recommendations(username: str):
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de base de datos")
+    try:
+        cursor = conn.cursor(dictionary=True, buffered=True)
+        # Recomendar jugadores que no sean amigos ni el propio usuario
+        cursor.execute("""
+            SELECT username, unique_id, avatar_url 
+            FROM players 
+            WHERE username != %s 
+            AND username NOT IN (
+                SELECT friend_username FROM friends WHERE username = %s
+                UNION
+                SELECT username FROM friends WHERE friend_username = %s
+            )
+            ORDER BY RAND() LIMIT 5
+        """, (username, username, username))
+        recs = cursor.fetchall()
+        return {"recommendations": recs}
     finally:
         conn.close()
