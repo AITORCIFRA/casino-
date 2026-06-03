@@ -389,6 +389,7 @@ body {
   opacity: 0;
   transition: opacity 0.3s;
   z-index: 1;
+  pointer-events: none;
 }
 
 .game-card:hover::before {
@@ -459,6 +460,8 @@ body {
   flex-direction: column;
   justify-content: space-between;
   text-align: center;
+  position: relative;
+  z-index: 5;
 }
 
 .card-title {
@@ -480,6 +483,8 @@ body {
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 0 15px var(--theme-color);
+  position: relative;
+  z-index: 10;
 }
 
 .card-btn:hover {
