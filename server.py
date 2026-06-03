@@ -19,17 +19,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Servir también las carpetas css y js desde la raíz del proyecto
+app.mount("/css", StaticFiles(directory="css"), name="css")
+app.mount("/js", StaticFiles(directory="js"), name="js")
+
 app.include_router(auth.router)
 app.include_router(wallet.router)
 app.include_router(games.router)
 app.include_router(battlepass_leagues.router)
 
-# Servir archivos estáticos desde public/
+# Servir archivos estáticos desde public/ (DEBE SER ÚLTIMO)
 app.mount("/", StaticFiles(directory="public", html=True), name="public")
-
-# Servir también las carpetas css y js desde la raíz del proyecto
-app.mount("/css", StaticFiles(directory="css"), name="css")
-app.mount("/js", StaticFiles(directory="js"), name="js")
 
 if __name__ == "__main__":
     uvicorn.run("server:app", host="0.0.0.0", port=5000, reload=True)
