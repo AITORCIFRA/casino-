@@ -29,699 +29,473 @@ body {
 .bg-glow {
   position: fixed;
   border-radius: 50%;
-  filter: blur(140px);
-  z-index: 0;
-  opacity: 0.4;
+  filter: blur(80px);
+  opacity: 0.3;
   pointer-events: none;
-  animation: glow-pulse 8s ease-in-out infinite;
 }
 
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
+.glow-1 { width: 500px; height: 500px; background: #00FF99; top: -200px; left: -200px; animation: float 20s infinite; }
+.glow-2 { width: 400px; height: 400px; background: #00BFFF; bottom: -100px; right: -100px; animation: float 25s infinite reverse; }
 
-.glow1 {
-  width: 50vw;
-  height: 50vw;
-  background: rgba(0, 255, 153, 0.3);
-  top: -20%;
-  left: -10%;
-}
+@keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(50px, 50px); } }
 
-.glow2 {
-  width: 55vw;
-  height: 55vw;
-  background: rgba(168, 85, 247, 0.3);
-  bottom: -15%;
-  right: -10%;
-}
-
-.glow3 {
-  width: 45vw;
-  height: 45vw;
-  background: rgba(0, 191, 255, 0.2);
-  top: 50%;
-  right: -5%;
-  animation: glow-pulse 6s ease-in-out infinite reverse;
-}
+.hidden { display: none !important; }
 
 /* ============ AUTH SCREEN ============ */
 #authScreen {
   position: fixed;
-  inset: 0;
-  z-index: 2000;
-  background: rgba(3, 3, 6, 0.98);
-  backdrop-filter: blur(30px);
+  top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: 0.5s;
-}
-
-#authScreen.hidden {
-  opacity: 0;
-  pointer-events: none;
-  display: none !important;
-}
-
-.auth-logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(3.5rem, 9vw, 6rem);
-  letter-spacing: 0.2em;
-  text-shadow: 0 0 30px rgba(0, 255, 153, 0.5), 0 0 60px rgba(0, 191, 255, 0.3);
-  margin-bottom: 1rem;
-  animation: logo-glow 3s ease-in-out infinite;
-}
-
-@keyframes logo-glow {
-  0%, 100% { text-shadow: 0 0 30px rgba(0, 255, 153, 0.5), 0 0 60px rgba(0, 191, 255, 0.3); }
-  50% { text-shadow: 0 0 50px rgba(0, 255, 153, 0.8), 0 0 100px rgba(0, 191, 255, 0.6); }
-}
-
-.auth-logo span:first-child { color: #fff; }
-.auth-logo span:last-child { color: #00FF99; }
-
-.auth-subtitle {
-  font-family: 'Orbitron';
-  font-size: 11px;
-  letter-spacing: 4px;
-  color: rgba(0, 255, 153, 0.6);
-  margin-bottom: 2.5rem;
-  animation: pulse-text 2s ease-in-out infinite;
-}
-
-@keyframes pulse-text {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  z-index: 1000;
+  background: linear-gradient(-45deg, #050508, #120626);
 }
 
 .auth-card {
-  background: rgba(10, 10, 16, 0.8);
-  border: 2px solid rgba(0, 255, 153, 0.3);
+  background: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,215,0,0.3);
   border-radius: 20px;
-  padding: 3rem;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  backdrop-filter: blur(10px);
+}
+
+.auth-logo {
+  font-family: 'Orbitron';
+  font-size: 32px;
+  font-weight: 900;
+  color: #FFD700;
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.auth-input {
   width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  box-shadow: 0 0 50px rgba(0, 255, 153, 0.2), inset 0 0 30px rgba(0, 255, 153, 0.05);
-  animation: card-float 3s ease-in-out infinite;
-}
-
-@keyframes card-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-.auth-field {
-  position: relative;
-}
-
-.auth-field input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(0, 255, 153, 0.2);
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
-  font-family: 'Rajdhani';
+  padding: 12px;
+  margin-bottom: 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 8px;
   color: #fff;
-  font-size: 16px;
-  width: 100%;
+  font-family: 'Rajdhani';
   outline: none;
   transition: all 0.3s;
 }
 
-.auth-field input:focus {
+.auth-input:focus {
   border-color: #00FF99;
-  box-shadow: 0 0 20px rgba(0, 255, 153, 0.3), inset 0 0 10px rgba(0, 255, 153, 0.1);
-  background: rgba(0, 255, 153, 0.05);
+  box-shadow: 0 0 10px rgba(0,255,153,0.3);
 }
 
 .auth-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 12px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: none;
+  border-radius: 8px;
+  color: #000;
   font-family: 'Orbitron';
   font-weight: 900;
-  background: linear-gradient(135deg, #00FF99, #00BFFF);
-  color: #000;
-  border: none;
-  border-radius: 12px;
   cursor: pointer;
+  margin-bottom: 10px;
   transition: all 0.3s;
-  font-size: 14px;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
 }
 
-.auth-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
+.auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,215,0,0.3); }
+
+.auth-toggle {
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  cursor: pointer;
 }
 
-.auth-btn:hover::before {
-  left: 100%;
-}
-
-.auth-btn:hover {
-  filter: brightness(1.2);
-  box-shadow: 0 0 30px rgba(0, 255, 153, 0.5), 0 0 60px rgba(0, 191, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-.auth-btn:active {
-  transform: translateY(0px);
-}
-
-.auth-btn.register {
-  background: linear-gradient(135deg, #A855F7, #EC4899);
-}
+.auth-toggle span { color: #00FF99; font-weight: 900; }
 
 /* ============ LOBBY SCREEN ============ */
 #lobbyScreen {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   flex-direction: column;
-  z-index: 1;
+  margin-bottom: 180px;
 }
 
-#lobbyScreen.hidden { display: none !important; }
-
-.top-bar {
+header {
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(255,215,0,0.2);
+  padding: 15px 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 15px 30px;
-  background: rgba(4, 4, 8, 0.9);
-  border-bottom: 2px solid rgba(0, 255, 153, 0.1);
-  backdrop-filter: blur(20px);
-  z-index: 100;
-  flex-shrink: 0;
-  box-shadow: 0 0 30px rgba(0, 255, 153, 0.1);
+  align-items: center;
+  backdrop-filter: blur(10px);
 }
 
-.user-profile-trigger {
+.nav-left {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: rgba(0, 255, 153, 0.05);
-  padding: 8px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 255, 153, 0.2);
+  gap: 15px;
+}
+
+.lobby-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid #00FF99;
+  object-fit: cover;
+}
+
+.lobby-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lobby-name {
+  font-family: 'Orbitron';
+  font-weight: 900;
+  font-size: 14px;
+  color: #FFD700;
+}
+
+.lobby-league {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+}
+
+.nav-menu-center {
+  display: flex;
+  gap: 10px;
+}
+
+.menu-btn {
+  padding: 8px 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Orbitron';
+  font-weight: 900;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-.user-profile-trigger:hover {
-  border-color: #00FF99;
-  background: rgba(0, 255, 153, 0.1);
-  box-shadow: 0 0 20px rgba(0, 255, 153, 0.3);
-  transform: translateY(-2px);
+.menu-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
 }
 
-.avatar-container {
-  position: relative;
-  width: 45px;
-  height: 45px;
+.menu-btn.gold {
+  border-color: rgba(255,215,0,0.3);
+  color: #FFD700;
 }
 
-.user-avatar-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #00FF99;
-  background: #222;
-  animation: avatar-pulse 2s ease-in-out infinite;
-}
-
-@keyframes avatar-pulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 153, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(0, 255, 153, 0.6); }
-}
-
-.lvl-badge {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  background: linear-gradient(135deg, #00BFFF, #A855F7);
-  color: #fff;
-  font-family: 'Orbitron';
-  font-weight: 900;
-  font-size: 10px;
-  padding: 3px 6px;
-  border-radius: 8px;
-  border: 2px solid #000;
-  box-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .credits-display {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: rgba(0, 255, 153, 0.08);
-  padding: 8px 18px;
-  border-radius: 14px;
-  border: 2px solid rgba(0, 255, 153, 0.2);
-  box-shadow: 0 0 20px rgba(0, 255, 153, 0.1);
+  gap: 8px;
+  background: rgba(0,255,153,0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,255,153,0.2);
 }
 
 .credits-value {
   font-family: 'Orbitron';
   font-weight: 900;
   color: #00FF99;
-  font-size: 18px;
-  text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+  font-size: 14px;
 }
 
-.nav-menu-center {
-  display: flex;
-  gap: 12px;
-}
-
-.menu-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-family: 'Orbitron';
-  font-weight: 700;
-  font-size: 11px;
-  color: #ccc;
-  cursor: pointer;
-  transition: all 0.3s;
-  letter-spacing: 0.5px;
-}
-
-.menu-btn:hover {
-  border-color: #00BFFF;
-  color: #00BFFF;
-  box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
-  transform: translateY(-2px);
-}
-
-.menu-btn.gold {
-  background: linear-gradient(135deg, #FF9900, #FFCC00);
-  border: none;
-  color: #000;
-  font-weight: 900;
-}
-
-.menu-btn.gold:hover {
-  box-shadow: 0 0 20px rgba(255, 153, 0, 0.5);
-}
-
-/* ============ CAROUSEL 3D ============ */
 .carousel-area {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  perspective: 2000px;
+  perspective: 1000px;
   overflow: hidden;
+}
+
+.nav-arrow {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: rgba(0,255,153,0.1);
+  border: 2px solid rgba(0,255,153,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  color: #00FF99;
+  transition: all 0.3s;
   z-index: 10;
 }
 
-.carousel-track {
-  position: relative;
+.nav-arrow:hover {
+  background: rgba(0,255,153,0.2);
+  box-shadow: 0 0 20px rgba(0,255,153,0.3);
+}
+
+.nav-left { left: 20px; }
+.nav-right { right: 20px; }
+
+.carousel-container {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-style: preserve-3d;
+}
+
+#carouselTrack {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
 }
 
 .game-card {
-  position: absolute;
-  width: 300px;
-  height: 420px;
-  background: rgba(10, 10, 18, 0.95);
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  width: 280px;
+  height: 350px;
+  background: rgba(0,0,0,0.3);
+  border: 2px solid var(--theme-color, #00FF99);
+  border-radius: 15px;
   overflow: hidden;
-  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
   cursor: pointer;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  transform-style: preserve-3d;
-}
-
-.game-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 255, 153, 0.1), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-  z-index: 1;
-}
-
-.game-card:hover::before {
-  opacity: 1;
+  transition: all 0.3s;
+  transform: scale(0.7) rotateY(-30deg);
+  opacity: 0.5;
+  position: relative;
 }
 
 .game-card.active {
-  transform: translateX(0) translateZ(200px) scale(1.05);
+  transform: scale(1) rotateY(0deg);
   opacity: 1;
-  z-index: 15;
-  border-color: var(--theme-color);
-  box-shadow: 0 0 40px var(--theme-color), 0 20px 60px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 30px var(--theme-color, #00FF99);
 }
 
 .game-card.next {
-  transform: translateX(120%) translateZ(-150px) rotateY(-35deg) scale(0.8);
-  opacity: 0.5;
-  z-index: 10;
+  transform: scale(0.8) rotateY(30deg);
+  opacity: 0.6;
 }
 
 .game-card.prev {
-  transform: translateX(-120%) translateZ(-150px) rotateY(35deg) scale(0.8);
-  opacity: 0.5;
-  z-index: 10;
-}
-
-.game-card.hidden-card {
-  transform: translateX(0) translateZ(-600px) scale(0.3);
-  opacity: 0;
-  z-index: 1;
-  pointer-events: none;
+  transform: scale(0.8) rotateY(-30deg);
+  opacity: 0.6;
 }
 
 .card-art {
-  height: 200px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  font-size: 100px;
-}
-
-.card-art::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent, rgba(10, 10, 18, 0.8));
-}
-
-.card-icon {
-  position: relative;
-  z-index: 2;
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
-  animation: icon-bounce 2s ease-in-out infinite;
-}
-
-@keyframes icon-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  width: 100%;
+  height: 60%;
+  overflow: hidden;
+  background: rgba(0,0,0,0.5);
 }
 
 .card-info {
-  padding: 20px;
-  flex: 1;
+  padding: 15px;
+  height: 40%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  text-align: center;
 }
 
-.card-title {
-  font-family: 'Orbitron';
-  font-weight: 900;
-  font-size: 18px;
-  color: #FFF;
+.card-info > div {
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .card-btn {
-  background: var(--theme-color);
+  padding: 8px 12px;
+  background: var(--theme-color, #00FF99);
   color: #000;
-  padding: 12px;
+  border: none;
+  border-radius: 6px;
   font-family: 'Orbitron';
   font-weight: 900;
-  font-size: 12px;
-  border: none;
-  border-radius: 10px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 0 15px var(--theme-color);
 }
 
 .card-btn:hover {
-  filter: brightness(1.2);
-  transform: translateY(-2px);
-  box-shadow: 0 0 25px var(--theme-color);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--theme-color, #00FF99);
 }
-
-.nav-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 200;
-  background: rgba(0, 0, 0, 0.6);
-  border: 2px solid rgba(0, 255, 153, 0.3);
-  color: #FFF;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.nav-arrow:hover {
-  border-color: #00FF99;
-  color: #00FF99;
-  box-shadow: 0 0 30px rgba(0, 255, 153, 0.5);
-  background: rgba(0, 255, 153, 0.1);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.nav-left { left: 30px; }
-.nav-right { right: 30px; }
 
 /* ============ MODALS ============ */
 .panel-modal {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 7000;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 500;
   opacity: 0;
   pointer-events: none;
-  transition: 0.3s;
-  backdrop-filter: blur(25px);
+  transition: opacity 0.3s;
 }
 
 .panel-modal.open {
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: all;
 }
 
 .panel-container {
-  background: rgba(10, 10, 18, 0.95);
-  border: 2px solid rgba(0, 255, 153, 0.2);
-  border-radius: 24px;
-  width: 95%;
-  max-width: 1000px;
-  padding: 35px;
-  position: relative;
-  box-shadow: 0 0 60px rgba(0, 255, 153, 0.1), inset 0 0 30px rgba(0, 255, 153, 0.05);
-  max-height: 85vh;
+  background: rgba(0,0,0,0.6);
+  border: 2px solid rgba(255,215,0,0.3);
+  border-radius: 15px;
+  padding: 25px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
   overflow-y: auto;
-  animation: modal-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes modal-pop {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  backdrop-filter: blur(10px);
+  position: relative;
 }
 
 .panel-close {
   position: absolute;
-  top: 20px;
-  right: 25px;
-  font-size: 35px;
-  color: #666;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
   cursor: pointer;
-  transition: all 0.2s;
+  color: #FFD700;
+  transition: all 0.3s;
 }
 
 .panel-close:hover {
+  transform: scale(1.2);
   color: #00FF99;
-  transform: rotate(90deg);
 }
 
-/* ============ GAME IFRAME ============ */
+/* ============ GAME CONTAINER ============ */
 #gameContainer {
   position: fixed;
-  inset: 0;
-  z-index: 6000;
-  background: #000;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.95);
   display: none;
   flex-direction: column;
+  z-index: 600;
 }
 
 .game-topbar {
-  background: #07070d;
-  padding: 15px 25px;
+  background: rgba(0,0,0,0.8);
+  border-bottom: 1px solid rgba(255,215,0,0.2);
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(0, 255, 153, 0.1);
 }
 
 .back-btn {
-  background: linear-gradient(135deg, #EF4444, #DC2626);
-  color: #FFF;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 8px 15px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #EF4444;
+  border-radius: 8px;
   font-family: 'Orbitron';
   font-weight: 900;
   cursor: pointer;
-  font-size: 12px;
   transition: all 0.3s;
 }
 
 .back-btn:hover {
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-  transform: translateY(-2px);
+  background: rgba(239,68,68,0.2);
+  box-shadow: 0 0 10px rgba(239,68,68,0.3);
 }
 
 #gameFrame {
-  width: 100%;
   flex: 1;
   border: none;
+  background: #000;
 }
 
-/* Responsive */
+/* ============ NOTICIAS MODAL ============ */
+#noticiasModal {
+  z-index: 501;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .carousel-area { padding: 0 60px; }
+  .game-card { width: 220px; height: 280px; }
+  .nav-arrow { width: 40px; height: 40px; font-size: 18px; }
+}
+
 @media (max-width: 768px) {
-  .top-bar { padding: 10px 15px; }
-  .game-card { width: 240px; height: 340px; }
-  .nav-arrow { width: 45px; height: 45px; font-size: 18px; }
+  header { flex-wrap: wrap; gap: 10px; }
+  .nav-menu-center { flex-wrap: wrap; }
+  .game-card { width: 180px; height: 230px; }
+  .carousel-area { padding: 0 40px; }
 }
 </style>
 </head>
 <body>
 
-<div class="bg-glow glow1"></div>
-<div class="bg-glow glow2"></div>
-<div class="bg-glow glow3"></div>
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
 
 <!-- ============ AUTH SCREEN ============ -->
 <div id="authScreen">
-  <div class="auth-logo"><span>ARCADE</span><span>PREMIUM</span></div>
-  <div class="auth-subtitle">⚡ CYBER CASINO CLOUD 3D ⚡</div>
   <div class="auth-card">
-    <div class="auth-field">
-      <input type="text" id="loginUser" placeholder="🎮 Nickname VIP..." autocomplete="username">
-    </div>
-    <div class="auth-field">
-      <input type="password" id="loginPass" placeholder="🔐 Contraseña..." autocomplete="current-password">
-    </div>
-    <button class="auth-btn" onclick="doLogin('login')">⚡ INICIAR SESIÓN ⚡</button>
-    <button class="auth-btn register" onclick="doLogin('register')">✨ REGISTRARSE ✨</button>
+    <div class="auth-logo">🎰 ARCADE</div>
+    <input type="text" id="loginUser" class="auth-input" placeholder="Usuario">
+    <input type="password" id="loginPass" class="auth-input" placeholder="Contraseña">
+    <button class="auth-btn" onclick="doLogin('login')">ENTRAR</button>
+    <button class="auth-btn" style="background:linear-gradient(135deg, #00FF99, #00BFFF);" onclick="doLogin('register')">REGISTRARSE</button>
+    <div class="auth-toggle" style="margin-top:15px;">¿Nuevo? <span onclick="document.getElementById('loginPass').type='password'">Crea una cuenta</span></div>
   </div>
 </div>
 
 <!-- ============ LOBBY SCREEN ============ -->
 <div id="lobbyScreen" class="hidden">
-  <header class="top-bar">
-    <div class="user-profile-trigger" onclick="openProfileModal()">
-      <div class="avatar-container">
-        <img src="" class="user-avatar-img" id="lobbyAvatar">
-        <div class="lvl-badge" id="lobbyLevel">1</div>
+  <header>
+    <div class="nav-left">
+      <img id="lobbyAvatar" class="lobby-avatar" src="">
+      <div class="lobby-info">
+        <div class="lobby-name" id="lobbyName">JUGADOR</div>
+        <div class="lobby-league" id="lobbyLeagueBadge">BRONCE</div>
       </div>
-      <div>
-        <div style="font-weight:700;font-size:14px;" id="lobbyName">Cargando...</div>
-        <div style="font-size:10px;color:rgba(0,255,153,0.7);" id="lobbyLeagueBadge">BRONCE</div>
-      </div>
-    </div>
-
-    <div class="credits-display">
-      <div class="credits-value" id="lobbyCredits">0</div>
-      <div style="font-size:11px; color:rgba(255,255,255,0.5); font-family:'Orbitron';">FICHAS</div>
     </div>
 
     <div class="nav-menu-center">
       <button class="menu-btn" onclick="openSocialModal()">👥 SOCIAL</button>
       <button class="menu-btn" onclick="openNoticiasModal()" style="border-color:#00BFFF;color:#00BFFF;">📰 NOTICIAS</button>
-      <button class="menu-btn gold" onclick="battlePassSidebar.loadBattlePass(currentUser)">🎫 PASE</button>
+      <button class="menu-btn gold" onclick="battlePassHorizontal.loadBattlePass(currentUser)">🎫 PASE</button>
       <button class="menu-btn gold" onclick="openModal('shopModal')">🛒 TIENDA</button>
       <button class="menu-btn" style="border-color:#EF4444;color:#EF4444" onclick="doLogout()">SALIR</button>
+    </div>
+
+    <div class="nav-right">
+      <div class="credits-display">
+        <span>💰</span>
+        <div class="credits-value" id="lobbyCredits">0</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.5); font-family:'Orbitron';">FICHAS</div>
+      </div>
     </div>
   </header>
 
   <div class="carousel-area">
     <div class="nav-arrow nav-left" onclick="moveCarousel(-1)">◀</div>
-    <div class="carousel-track" id="carouselTrack"></div>
+    <div class="carousel-container">
+      <div id="carouselTrack"></div>
+    </div>
     <div class="nav-arrow nav-right" onclick="moveCarousel(1)">▶</div>
-  </div>
-</div>
-
-<!-- ============ MODAL PERFIL ============ -->
-<div class="panel-modal" id="profileModal">
-  <div class="panel-container">
-    <span class="panel-close" onclick="closeModal('profileModal')">&times;</span>
-    <div style="display:flex; gap:20px; margin-bottom:25px;">
-      <img src="" id="profAvatar" style="width:100px; height:100px; border-radius:50%; border:3px solid #00FF99; background:#222;">
-      <div style="flex:1;">
-        <h2 id="profName" style="font-family:'Orbitron'; color:#00FF99;">-</h2>
-        <div style="background:rgba(0,255,153,0.1); color:#00FF99; padding:4px 12px; border-radius:8px; font-family:'Orbitron'; font-size:12px; font-weight:bold; margin-top:8px; display:inline-block; border:1px solid rgba(0,255,153,0.3);" id="profID">ID: --------</div>
-        <p id="profLeague" style="color:#00BFFF; font-size:13px; font-weight:bold; margin-top:8px;">LIGA: BRONCE</p>
-      </div>
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-      <div style="background:rgba(255,255,255,0.02); border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.05);">
-        <div style="font-family:'Orbitron'; font-size:14px; color:#00FF99; margin-bottom:15px;">👥 MIS AMIGOS</div>
-        <div id="friendsList" style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto;"></div>
-      </div>
-      <div style="background:rgba(255,255,255,0.02); border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.05);">
-        <div style="font-family:'Orbitron'; font-size:14px; color:#00FF99; margin-bottom:15px;">✨ RECOMENDADOS</div>
-        <div id="recommendationsList" style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto;"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ MODAL SOCIAL ============ -->
-<div class="panel-modal" id="socialModal">
-  <div class="panel-container">
-    <span class="panel-close" onclick="closeModal('socialModal')">&times;</span>
-    <h2 style="font-family:'Orbitron'; color:#00FF99; margin-bottom:20px;">👥 BUSCAR AMIGOS</h2>
-    <div style="display:flex; gap:8px; margin-bottom:20px;">
-      <input type="text" id="searchFriendInput" placeholder="Nombre o ID..." style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 12px; color:#fff; font-family:'Rajdhani'; outline:none;">
-      <button onclick="searchAndAddFriend()" style="background:#00BFFF; color:#000; border:none; padding:8px 15px; border-radius:8px; font-family:'Orbitron'; font-weight:900; cursor:pointer;">AGREGAR</button>
-    </div>
-    <div id="leaderboardList" style="display:flex; flex-direction:column; gap:10px;"></div>
   </div>
 </div>
 
@@ -750,6 +524,19 @@ body {
   </div>
 </div>
 
+<!-- ============ MODAL SOCIAL ============ -->
+<div class="panel-modal" id="socialModal">
+  <div class="panel-container">
+    <span class="panel-close" onclick="closeModal('socialModal')">&times;</span>
+    <h2 style="font-family:'Orbitron'; color:#00FF99; margin-bottom:20px;">👥 BUSCAR AMIGOS</h2>
+    <div style="display:flex; gap:8px; margin-bottom:20px;">
+      <input type="text" id="searchFriendInput" placeholder="Nombre o ID..." style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 12px; color:#fff; font-family:'Rajdhani'; outline:none;">
+      <button onclick="searchAndAddFriend()" style="background:#00BFFF; color:#000; border:none; padding:8px 15px; border-radius:8px; font-family:'Orbitron'; font-weight:900; cursor:pointer;">AGREGAR</button>
+    </div>
+    <div id="leaderboardList" style="display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+</div>
+
 <!-- ============ MODAL NOTICIAS ============ -->
 <div class="panel-modal" id="noticiasModal">
   <div class="panel-container" style="max-width:800px;">
@@ -757,7 +544,6 @@ body {
     <h2 style="font-family:'Orbitron'; color:#00BFFF; margin-bottom:20px; letter-spacing:2px;">📰 NOTICIAS Y PREMIOS</h2>
     
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
-      <!-- Progreso del Pase -->
       <div style="background:rgba(0,191,255,0.05); padding:15px; border-radius:12px; border:1px solid rgba(0,191,255,0.2);">
         <div style="font-family:'Orbitron'; color:#00BFFF; font-weight:900; margin-bottom:10px; font-size:12px;">PROGRESO PASE</div>
         <div id="newsPassLevel" style="font-size:24px; color:#FFD700; font-weight:900;">Nivel 1</div>
@@ -767,7 +553,6 @@ body {
         </div>
       </div>
       
-      <!-- Tiradas Gratis -->
       <div style="background:rgba(0,255,153,0.05); padding:15px; border-radius:12px; border:1px solid rgba(0,255,153,0.2);">
         <div style="font-family:'Orbitron'; color:#00FF99; font-weight:900; margin-bottom:10px; font-size:12px;">TIRADAS GRATIS</div>
         <div id="newsFreeSpin" style="font-size:24px; color:#FFD700; font-weight:900;">0</div>
@@ -775,7 +560,6 @@ body {
       </div>
     </div>
     
-    <!-- Rascas Pendientes -->
     <div style="background:rgba(255,215,0,0.05); padding:15px; border-radius:12px; border:1px solid rgba(255,215,0,0.2); margin-bottom:15px;">
       <div style="font-family:'Orbitron'; color:#FFD700; font-weight:900; margin-bottom:10px; font-size:12px;">🎫 RASCAS Y GANA PENDIENTES</div>
       <div id="newsScratchList" style="display:flex; flex-direction:column; gap:8px; max-height:150px; overflow-y:auto;">
@@ -783,7 +567,6 @@ body {
       </div>
     </div>
     
-    <!-- Misiones Diarias -->
     <div style="background:rgba(168,85,247,0.05); padding:15px; border-radius:12px; border:1px solid rgba(168,85,247,0.2);">
       <div style="font-family:'Orbitron'; color:#A855F7; font-weight:900; margin-bottom:10px; font-size:12px;">⚔️ MISIONES DIARIAS</div>
       <div id="newsMissionsList" style="display:flex; flex-direction:column; gap:8px; max-height:150px; overflow-y:auto;">
@@ -803,14 +586,13 @@ body {
 </div>
 
 <script src="/animations.js"></script>
-<script src="/battlepass-sidebar.js"></script>
+<script src="/battlepass-horizontal.js"></script>
 <script src="/social-play.js"></script>
 <script>
 const API_URL = "/api";
 let currentUser = localStorage.getItem("arcade_user") || null;
 let carouselIndex = 0;
 let hudInterval = null;
-const winAnim = new WinAnimation();
 
 const GAMES = [
   { id: 'slots', title: 'LUCKY SEVENS', file: 'slots.html', cat: 'slots', color: '#00FF99', img: '/assets/games/0fHpJdYkysVc.jpg' },
@@ -860,10 +642,12 @@ async function updateHUD() {
       const resW = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
       if(resW.ok) {
         const w = await resW.json();
-        document.getElementById("lobbyCredits").innerText = Math.floor(w.balance).toLocaleString();
+        const balance = Math.floor(w.balance || 0);
+        localStorage.setItem('arcade_credits', balance);
+        document.getElementById('lobbyCredits').innerText = balance.toLocaleString();
       }
     }
-  } catch(e) { console.log("HUD Error"); }
+  } catch(e) { console.log("Error actualizando HUD"); }
 }
 
 function renderGames() {
@@ -887,90 +671,7 @@ function initLobby() {
   updateHUD();
   if(!hudInterval) hudInterval = setInterval(updateHUD, 10000);
   moveCarousel(0);
-  battlePassSidebar.loadBattlePass(currentUser);
-}
-
-async function openProfileModal() {
-  const res = await fetch(`${API_URL}/progression/profile/${currentUser}`);
-  if(res.ok) {
-    const p = await res.json();
-    document.getElementById("profName").innerText = p.username.toUpperCase();
-    document.getElementById("profID").innerText = `ID: ${p.unique_id}`;
-    document.getElementById("profAvatar").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${p.username}`;
-    document.getElementById("profLeague").innerText = `LIGA: ${p.league.toUpperCase()}`;
-    
-    loadFriends();
-    loadRecommendations();
-    openModal("profileModal");
-  }
-}
-
-async function loadFriends() {
-  const res = await fetch(`${API_URL}/progression/friends/${currentUser}`);
-  if(res.ok) {
-    const data = await res.json();
-    document.getElementById("friendsList").innerHTML = data.friends.map(f => `
-      <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:10px; border-radius:10px;">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${f.username}" style="width:35px; height:35px; border-radius:50%; border:1px solid #00FF99;">
-        <div style="flex:1;">
-          <div style="font-weight:bold; font-size:12px;">${f.username.toUpperCase()}</div>
-          <div style="font-size:9px; color:rgba(255,255,255,0.4);">ID: ${f.unique_id}</div>
-        </div>
-      </div>
-    `).join('') || '<p style="font-size:11px; color:rgba(255,255,255,0.3); text-align:center;">Sin amigos aún.</p>';
-  }
-}
-
-async function loadRecommendations() {
-  const res = await fetch(`${API_URL}/progression/friends/${currentUser}/recommendations`);
-  if(res.ok) {
-    const data = await res.json();
-    document.getElementById("recommendationsList").innerHTML = data.recommendations.map(r => `
-      <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:10px; border-radius:10px;">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${r.username}" style="width:35px; height:35px; border-radius:50%; border:1px solid #00FF99;">
-        <div style="flex:1;">
-          <div style="font-weight:bold; font-size:12px;">${r.username.toUpperCase()}</div>
-          <div style="font-size:9px; color:rgba(255,255,255,0.4);">ID: ${r.unique_id}</div>
-        </div>
-        <button onclick="addFriend('${r.username}')" style="background:#00FF99; color:#000; border:none; padding:4px 10px; border-radius:6px; font-family:'Orbitron'; font-size:9px; font-weight:900; cursor:pointer;">+</button>
-      </div>
-    `).join('');
-  }
-}
-
-async function addFriend(friend) {
-  const res = await fetch(`${API_URL}/progression/friends/${currentUser}/add`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ friend_username: friend })
-  });
-  if(res.ok) { alert("¡Solicitud enviada!"); loadRecommendations(); }
-}
-
-async function searchAndAddFriend() {
-  const input = document.getElementById("searchFriendInput");
-  if(!input.value.trim()) return;
-  await addFriend(input.value.trim());
-  input.value = "";
-}
-
-async function openSocialModal() {
-  const res = await fetch(`${API_URL}/progression/leagues/leaderboard`);
-  if(res.ok) {
-    const data = await res.json();
-    document.getElementById("leaderboardList").innerHTML = data.leaderboard.map((u, i) => `
-      <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.05);">
-        <div style="font-family:'Orbitron'; font-weight:900; color:#00FF99; width:30px; text-align:center;">${i+1}</div>
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${u.username}" style="width:40px; height:40px; border-radius:50%; border:2px solid #00FF99;">
-        <div style="flex:1;">
-          <div style="font-weight:bold; font-size:13px;">${u.username.toUpperCase()}</div>
-          <div style="font-size:10px; color:rgba(255,255,255,0.4);">${u.rank.toUpperCase()}</div>
-        </div>
-        <div style="font-family:'Orbitron'; font-size:12px; color:#00BFFF; font-weight:bold;">${u.points} PTS</div>
-      </div>
-    `).join('');
-    openModal("socialModal");
-  }
+  battlePassHorizontal.loadBattlePass(currentUser);
 }
 
 function openModal(id) { document.getElementById(id).classList.add("open"); }
@@ -978,31 +679,38 @@ function closeModal(id) { document.getElementById(id).classList.remove("open"); 
 
 function launchGame(file) {
   if (!currentUser) { alert("Inicia sesión primero"); return; }
+  
+  console.log("Cargando juego:", file);
   document.getElementById("gameActiveTitle").innerText = file.replace(".html","").replace("_", " ").toUpperCase();
   const gameFrame = document.getElementById("gameFrame");
   
-  // Limpiar iframe anterior
-  gameFrame.src = "";
-  
-  // Cargar nuevo juego (ruta simple)
-  gameFrame.src = `${file}?u=${encodeURIComponent(currentUser)}`;
   document.getElementById("gameContainer").style.display = "flex";
   
-  // Enviar créditos al iframe cuando cargue
+  const gameUrl = `/${file}?u=${encodeURIComponent(currentUser)}&t=${Date.now()}`;
+  console.log("URL del juego:", gameUrl);
+  
+  gameFrame.src = gameUrl;
+  
   gameFrame.onload = () => {
+    console.log("Juego cargado:", file);
     const balance = parseInt(localStorage.getItem('arcade_credits')) || 0;
     try {
       gameFrame.contentWindow.postMessage({ type: 'credits_updated', balance }, '*');
+      console.log("Créditos enviados:", balance);
     } catch(e) {
-      console.log("Error enviando créditos al iframe");
+      console.log("Error enviando créditos:", e);
     }
+  };
+  
+  gameFrame.onerror = () => {
+    console.error("Error cargando juego:", file);
+    alert("Error cargando el juego. Intenta de nuevo.");
   };
 }
 
 function closeGame() {
   document.getElementById("gameContainer").style.display = "none";
   document.getElementById("gameFrame").src = "";
-  updateHUD();
 }
 
 function moveCarousel(dir) {
@@ -1059,7 +767,6 @@ async function openNoticiasModal() {
       document.getElementById('newsPassBar').style.width = `${((data.xp || 0) / 100) * 100}%`;
       document.getElementById('newsFreeSpin').innerText = data.free_spins || 0;
       
-      // Mostrar misiones diarias
       const missions = [
         { name: 'Juega 5 rondas', reward: '+50 XP', completed: false },
         { name: 'Gana 1000 fichas', reward: '+100 XP', completed: false },
@@ -1095,7 +802,6 @@ window.addEventListener('message', (event) => {
   
   if (event.data.type === 'add_xp') {
     const xpAmount = event.data.amount || 10;
-    // Aquí se podría hacer una llamada al backend para actualizar XP
     console.log(`+${xpAmount} XP`);
   }
   
