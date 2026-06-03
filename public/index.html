@@ -674,7 +674,7 @@ body {
     <div class="nav-menu-center">
       <button class="menu-btn" onclick="openSocialModal()">👥 SOCIAL</button>
       <button class="menu-btn" onclick="openNoticiasModal()" style="border-color:#00BFFF;color:#00BFFF;">📰 NOTICIAS</button>
-      <button class="menu-btn gold" onclick="battlePass.openBattlePassModal(currentUser)">🎫 PASE</button>
+      <button class="menu-btn gold" onclick="battlePassSidebar.loadBattlePass(currentUser)">🎫 PASE</button>
       <button class="menu-btn gold" onclick="openModal('shopModal')">🛒 TIENDA</button>
       <button class="menu-btn" style="border-color:#EF4444;color:#EF4444" onclick="doLogout()">SALIR</button>
     </div>
@@ -803,7 +803,8 @@ body {
 </div>
 
 <script src="/animations.js"></script>
-<script src="/battlepass-system.js"></script>
+<script src="/battlepass-sidebar.js"></script>
+<script src="/social-play.js"></script>
 <script>
 const API_URL = "/api";
 let currentUser = localStorage.getItem("arcade_user") || null;
@@ -872,7 +873,10 @@ function renderGames() {
       <div class="card-art"><img src="${g.img}" alt="${g.title}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;"></div>
       <div class="card-info">
         <div><div style="font-family:'Orbitron'; font-weight:900; font-size:18px;">${g.title}</div></div>
-        <button class="card-btn" onclick="launchGame('${g.file}')">JUGAR</button>
+        <div style="display:flex; gap:8px;">
+          <button class="card-btn" onclick="launchGame('${g.file}')" style="flex:1;">JUGAR</button>
+          <button class="card-btn" onclick="socialPlay.createRoom('${g.file}'); socialPlay.showInviteModal();" style="flex:0.5; font-size:12px;" title="Juego Social">👥</button>
+        </div>
       </div>
     </div>
   `).join('');
@@ -883,6 +887,7 @@ function initLobby() {
   updateHUD();
   if(!hudInterval) hudInterval = setInterval(updateHUD, 10000);
   moveCarousel(0);
+  battlePassSidebar.loadBattlePass(currentUser);
 }
 
 async function openProfileModal() {
@@ -979,8 +984,8 @@ function launchGame(file) {
   // Limpiar iframe anterior
   gameFrame.src = "";
   
-  // Cargar nuevo juego
-  gameFrame.src = `/public/${file}?u=${encodeURIComponent(currentUser)}`;
+  // Cargar nuevo juego (ruta simple)
+  gameFrame.src = `${file}?u=${encodeURIComponent(currentUser)}`;
   document.getElementById("gameContainer").style.display = "flex";
   
   // Enviar créditos al iframe cuando cargue

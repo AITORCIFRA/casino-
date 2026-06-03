@@ -19,16 +19,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Servir también las carpetas css y js desde la raíz del proyecto
-app.mount("/css", StaticFiles(directory="css"), name="css")
-app.mount("/js", StaticFiles(directory="js"), name="js")
-
+# Incluir routers de API PRIMERO (tienen prioridad)
 app.include_router(auth.router)
 app.include_router(wallet.router)
 app.include_router(games.router)
 app.include_router(battlepass_leagues.router)
 
-# Servir archivos estáticos desde public/ (DEBE SER ÚLTIMO)
+# Servir archivos estáticos desde public/
+app.mount("/css", StaticFiles(directory="public/css"), name="css")
+app.mount("/js", StaticFiles(directory="public/js"), name="js")
+app.mount("/assets", StaticFiles(directory="public/assets"), name="assets")
+
+# Servir archivos HTML desde public/ (DEBE SER ÚLTIMO)
 app.mount("/", StaticFiles(directory="public", html=True), name="public")
 
 if __name__ == "__main__":
