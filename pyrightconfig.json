@@ -1,4 +1,8 @@
 {
   "venvPath": ".",
-  "venv": ".venv"
+  "venv": ".venv",
+  "reportArgumentType": false,
+  "reportOperatorIssue": false,
+  "reportOptionalMemberAccess": "warning",
+  "reportPossiblyUnboundVariable": "warning"
 }

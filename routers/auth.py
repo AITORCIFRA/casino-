@@ -19,20 +19,23 @@ async def register(data: AuthModel):
     conn = get_db_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Error de base de datos")
-    cursor = conn.cursor()
-    
-    # Verificar si ya existe en users
-    cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
-    if cursor.fetchone():
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+             raise HTTPException(status_code=500, detail="Error al crear cursor")
+        
+        # Verificar si ya existe en users
+        cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
+        if cursor.fetchone():
+            cursor.close()
+            raise HTTPException(status_code=400, detail="El usuario ya existe")
+        
+        # Insertar en users
+        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+        conn.commit()
         cursor.close()
+    finally:
         conn.close()
-        raise HTTPException(status_code=400, detail="El usuario ya existe")
-    
-    # Insertar en users
-    cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
-    conn.commit()
-    cursor.close()
-    conn.close()
     
     # Inicializar datos en players y usuarios
     ensure_user(username)
@@ -43,15 +46,19 @@ async def login(data: AuthModel):
     conn = get_db_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Error de base de datos")
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT username, password FROM users WHERE username = %s", (data.username,))
-    row = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    
-    if not row or row[1] != data.password:
-        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
-    
-    ensure_user(data.username)
-    return {"status": "success", "message": "Login correcto", "username": data.username}
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+             raise HTTPException(status_code=500, detail="Error al crear cursor")
+        
+        cursor.execute("SELECT username, password FROM users WHERE username = %s", (data.username,))
+        row = cursor.fetchone()
+        cursor.close()
+        
+        if not row or not isinstance(row, (list, tuple)) or str(row[1]) != data.password:
+            raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+        
+        ensure_user(data.username)
+        return {"status": "success", "message": "Login correcto", "username": data.username}
+    finally:
+        conn.close()

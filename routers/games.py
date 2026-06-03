@@ -1,5 +1,5 @@
 # routers/games.py
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 import random
 import json
 
@@ -114,7 +114,7 @@ def _settle_bet(
     xp_gain: int,
     league_points: int,
     game_name: str,
-    transaction_type: str = None
+    transaction_type: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Ejecuta la apuesta:
@@ -143,7 +143,7 @@ def _settle_accepted_result(
     request: GameResultRequest,
     xp_gain: int,
     league_points: int,
-) -> Dict[str, Any]:
+) -> Union[Dict[str, Any], JSONResponse]:
     validation_error = _validate_username_and_bet(request.username, request.bet)
     if validation_error:
         return validation_error
