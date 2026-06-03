@@ -39,6 +39,14 @@ let credits = 0;
 async function init() {
   credits = await WalletAPI.getBalance();
   updateUI();
+  
+  // Escuchar actualizaciones de créditos desde el lobby
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'credits_updated') {
+      credits = Math.floor(event.data.balance);
+      updateUI();
+    }
+  });
 }
 
 async function doSpin() {

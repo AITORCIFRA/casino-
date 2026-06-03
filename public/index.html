@@ -672,6 +672,7 @@ body {
 
     <div class="nav-menu-center">
       <button class="menu-btn" onclick="openSocialModal()">👥 SOCIAL</button>
+      <button class="menu-btn gold" onclick="battlePass.openBattlePassModal(currentUser)">🎫 PASE</button>
       <button class="menu-btn gold" onclick="openModal('shopModal')">🛒 TIENDA</button>
       <button class="menu-btn" style="border-color:#EF4444;color:#EF4444" onclick="doLogout()">SALIR</button>
     </div>
@@ -757,6 +758,7 @@ body {
 </div>
 
 <script src="/animations.js"></script>
+<script src="/battlepass-system.js"></script>
 <script>
 const API_URL = "/api";
 let currentUser = localStorage.getItem("arcade_user") || null;
@@ -769,7 +771,10 @@ const GAMES = [
   { id: 'keno', title: 'KENO TURBO', file: 'keno.html', cat: 'arcade', color: '#00BFFF', icon: '🎱' },
   { id: '3_en_1', title: '3 EN 1 ARCADE', file: '3_en_1.html', cat: 'arcade', color: '#A855F7', icon: '💎' },
   { id: 'blackjack', title: 'BLACKJACK VIP', file: 'blackjack.html', cat: 'mesa', color: '#FACC15', icon: '🃏' },
-  { id: 'crash', title: 'ROCKET CRASH', file: 'crash.html', cat: 'arcade', color: '#22C55E', icon: '🚀' }
+  { id: 'crash', title: 'ROCKET CRASH', file: 'crash.html', cat: 'arcade', color: '#22C55E', icon: '🚀' },
+  { id: 'mines', title: 'MINES ARCADE', file: 'mines.html', cat: 'arcade', color: '#FF6B6B', icon: '💣' },
+  { id: 'plinko', title: 'PLINKO EXTREME', file: 'plinko.html', cat: 'arcade', color: '#FF9F43', icon: '⚪' },
+  { id: 'roulette', title: 'ROULETTE ELITE', file: 'roulette.html', cat: 'mesa', color: '#FF1744', icon: '🎡' }
 ];
 
 async function doLogin(action) {
@@ -964,9 +969,18 @@ async function buyCredits(amount) {
       body: JSON.stringify({ username: currentUser, amount })
     });
     if(res.ok) { 
-      await updateHUD(); 
-      closeModal('shopModal'); 
-      winAnim.smallWin(amount); 
+      const data = await res.json();
+      const newBalance = Math.floor(data.new_balance || 0);
+      localStorage.setItem('arcade_credits', newBalance);
+      document.getElementById('lobbyCredits').innerText = newBalance.toLocaleString();
+      
+      const gameFrame = document.getElementById('gameFrame');
+      if(gameFrame && gameFrame.contentWindow) {
+        gameFrame.contentWindow.postMessage({ type: 'credits_updated', balance: newBalance }, '*');
+      }
+      
+      closeModal('shopModal');
+      winAnim.fountainEffect(amount);
     } else {
       const err = await res.json();
       alert("Error al comprar: " + (err.detail || "Error desconocido"));

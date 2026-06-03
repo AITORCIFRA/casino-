@@ -43,7 +43,8 @@ const WalletAPI = {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
-      return this.cacheBalance(data.balance || 0);
+      const balance = Math.floor(data.balance || 0);
+      return this.cacheBalance(balance);
     } catch (error) {
       console.error('Error al obtener saldo de la BD:', error);
       return this.getCachedBalance();
@@ -73,7 +74,8 @@ const WalletAPI = {
 
       const data = await response.json();
       if (data.success || response.ok) {
-        const balance = this.cacheBalance(data.new_balance ?? data.balance ?? 0);
+        const balance = Math.floor(data.new_balance ?? data.balance ?? 0);
+        this.cacheBalance(balance);
         return { success: true, balance: balance, new_balance: balance };
       }
 

@@ -405,6 +405,15 @@ function updateUI() {
   setMultStep(0);
   if(credits < BETS[betIdx]) handleInsufficientFunds();
   else { insufficientLocked = false; setSpinAvailable(); }
+  
+  // Escuchar actualizaciones de créditos desde el lobby
+  window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'credits_updated') {
+      credits = Math.floor(event.data.balance);
+      updateUI();
+      setSpinAvailable();
+    }
+  });
 })();
 </script>
 </body>
