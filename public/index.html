@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ARCADE PREMIUM — Cyber Casino Cloud 3D</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght=400;700;900&family=Rajdhani:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,7 +40,7 @@ body {
 /* ============ AUTH ============ */
 #authScreen { position: fixed; inset: 0; z-index: 2000; background: rgba(3,3,6,0.95); backdrop-filter: blur(25px); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.5s; }
 #authScreen.hidden { opacity: 0; pointer-events: none; display: none !important; }
-.auth-logo { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem,9vw,5.5rem); letter-spacing: .15em; text-shadow: 0 0 30px rgba(0,255,153,0.3); }
+.auth-logo { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 9vw, 5.5rem); letter-spacing: .15em; text-shadow: 0 0 30px rgba(0,255,153,0.3); }
 .auth-logo span:first-child { color: #fff; }
 .auth-logo span:last-child { color: #00FF99; }
 .auth-card { background: rgba(10,10,16,0.7); border: 1px solid rgba(0,255,153,0.2); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 1rem; }
@@ -134,6 +134,15 @@ body {
 .game-topbar { background: #07070d; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); }
 .back-btn { background: #EF4444; color: #FFF; border: none; padding: 9px 18px; border-radius: 8px; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; font-size: 12px; }
 #gameFrame { width: 100%; flex: 1; border: none; }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .top-bar { padding: 8px 15px; }
+  .nav-menu-center { gap: 5px; }
+  .menu-btn { padding: 6px 10px; font-size: 9px; }
+  .game-card { width: 220px; height: 330px; }
+  .nav-arrow { width: 45px; height: 45px; }
+}
 </style>
 </head>
 <body>
@@ -167,149 +176,66 @@ body {
       </div>
     </div>
 
+    <div style="display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(0,255,153,0.15);">
+      <div style="font-family:'Orbitron'; font-weight:900; color:#00FF99; font-size:16px;" id="lobbyCredits">0</div>
+      <div style="font-size:10px; color:rgba(255,255,255,0.4); font-family:'Orbitron';">FICHAS</div>
+    </div>
+
     <div class="nav-menu-center">
-      <button class="menu-btn" onclick="openModal('profileModal')">🏆 MI PERFIL VIP</button>
-      <button class="notif-btn" onclick="openModal('socialModal')">🎖️ SOCIAL</button>
       <button class="menu-btn gold" onclick="openShopModal()">🛒 TIENDA</button>
       <button class="menu-btn" style="border-color:#EF4444;color:#EF4444" onclick="doLogout()">SALIR</button>
     </div>
-
-    <div style="text-align:center;background:rgba(0,255,153,0.02);padding:5px 18px;border-radius:12px;border:1px solid #00FF99;">
-      <div style="font-family:'Orbitron';font-size:8px;color:rgba(0,255,153,0.6)">MIS FICHAS CLOUD</div>
-      <div style="font-family:'Orbitron';font-size:22px;color:#00FF99;font-weight:900;" id="lobbyCredits">0</div>
-    </div>
   </header>
 
-  <div class="cat-filter-bar">
-    <span style="font-family:'Orbitron';font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:.1em;margin-right:4px;">FILTRAR:</span>
-    <button class="cat-btn active" onclick="filterCat(this,'all')">TODOS</button>
-    <button class="cat-btn" onclick="filterCat(this,'slots')">🎰 TRAGAPERRAS</button>
-    <button class="cat-btn" onclick="filterCat(this,'mesa')">🃏 MESA</button>
-    <button class="cat-btn" onclick="filterCat(this,'arcade')">🕹️ ARCADE</button>
-  </div>
+  <nav class="cat-filter-bar">
+    <button class="cat-btn active" onclick="filterCat(this, 'all')">TODOS</button>
+    <button class="cat-btn" onclick="filterCat(this, 'slots')">SLOTS</button>
+    <button class="cat-btn" onclick="filterCat(this, 'mesa')">MESA</button>
+    <button class="cat-btn" onclick="filterCat(this, 'arcade')">ARCADE</button>
+  </nav>
 
-  <!-- CAROUSEL DE JUEGOS -->
   <div class="carousel-area">
     <div class="nav-arrow nav-left" onclick="moveCarousel(-1)">◀</div>
-    <div id="carouselTrack" style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+    <div id="carouselTrack" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; position:relative;">
       
-      <div class="game-card" data-game="slots" data-file="slots.html" data-cat="slots" style="--theme-color:#FF9900">
-        <div class="card-art" style="background:linear-gradient(45deg, #111, #333);"><div class="card-icon">🎰🌟</div></div>
+      <!-- Games will be injected or kept here -->
+      <div class="game-card" data-game="slots" data-file="slots.html" data-cat="slots" style="--theme-color:#00FF99">
+        <div class="card-art" style="background:linear-gradient(45deg, #05261a, #0a0a12);"><div class="card-icon">🎰</div></div>
         <div class="card-info">
-          <div><div class="game-badge" style="color:#FF9900;border-color:#FF9900;">CLÁSICO</div><div class="card-title">LUCKY SEVENS</div><div class="card-sub">5 Rodillos · Jackpot</div></div>
-          <button class="card-btn" onclick="launchGame('slots')">GIRAR</button>
+          <div><div class="game-badge" style="color:#00FF99;border-color:#00FF99;">SLOT</div><div class="card-title">LUCKY SEVENS</div><div class="card-sub">Clásico · 3 Rieles</div></div>
+          <button class="card-btn" onclick="launchGame('slots.html')">JUGAR</button>
         </div>
       </div>
 
-      <div class="game-card" data-game="magic_trakka" data-file="magic_trakka.html" data-cat="slots" style="--theme-color:#A855F7">
-        <div class="card-art" style="background:linear-gradient(45deg, #1a092e, #090912);"><div class="card-icon">🪄🚂</div></div>
+      <div class="game-card" data-game="keno" data-file="keno.html" data-cat="arcade" style="--theme-color:#00BFFF">
+        <div class="card-art" style="background:linear-gradient(45deg, #041b2b, #0a0a12);"><div class="card-icon">🎱</div></div>
         <div class="card-info">
-          <div><div class="game-badge" style="color:#A855F7;border-color:#A855F7;">BONOS</div><div class="card-title">MAGIC TRAKKA</div><div class="card-sub">Slot de bonos</div></div>
-          <button class="card-btn" onclick="launchGame('magic_trakka')">JUGAR</button>
+          <div><div class="game-badge" style="color:#00BFFF;border-color:#00BFFF;">KENO</div><div class="card-title">KENO TURBO</div><div class="card-sub">Sorteo instantáneo</div></div>
+          <button class="card-btn" onclick="launchGame('keno.html')">JUGAR</button>
         </div>
       </div>
 
-      <div class="game-card" data-game="blackjack" data-file="blackjack.html" data-cat="mesa" style="--theme-color:#00FF99">
-        <div class="card-art" style="background:linear-gradient(45deg, #061f14, #0a0a12);"><div class="card-icon">🃏♠️</div></div>
+      <div class="game-card" data-game="mines" data-file="mines.html" data-cat="arcade" style="--theme-color:#A855F7">
+        <div class="card-art" style="background:linear-gradient(45deg, #1b0838, #0a0a12);"><div class="card-icon">💣</div></div>
         <div class="card-info">
-          <div><div class="game-badge" style="color:#00FF99;border-color:#00FF99;">MESA</div><div class="card-title">BLACKJACK</div><div class="card-sub">21 · Doblar · Plantarse</div></div>
-          <button class="card-btn" onclick="launchGame('blackjack')">JUGAR</button>
+          <div><div class="game-badge" style="color:#A855F7;border-color:#A855F7;">ARCADE</div><div class="card-title">MINES ARCADE</div><div class="card-sub">Multiplicador x100</div></div>
+          <button class="card-btn" onclick="launchGame('mines.html')">JUGAR</button>
         </div>
       </div>
 
-      <div class="game-card" data-game="roulette" data-file="roulette.html" data-cat="mesa" style="--theme-color:#EF4444">
-        <div class="card-art" style="background:linear-gradient(45deg, #2a0808, #0a0a12);"><div class="card-icon">🎡🔴</div></div>
+      <div class="game-card" data-game="blackjack" data-file="blackjack.html" data-cat="mesa" style="--theme-color:#FACC15">
+        <div class="card-art" style="background:linear-gradient(45deg, #1f1300, #0a0a12);"><div class="card-icon">🃏</div></div>
         <div class="card-info">
-          <div><div class="game-badge" style="color:#EF4444;border-color:#EF4444;">RULETA</div><div class="card-title">RULETA EUROPEA</div><div class="card-sub">37 números · Apuestas completas</div></div>
-          <button class="card-btn" onclick="launchGame('roulette')">GIRAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-game="keno" data-file="keno.html" data-cat="mesa" style="--theme-color:#00D4FF">
-        <div class="card-art" style="background:linear-gradient(45deg, #051a2e, #0a0a14);"><div class="card-icon">🎱🔮</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#00D4FF;border-color:#00D4FF;">NUMÉRICOS</div><div class="card-title">KENO TURBO</div><div class="card-sub">Multiplicadores rápidos</div></div>
-          <button class="card-btn" onclick="launchGame('keno')">APOSTAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-game="mines" data-file="mines.html" data-cat="mesa" style="--theme-color:#FACC15">
-        <div class="card-art" style="background:linear-gradient(45deg, #2a2108, #0a0a12);"><div class="card-icon">💣💎</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#FACC15;border-color:#FACC15;">MINAS</div><div class="card-title">MINES ARCADE</div><div class="card-sub">Esquiva y multiplica</div></div>
-          <button class="card-btn" onclick="launchGame('mines')">ABRIR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-game="crash" data-file="crash.html" data-cat="mesa" style="--theme-color:#22C55E">
-        <div class="card-art" style="background:linear-gradient(45deg, #062510, #0a0a12);"><div class="card-icon">🚀📈</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#22C55E;border-color:#22C55E;">CRASH</div><div class="card-title">CRASH</div><div class="card-sub">Retira antes del impacto</div></div>
-          <button class="card-btn" onclick="launchGame('crash')">DESPEGAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-game="poker" data-file="poker.html" data-cat="mesa" style="--theme-color:#F97316">
-        <div class="card-art" style="background:linear-gradient(45deg, #2a1205, #0a0a12);"><div class="card-icon">♣️♦️</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#F97316;border-color:#F97316;">POKER</div><div class="card-title">TEXAS HOLD'EM</div><div class="card-sub">Mesa premium</div></div>
-          <button class="card-btn" onclick="launchGame('poker')">JUGAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-game="3_en_1" data-file="3_en_1.html" data-cat="slots" style="--theme-color:#EC4899">
-        <div class="card-art" style="background:linear-gradient(45deg, #2a0618, #0a0a12);"><div class="card-icon">🐉🍒</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#EC4899;border-color:#EC4899;">3 EN 1</div><div class="card-title">LINK TRIPLE</div><div class="card-sub">Dragon · Party · Funny</div></div>
-          <button class="card-btn" onclick="launchGame('3_en_1')">JUGAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-file="blackjack.html" data-cat="mesa" style="--theme-color:#FACC15">
-        <div class="card-art" style="background:linear-gradient(45deg, #1f1300, #0a0a12);"><div class="card-icon">🃏♠️</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#FACC15;border-color:#FACC15;">MESA</div><div class="card-title">BLACKJACK VIP</div><div class="card-sub">21 Clásico · Dealer Live</div></div>
+          <div><div class="game-badge" style="color:#FACC15;border-color:#FACC15;">MESA</div><div class="card-title">BLACKJACK VIP</div><div class="card-sub">21 Clásico</div></div>
           <button class="card-btn" onclick="launchGame('blackjack.html')">JUGAR</button>
         </div>
       </div>
 
-      <div class="game-card" data-file="magic_trakka.html" data-cat="slots" style="--theme-color:#A855F7">
-        <div class="card-art" style="background:linear-gradient(45deg, #1b0838, #0a0a12);"><div class="card-icon">✨🚂</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#A855F7;border-color:#A855F7;">SLOT MÁGICA</div><div class="card-title">MAGIC TRAKKA</div><div class="card-sub">Bonos · Rieles Encantados</div></div>
-          <button class="card-btn" onclick="launchGame('magic_trakka.html')">GIRAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-file="crash.html" data-cat="arcade" style="--theme-color:#22C55E">
-        <div class="card-art" style="background:linear-gradient(45deg, #062a16, #0a0a12);"><div class="card-icon">🚀📈</div></div>
+      <div class="game-card" data-game="crash" data-file="crash.html" data-cat="arcade" style="--theme-color:#22C55E">
+        <div class="card-art" style="background:linear-gradient(45deg, #062a16, #0a0a12);"><div class="card-icon">🚀</div></div>
         <div class="card-info">
           <div><div class="game-badge" style="color:#22C55E;border-color:#22C55E;">CRASH</div><div class="card-title">ROCKET CRASH</div><div class="card-sub">Retira antes del impacto</div></div>
-          <button class="card-btn" onclick="launchGame('crash.html')">DESPEGAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-file="roulette.html" data-cat="mesa" style="--theme-color:#DC2626">
-        <div class="card-art" style="background:linear-gradient(45deg, #2a0606, #0a0a12);"><div class="card-icon">🎡♦️</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#DC2626;border-color:#DC2626;">RULETA</div><div class="card-title">ROULETTE ROYALE</div><div class="card-sub">Rojo / Negro · Pleno</div></div>
-          <button class="card-btn" onclick="launchGame('roulette.html')">APOSTAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-file="poker.html" data-cat="mesa" style="--theme-color:#38BDF8">
-        <div class="card-art" style="background:linear-gradient(45deg, #041b2b, #0a0a12);"><div class="card-icon">♣️♥️</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#38BDF8;border-color:#38BDF8;">POKER</div><div class="card-title">POKER NIGHT</div><div class="card-sub">Cartas · Estrategia VIP</div></div>
-          <button class="card-btn" onclick="launchGame('poker.html')">JUGAR</button>
-        </div>
-      </div>
-
-      <div class="game-card" data-file="3_en_1.html" data-cat="slots" style="--theme-color:#FB7185">
-        <div class="card-art" style="background:linear-gradient(45deg, #3a0715, #0a0a12);"><div class="card-icon">🎰🎲</div></div>
-        <div class="card-info">
-          <div><div class="game-badge" style="color:#FB7185;border-color:#FB7185;">MULTIJUEGO</div><div class="card-title">TRIPLE 3 EN 1</div><div class="card-sub">Slots · Dados · Sorpresas</div></div>
-          <button class="card-btn" onclick="launchGame('3_en_1.html')">ENTRAR</button>
+          <button class="card-btn" onclick="launchGame('crash.html')">JUGAR</button>
         </div>
       </div>
 
@@ -327,20 +253,6 @@ body {
     <div class="chat-input-row">
       <input type="text" class="chat-input" id="chatMsgInput" placeholder="Escribe un mensaje VIP al servidor..." onkeydown="if(event.key==='Enter') sendChat()">
       <button class="chat-send-btn" onclick="sendChat()">ENVIAR</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============ MODAL SOCIAL ============ -->
-<div class="panel-modal" id="socialModal">
-  <div class="panel-container">
-    <span class="panel-close" onclick="closeModal('socialModal')">&times;</span>
-    <div class="social-tabs">
-      <div class="stab active">🏆 CLASIFICACIÓN DE LIGAS</div>
-    </div>
-    <div class="league-podium">
-      <h3>TOP USUARIOS EN SERVIDOR</h3>
-      <div id="podiumContainer"></div>
     </div>
   </div>
 </div>
@@ -398,181 +310,91 @@ body {
   <iframe id="gameFrame" src=""></iframe>
 </div>
 
-<!-- ============ SCRIPTS CORREGIDOS ============ -->
 <script>
-const API_URL = "http://localhost:5000/api";
-
-// Fuente única de verdad del lobby: IDs canónicos -> archivos reales en /public.
-const GAME_MAP = {
-  slots: { file: "slots.html", title: "LUCKY SEVENS" },
-  magic_trakka: { file: "magic_trakka.html", title: "MAGIC TRAKKA" },
-  blackjack: { file: "blackjack.html", title: "BLACKJACK" },
-  roulette: { file: "roulette.html", title: "RULETA EUROPEA" },
-  keno: { file: "keno.html", title: "KENO TURBO" },
-  mines: { file: "mines.html", title: "MINES ARCADE" },
-  crash: { file: "crash.html", title: "CRASH" },
-  poker: { file: "poker.html", title: "TEXAS HOLD'EM" },
-  "3_en_1": { file: "3_en_1.html", title: "LINK TRIPLE 3 EN 1" }
-};
-
-const GAME_BY_FILE = Object.values(GAME_MAP).reduce((acc, game) => {
-  acc[game.file] = game;
-  return acc;
-}, {});
-
+const API_URL = "/api";
 let currentUser = localStorage.getItem("arcade_user") || null;
 let carouselIndex = 0;
 let hudInterval = null;
 
 function toggleChat() {
   const bar = document.getElementById("mainChatBar");
-  if (!bar) return;
-  bar.classList.toggle("collapsed");
-  bar.classList.toggle("expanded");
+  if (bar) bar.classList.toggle("collapsed"), bar.classList.toggle("expanded");
 }
 
-// *********************************************************
-// FUNCIÓN PRINCIPAL: LOGIN Y REGISTRO SEPARADOS
-// *********************************************************
 async function doLogin(action) {
   const username = document.getElementById("loginUser").value.trim();
   const password = document.getElementById("loginPass").value.trim();
-
-  if (!username || !password) {
-    alert("❌ Introduce usuario y contraseña.");
-    return;
-  }
-
+  if (!username || !password) { alert("❌ Introduce usuario y contraseña."); return; }
   try {
     const res = await fetch(`${API_URL}/auth/${action}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
-
     const data = await res.json();
-
     if (res.ok) {
       if (action === 'login') {
-        // Login exitoso → entrar al lobby
         localStorage.setItem("arcade_user", username);
         currentUser = username;
         document.getElementById("authScreen").classList.add("hidden");
         document.getElementById("lobbyScreen").classList.remove("hidden");
         initLobby();
-      } else if (action === 'register') {
-        // Registro exitoso → mensaje y no iniciar sesión
-        alert(`✅ Usuario "${username}" registrado con éxito. ¡Ahora inicia sesión!`);
-        // Limpiar campos para facilitar nuevo login
-        document.getElementById("loginUser").value = "";
-        document.getElementById("loginPass").value = "";
+      } else {
+        alert(`✅ Usuario "${username}" registrado. ¡Inicia sesión!`);
       }
-    } else {
-      // Error: mostrar mensaje devuelto por el backend (ej. "El usuario ya existe")
-      alert(`❌ Error: ${data.detail || data.message || "Fallo en el servidor"}`);
-    }
-  } catch(e) {
-    alert("❌ No se pudo conectar con el servidor. ¿Está ejecutándose?");
-  }
+    } else alert(`❌ Error: ${data.detail || data.message}`);
+  } catch(e) { alert("❌ Error de conexión."); }
 }
 
 async function updateHUD() {
-  if(!currentUser) return Number(localStorage.getItem("arcade_credits")) || 0;
-
-  let balance = Number(localStorage.getItem("arcade_credits")) || 0;
-  if(!currentUser) return null;
-  let currentBalance = null;
+  if(!currentUser) return;
   try {
-    const resWallet = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
-    if(resWallet.ok) {
-      const dataW = await resWallet.json();
+    const resW = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
+    if(resW.ok) {
+      const dataW = await resW.json();
       const balance = Math.floor(dataW.balance);
-      currentBalance = balance;
-      
-      // Guardamos en localStorage para persistencia
       localStorage.setItem("arcade_credits", balance);
-
-      const creditsEl = document.getElementById("lobbyCredits");
-      if(creditsEl) creditsEl.innerText = balance.toLocaleString();
+      document.getElementById("lobbyCredits").innerText = balance.toLocaleString();
+      
+      // Notificar al iframe si está abierto
+      const gameFrame = document.getElementById("gameFrame");
+      if(gameFrame && gameFrame.contentWindow) {
+        gameFrame.contentWindow.postMessage({ type: "credits_updated", balance }, "*");
+      }
     }
-
-    const resProg = await fetch(`${API_URL}/progression/battlepass/${currentUser}`);
-    if(resProg.ok) {
-      const dataP = await resProg.json();
-      if(document.getElementById("lobbyLevel")) document.getElementById("lobbyLevel").innerText = dataP.level;
-      if(document.getElementById("lobbyName")) document.getElementById("lobbyName").innerText = currentUser.toUpperCase();
+    const resP = await fetch(`${API_URL}/progression/battlepass/${currentUser}`);
+    if(resP.ok) {
+      const dataP = await resP.json();
+      document.getElementById("lobbyLevel").innerText = dataP.level;
+      document.getElementById("lobbyName").innerText = currentUser.toUpperCase();
     }
-  } catch(err) { console.log("Servidor en pausa..."); }
-  return currentBalance;
+  } catch(err) { console.log("Servidor offline..."); }
 }
 
-function openModal(id) {
-  const modal = document.getElementById(id);
-  if(modal) modal.classList.add("open");
-}
-
-function closeModal(id) {
-  const modal = document.getElementById(id);
-  if(modal) modal.classList.remove("open");
-}
-
-function openShopModal() {
-  openModal("shopModal");
-}
-
-function closeShopModal() {
-  closeModal("shopModal");
-}
+function openModal(id) { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+function openShopModal() { openModal("shopModal"); }
+function closeShopModal() { closeModal("shopModal"); }
 
 async function buyCredits(amount) {
-  if(!currentUser) { alert("Inicia sesión para comprar créditos."); return; }
-
+  if(!currentUser) return;
   try {
     const res = await fetch(`${API_URL}/wallet/deposit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: currentUser, amount })
     });
-    const data = await res.json().catch(() => ({}));
-
-    if(!res.ok) {
-      alert("No se pudo completar la compra: " + (data.detail || data.message || "Error del servidor"));
-      return;
+    if(res.ok) {
+      await updateHUD();
+      closeShopModal();
     }
-
-    const apiBalance = data.balance ?? data.new_balance;
-    let balance = Number.isFinite(Number(apiBalance)) ? Math.floor(Number(apiBalance)) : null;
-    if(balance !== null) {
-      localStorage.setItem("arcade_credits", balance);
-      const creditsEl = document.getElementById("lobbyCredits");
-      if(creditsEl) creditsEl.innerText = balance.toLocaleString();
-    }
-
-    const updatedBalance = await updateHUD();
-    if(updatedBalance !== null) balance = updatedBalance;
-    closeShopModal();
-
-    const gameFrame = document.getElementById("gameFrame");
-    if(gameFrame && gameFrame.contentWindow && balance !== null) {
-      gameFrame.contentWindow.postMessage({ type: "credits_updated", balance }, "*");
-    }
-  } catch(err) {
-    alert("No se pudo conectar con la tienda.");
-  }
+  } catch(err) { alert("Error en la tienda."); }
 }
-
-window.addEventListener("message", (event) => {
-  const data = event.data;
-  if(data && data.type === "insufficient_funds" && data.open_shop === true) {
-    openShopModal();
-  }
-});
 
 function launchGame(file) {
   document.getElementById("gameActiveTitle").innerText = file.replace(".html","").toUpperCase();
-  const savedCredits = localStorage.getItem("arcade_credits");
-  const creditsParam = savedCredits !== null ? `&c=${encodeURIComponent(savedCredits)}` : "";
-  document.getElementById("gameFrame").src = `/${file}?u=${encodeURIComponent(currentUser)}${creditsParam}`;
+  const credits = localStorage.getItem("arcade_credits") || "0";
+  document.getElementById("gameFrame").src = `/${file}?u=${encodeURIComponent(currentUser)}&c=${credits}`;
   document.getElementById("gameContainer").style.display = "flex";
 }
 
@@ -583,93 +405,48 @@ function closeGame() {
 }
 
 function initLobby() {
-  const savedCredits = localStorage.getItem("arcade_credits");
-  if(savedCredits) document.getElementById("lobbyCredits").innerText = parseInt(savedCredits).toLocaleString();
-  if(currentUser && document.getElementById("lobbyName")) document.getElementById("lobbyName").innerText = currentUser.toUpperCase();
-
   updateHUD();
-  if (!hudInterval) hudInterval = setInterval(updateHUD, 4000);
+  if (!hudInterval) hudInterval = setInterval(updateHUD, 5000);
   moveCarousel(0);
+}
+
+function moveCarousel(dir) {
+  const cards = Array.from(document.querySelectorAll('.game-card:not(.cat-hidden)'));
+  if(!cards.length) return;
+  carouselIndex = (carouselIndex + dir + cards.length) % cards.length;
+  cards.forEach((c, i) => {
+    c.className = "game-card";
+    if(i === carouselIndex) c.classList.add("active");
+    else if(i === (carouselIndex+1)%cards.length) c.classList.add("next");
+    else if(i === (carouselIndex-1+cards.length)%cards.length) c.classList.add("prev");
+    else c.classList.add("hidden-card");
+  });
 }
 
 function filterCat(btn, cat) {
-  document.querySelectorAll('.cat-btn').forEach((catBtn) => catBtn.classList.remove('active'));
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.game-card').forEach((card) => {
-    const showCard = cat === 'all' || card.dataset.cat === cat;
-    card.classList.toggle('cat-hidden', !showCard);
-  });
-  carouselIndex = 0;
-  moveCarousel(0);
-}
-
-function moveCarousel(direction) {
-  const cards = Array.from(document.querySelectorAll('.game-card:not(.cat-hidden)'));
-  if(cards.length === 0) return;
-  carouselIndex = (carouselIndex + direction + cards.length) % cards.length;
-  cards.forEach((card, idx) => {
-    card.className = "game-card";
-    if(idx === carouselIndex) card.classList.add("active");
-    else if(idx === (carouselIndex + 1) % cards.length) card.classList.add("next");
-    else if(idx === (carouselIndex - 1 + cards.length) % cards.length) card.classList.add("prev");
-    else card.classList.add("hidden-card");
-  });
-}
-
-function filterCat(button, category) {
-  document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-  if (button) button.classList.add('active');
-
-  document.querySelectorAll('.game-card').forEach(card => {
-    const visible = category === 'all' || card.dataset.cat === category;
-    card.classList.toggle('cat-hidden', !visible);
-  });
-
-  carouselIndex = 0;
-  moveCarousel(0);
-}
-
-function openModal(id) {
-  const modal = document.getElementById(id);
-  if (modal) modal.classList.add('open');
-}
-
-function closeModal(id) {
-  const modal = document.getElementById(id);
-  if (modal) modal.classList.remove('open');
+  document.querySelectorAll('.game-card').forEach(c => c.classList.toggle('cat-hidden', cat !== 'all' && c.dataset.cat !== cat));
+  carouselIndex = 0; moveCarousel(0);
 }
 
 function sendChat() {
   const input = document.getElementById('chatMsgInput');
-  const box = document.getElementById('chatBox');
-  const msg = input ? input.value.trim() : '';
-  if (!msg || !box) return;
+  const msg = input.value.trim();
+  if(!msg) return;
   const row = document.createElement('div');
-  row.textContent = `${currentUser || 'VIP'}: ${msg}`;
-  box.appendChild(row);
-  box.scrollTop = box.scrollHeight;
+  row.textContent = `${currentUser}: ${msg}`;
+  document.getElementById('chatBox').appendChild(row);
   input.value = '';
 }
 
-window.addEventListener('message', (event) => {
-  if (!event.data || event.data.type !== 'credits') return;
-  const balance = Math.floor(Number(event.data.value));
-  if (!Number.isFinite(balance) || balance < 0) return;
-  localStorage.setItem("arcade_credits", balance);
-  const creditsEl = document.getElementById("lobbyCredits");
-  if(creditsEl) creditsEl.innerText = balance.toLocaleString();
+window.addEventListener('message', (e) => {
+  if(e.data.type === 'credits') updateHUD();
+  if(e.data.type === 'open_shop') openShopModal();
 });
 
-window.onload = () => {
-  if(currentUser) {
-    document.getElementById("authScreen").classList.add("hidden");
-    document.getElementById("lobbyScreen").classList.remove("hidden");
-    initLobby();
-  }
-};
-
+window.onload = () => { if(currentUser) { document.getElementById("authScreen").classList.add("hidden"); document.getElementById("lobbyScreen").classList.remove("hidden"); initLobby(); } };
 function doLogout() { localStorage.clear(); window.location.reload(); }
 </script>
-
 </body>
 </html>

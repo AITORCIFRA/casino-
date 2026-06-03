@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Keno Turbo</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+<script src="/js/wallet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--neon:#00D4FF;--gold:#C9A84C;--green:#00FF88;--red:#FF3366;--bg:#020d14;--font-d:'Bebas Neue',sans-serif;--font-u:'Orbitron',sans-serif;--font-b:'Rajdhani',sans-serif}
@@ -14,7 +15,6 @@ h1{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.15em;color:var(--n
 .cval{color:var(--green);text-shadow:0 0 8px var(--green)}
 .bval{color:var(--gold)}
 .wval{color:var(--neon)}
-/* Board */
 .keno-board{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-width:600px;width:100%;margin-bottom:.75rem}
 .kball{width:100%;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:var(--font-u);font-size:11px;cursor:pointer;transition:all .15s;user-select:none;position:relative}
 .kball:hover{background:rgba(0,212,255,.1);border-color:var(--neon)}
@@ -22,13 +22,11 @@ h1{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.15em;color:var(--n
 .kball.drawn{background:radial-gradient(circle at 35% 35%,rgba(201,168,76,.5),rgba(100,60,0,.6));border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px var(--gold)}
 .kball.match{background:radial-gradient(circle at 35% 35%,rgba(0,255,136,.5),rgba(0,100,50,.6));border-color:var(--green);color:var(--green);box-shadow:0 0 20px var(--green);animation:matchPop .5s ease}
 @keyframes matchPop{0%{transform:scale(.8)}60%{transform:scale(1.3)}100%{transform:scale(1.1)}}
-/* Draw balls display */
 .draw-display{display:flex;flex-wrap:wrap;gap:4px;max-width:600px;width:100%;min-height:44px;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:6px;margin-bottom:.75rem;align-items:center}
 .drawn-ball{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-u);font-size:10px;font-weight:700;border:1.5px solid;animation:ballIn .25s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes ballIn{from{transform:scale(0) rotate(-180deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
 .db-normal{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
 .db-hit{background:rgba(0,255,136,.2);border-color:var(--green);color:var(--green);box-shadow:0 0 10px var(--green)}
-/* Controls */
 .controls{display:flex;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap;justify-content:center}
 .ctrl{font-family:var(--font-u);font-size:10px;letter-spacing:.1em;padding:.45rem .9rem;border:none;border-radius:6px;cursor:pointer;transition:all .15s}
 .ctrl:active{transform:scale(.96)}
@@ -38,55 +36,23 @@ h1{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.15em;color:var(--n
 .btn-clear{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6)}
 .btn-quick{background:rgba(201,168,76,.1);border:1px solid var(--gold);color:var(--gold)}
 .bet-ctrl{background:rgba(0,212,255,.08);border:1px solid var(--neon);color:var(--neon)}
-/* Info row */
 .info-row{font-family:var(--font-u);font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,.3);text-align:center;margin-bottom:.5rem}
-/* Result msg */
 .result-msg{font-family:var(--font-d);font-size:1.8rem;letter-spacing:.1em;text-align:center;min-height:2.5rem;text-shadow:0 0 20px currentColor}
-/* Paytable */
 .pt{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;max-width:600px;width:100%;margin-top:.5rem}
 .pt-cell{background:rgba(255,255,255,.04);border-radius:4px;padding:3px;text-align:center;font-size:9px;font-family:var(--font-u);color:var(--gold)}
 .pt-cell span{display:block;color:rgba(255,255,255,.5);font-size:8px;margin-bottom:1px}
-/* Shop modal */
-.shop-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s ease}
-.shop-modal.active{opacity:1;pointer-events:auto}
-.shop-content{background:#071823;border:2px solid var(--gold);box-shadow:0 0 40px rgba(201,168,76,.35);border-radius:16px;width:min(380px,calc(100vw - 2rem));padding:25px;text-align:center;position:relative;font-family:var(--font-u)}
-.shop-close-btn{position:absolute;top:15px;right:15px;background:none;border:none;color:rgba(255,255,255,.45);font-size:20px;cursor:pointer;font-weight:bold}
-.shop-close-btn:hover{color:var(--red)}
-.shop-title{color:var(--gold);font-size:20px;margin-bottom:20px;font-weight:900;letter-spacing:1px}
-.shop-option{background:#041018;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:.2s}
-.shop-option:hover{border-color:var(--neon);background:#082131;transform:scale(1.02)}
-.shop-pack-name{font-weight:bold;font-family:var(--font-b);font-size:18px;color:#fff}
-.shop-pack-price{color:var(--green);font-weight:900}
 </style>
 </head>
 <body>
-<div class="shop-modal" id="shopModalNode">
-  <div class="shop-content">
-    <button class="shop-close-btn" onclick="closeShopModal()">✕</button>
-    <div class="shop-title">RECARGA DE CRÉDITOS</div>
-    <div class="shop-option" onclick="buyCredits(5000)">
-      <span class="shop-pack-name">Bronce Pack (+5.000)</span>
-      <span class="shop-pack-price">5.00 €</span>
-    </div>
-    <div class="shop-option" onclick="buyCredits(20000)">
-      <span class="shop-pack-name">Plata Pack (+20.000)</span>
-      <span class="shop-pack-price">15.00 €</span>
-    </div>
-    <div class="shop-option" onclick="buyCredits(100000)">
-      <span class="shop-pack-name">Oro Pack (+100.000)</span>
-      <span class="shop-pack-price">50.00 €</span>
-    </div>
-  </div>
-</div>
 <h1>KENO TURBO</h1>
 <div class="stats-row">
-  <div class="stat"><div class="stat-lbl">CRÉDITOS</div><div class="stat-val cval" id="cred">500</div></div>
+  <div class="stat"><div class="stat-lbl">CRÉDITOS</div><div class="stat-val cval" id="cred">0</div></div>
   <div class="stat"><div class="stat-lbl">APUESTA</div><div class="stat-val bval" id="betD">10</div></div>
   <div class="stat"><div class="stat-lbl">ELEGIDOS</div><div class="stat-val" id="pickedCount" style="color:var(--neon)">0 / 10</div></div>
   <div class="stat"><div class="stat-lbl">ACIERTOS</div><div class="stat-val wval" id="hitsD">-</div></div>
 </div>
 <div class="keno-board" id="board"></div>
-<div class="draw-display" id="drawDisplay"><span style="color:rgba(255,255,255,.2);font-size:11px;font-family:var(--font-u)">BOLAS EXTRAÍDAS</span></div>
+<div class="draw-display" id="drawDisplay"></div>
 <div class="result-msg" id="resultMsg"></div>
 <div class="controls">
   <button class="ctrl bet-ctrl" onclick="chBet(-1)">BET -</button>
@@ -101,59 +67,25 @@ h1{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.15em;color:var(--n
 <script>
 const BETS=[1,2,5,10,25,50,100];
 const PAY_TABLE = {
-  1:  {1:3},
-  2:  {2:10, 1:1},
-  3:  {3:25, 2:2},
-  4:  {4:80, 3:5, 2:1},
-  5:  {5:200, 4:15, 3:3},
-  6:  {6:500, 5:50, 4:8, 3:1},
-  7:  {7:1500, 6:100, 5:20, 4:3},
-  8:  {8:5000, 7:500, 6:80, 5:10, 4:2},
-  9:  {9:8000, 8:1000, 7:150, 6:20, 5:4},
+  1:  {1:3}, 2:  {2:10, 1:1}, 3:  {3:25, 2:2}, 4:  {4:80, 3:5, 2:1},
+  5:  {5:200, 4:15, 3:3}, 6:  {6:500, 5:50, 4:8, 3:1}, 7:  {7:1500, 6:100, 5:20, 4:3},
+  8:  {8:5000, 7:500, 6:80, 5:10, 4:2}, 9:  {9:8000, 8:1000, 7:150, 6:20, 5:4},
   10: {10:10000, 9:2000, 8:300, 7:50, 6:10, 5:2},
 };
 
-let credits=500, betIdx=3, picked=new Set(), playing=false;
+let credits=0, betIdx=3, picked=new Set(), playing=false;
 
-// Configuración de la URL de tu API del Backend
-const BACKEND_API_URL = '/api/games/keno/play';
-
-function getUsername() {
-  try {
-    const p = new URLSearchParams(window.location.search);
-    const queryUser = (p.get('u') || '').trim();
-    if (queryUser) {
-      localStorage.setItem('arcade_user', queryUser);
-      return queryUser;
-    }
-    return (localStorage.getItem('arcade_user') || '').trim();
-  } catch(e) {
-    return '';
-  }
+async function init() {
+  credits = await WalletAPI.getBalance();
+  updateUI();
 }
 
-(function(){try{const p=new URLSearchParams(window.location.search);const c=parseInt(p.get('c'));if(!isNaN(c)&&c>=0)credits=c;}catch(e){}})();
-
-// Build board
 const board = document.getElementById('board');
 for(let i=1;i<=80;i++){
   const d=document.createElement('div');
   d.className='kball'; d.textContent=i; d.id='k'+i;
   d.onclick=()=>togglePick(i);
   board.appendChild(d);
-}
-
-// Build paytable
-function buildPT() {
-  const pt = document.getElementById('pt');
-  pt.innerHTML='';
-  const p = PAY_TABLE[Math.max(1,picked.size)];
-  for(const [hits, mult] of Object.entries(p)){
-    const d=document.createElement('div');
-    d.className='pt-cell';
-    d.innerHTML=`<span>${hits} ACIERTOS</span>×${mult}`;
-    pt.appendChild(d);
-  }
 }
 
 function togglePick(n) {
@@ -175,7 +107,7 @@ function clearPicked() {
   picked.forEach(n=>document.getElementById('k'+n).classList.remove('picked'));
   picked.clear();
   document.getElementById('pickedCount').textContent='0 / 10';
-  document.getElementById('drawDisplay').innerHTML='<span style="color:rgba(255,255,255,.2);font-size:11px;font-family:var(--font-u)">BOLAS EXTRAÍDAS</span>';
+  document.getElementById('drawDisplay').innerHTML='';
   document.getElementById('resultMsg').textContent='';
   document.getElementById('hitsD').textContent='-';
   buildPT();
@@ -187,9 +119,7 @@ function quickPick() {
   clearPicked();
   const nums=Array.from({length:80},(_,i)=>i+1);
   for(let i=nums.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[nums[i],nums[j]]=[nums[j],nums[i]];}
-  nums.slice(0,10).forEach(n=>{
-    picked.add(n); document.getElementById('k'+n).classList.add('picked');
-  });
+  nums.slice(0,10).forEach(n=>{ picked.add(n); document.getElementById('k'+n).classList.add('picked'); });
   document.getElementById('pickedCount').textContent='10 / 10';
   buildPT();
 }
@@ -200,124 +130,66 @@ function chBet(d) {
   document.getElementById('betD').textContent=BETS[betIdx];
 }
 
-// ---- FUNCIÓN DE JUEGO ADAPTADA AL BACKEND ----
 async function playKeno() {
   if(playing||picked.size<1) return;
   const bet=BETS[betIdx];
-  if(credits<bet) {
-    openShopModal();
-    return;
-  }
+  if(credits<bet) { WalletAPI.openShop(); return; }
   
   playing=true;
   document.getElementById('playBtn').disabled=true;
-  document.getElementById('resultMsg').textContent='';
-  document.getElementById('hitsD').textContent='...';
-
-  // Reset visual previo
-  for(let i=1;i<=80;i++){
-    const el=document.getElementById('k'+i);
-    el.classList.remove('drawn','match');
-  }
+  for(let i=1;i<=80;i++) document.getElementById('k'+i).classList.remove('drawn','match');
   document.getElementById('drawDisplay').innerHTML='';
 
-  // 1. PETICIÓN AL BACKEND
-  let drawn = [];
-  let hits = 0;
-  let win = 0;
-
   try {
-    const response = await fetch(BACKEND_API_URL, {
+    const res = await fetch('/api/games/keno/play', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: getUsername(),
-        numbers: Array.from(picked),
-        bet: bet
-      })
+      body: JSON.stringify({ username: WalletAPI.getUsername(), numbers: Array.from(picked), bet: bet })
     });
+    const data = await res.json();
+    if(!res.ok) { if(res.status===402) WalletAPI.openShop(); throw new Error(data.detail); }
+    
+    const drawn = data.winning_numbers;
+    const win = data.win_amount;
+    credits = data.new_balance;
+    WalletAPI.cacheBalance(credits);
 
-    const data = await response.json().catch(() => ({}));
-    const serverMessage = data.detail || data.message || '';
-    const shouldOpenShop = response.status === 402 || data.open_shop === true || /saldo|cr[eé]ditos|fondos/i.test(serverMessage);
-    if (shouldOpenShop) {
-      openShopModal();
-      throw Object.assign(new Error(serverMessage || 'Créditos insuficientes'), { openShop: true });
+    let hits = 0;
+    const dd=document.getElementById('drawDisplay');
+    for(let idx=0;idx<drawn.length;idx++){
+      const n=drawn[idx];
+      const isHit=picked.has(n);
+      if(isHit) hits++;
+      document.getElementById('k'+n).classList.add(isHit?'match':'drawn');
+      const ball=document.createElement('div');
+      ball.className='drawn-ball '+(isHit?'db-hit':'db-normal');
+      ball.textContent=n;
+      dd.appendChild(ball);
+      await new Promise(r=>setTimeout(r, 80));
     }
-    if (!response.ok) throw new Error(serverMessage || 'Error en el servidor');
-    
-    // Asignamos las variables con lo que dictamine el Backend
-    drawn = data.winning_numbers; // Array de 20 números [3, 45, ...]
-    win = data.win_amount;        // Créditos ganados totales
-    credits = data.new_balance;   // El saldo final actualizado por la base de datos
-    
-  } catch (error) {
-    console.error("Fallo de red o servidor:", error);
-    document.getElementById('resultMsg').style.color = error.openShop ? '#C9A84C' : '#FF3366';
-    document.getElementById('resultMsg').textContent = error.openShop ? 'RECARGA CRÉDITOS PARA JUGAR' : 'ERROR DE CONEXIÓN';
-    document.getElementById('hitsD').textContent = '-';
-    document.getElementById('playBtn').disabled = false;
-    playing = false;
-    return;
-  }
 
-  // 2. ANIMACIÓN REPRODUCIDA EN BASE A LOS DATOS DEL SERVIDOR
-  const dd=document.getElementById('drawDisplay');
-  
-  for(let idx=0;idx<drawn.length;idx++){
-    const n=drawn[idx];
-    const isHit=picked.has(n);
-    if(isHit) hits++;
-    const el=document.getElementById('k'+n);
-    el.classList.add(isHit?'match':'drawn');
-
-    const ball=document.createElement('div');
-    ball.className='drawn-ball '+(isHit?'db-hit':'db-normal');
-    ball.style.animationDelay=(idx*0.05)+'s';
-    ball.textContent=n;
-    dd.appendChild(ball);
-
-    await sleep(120);
-  }
-
-  // Mostrar resultados finales estructurados
-  document.getElementById('hitsD').textContent=hits;
-
-  const msg=document.getElementById('resultMsg');
-  if(win>=bet*200){msg.style.color='#FFD700';msg.textContent='🏆 MEGA JACKPOT! +'+win;}
-  else if(win>=bet*50){msg.style.color='#00FF88';msg.textContent='🎉 GRAN PREMIO! +'+win;}
-  else if(win>0){msg.style.color='#00D4FF';msg.textContent='✔ GANASTE +'+win+' créditos';}
-  else{msg.style.color='rgba(255,255,255,.4)';msg.textContent='Sin premio · '+hits+' aciertos';}
-
-  updateUI();
+    document.getElementById('hitsD').textContent=hits;
+    const msg=document.getElementById('resultMsg');
+    msg.style.color = win > 0 ? '#00FF88' : 'rgba(255,255,255,.4)';
+    msg.textContent = win > 0 ? `¡GANASTE +${win}!` : 'Sin premio';
+    updateUI();
+  } catch (e) { console.error(e); }
   playing=false;
   document.getElementById('playBtn').disabled=false;
 }
 
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-function openShopModal() {
-  document.getElementById('shopModalNode').classList.add('active');
+function updateUI(){ document.getElementById('cred').textContent=credits.toLocaleString(); }
+function buildPT() {
+  const pt = document.getElementById('pt'); pt.innerHTML='';
+  const p = PAY_TABLE[Math.max(1,picked.size)];
+  for(const [h, m] of Object.entries(p)){
+    const d=document.createElement('div'); d.className='pt-cell';
+    d.innerHTML=`<span>${h} ACIERTOS</span>×${m}`; pt.appendChild(d);
+  }
 }
 
-function closeShopModal() {
-  document.getElementById('shopModalNode').classList.remove('active');
-}
-
-function buyCredits(amount) {
-  try {
-    window.parent.postMessage({type:'open_shop', amount}, '*');
-  } catch(e) {}
-  closeShopModal();
-}
-
-function updateUI(){
-  document.getElementById('cred').textContent=credits.toLocaleString('es-ES');
-  try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}
-}
-
-buildPT();
-updateUI();
+window.addEventListener('walletUpdated', (e) => { credits = e.detail.balance; updateUI(); });
+init();
 </script>
 </body>
 </html>
