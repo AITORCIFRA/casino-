@@ -767,7 +767,7 @@ const winAnim = new WinAnimation();
 const GAMES = [
   { id: 'slots', title: 'LUCKY SEVENS', file: 'slots.html', cat: 'slots', color: '#00FF99', icon: '🎰' },
   { id: 'keno', title: 'KENO TURBO', file: 'keno.html', cat: 'arcade', color: '#00BFFF', icon: '🎱' },
-  { id: 'mines', title: 'MINES ARCADE', file: 'mines.html', cat: 'arcade', color: '#A855F7', icon: '💣' },
+  { id: '3_en_1', title: '3 EN 1 ARCADE', file: '3_en_1.html', cat: 'arcade', color: '#A855F7', icon: '💎' },
   { id: 'blackjack', title: 'BLACKJACK VIP', file: 'blackjack.html', cat: 'mesa', color: '#FACC15', icon: '🃏' },
   { id: 'crash', title: 'ROCKET CRASH', file: 'crash.html', cat: 'arcade', color: '#22C55E', icon: '🚀' }
 ];
@@ -825,12 +825,12 @@ async function updateHUD() {
 
 function renderGames() {
   const track = document.getElementById("carouselTrack");
-  track.innerHTML = GAMES.map(g => `
-    <div class="game-card" data-cat="${g.cat}" style="--theme-color:${g.color}">
+  track.innerHTML = GAMES.map((g, index) => `
+    <div class="game-card" data-cat="${g.cat}" style="--theme-color:${g.color}" onclick="if(this.classList.contains('active')) launchGame('${g.file}')">
       <div class="card-art">${g.icon}</div>
       <div class="card-info">
         <div><div style="font-family:'Orbitron'; font-weight:900; font-size:18px;">${g.title}</div></div>
-        <button class="card-btn" onclick="launchGame('${g.file}')">JUGAR</button>
+        <button class="card-btn">JUGAR</button>
       </div>
     </div>
   `).join('');
@@ -930,7 +930,9 @@ function openModal(id) { document.getElementById(id).classList.add("open"); }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
 
 function launchGame(file) {
-  document.getElementById("gameActiveTitle").innerText = file.replace(".html","").toUpperCase();
+  if (!currentUser) { alert("Inicia sesión primero"); return; }
+  const gameTitle = file.replace(".html","").replace("_", " ").toUpperCase();
+  document.getElementById("gameActiveTitle").innerText = gameTitle;
   document.getElementById("gameFrame").src = `/${file}?u=${encodeURIComponent(currentUser)}`;
   document.getElementById("gameContainer").style.display = "flex";
 }
