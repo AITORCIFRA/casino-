@@ -159,6 +159,17 @@ class WinAnimation {
     this.fountainEffect(amount);
     this.showText(`+${amount}`, '#00FF99');
   }
+  
+  /**
+   * Notifica ganancia de XP al lobby
+   */
+  addXP(amount) {
+    try {
+      window.parent.postMessage({ type: 'add_xp', amount }, '*');
+    } catch(e) {
+      console.log("Error enviando XP");
+    }
+  }
 
   bigWin(amount) {
     document.body.classList.add('screen-shake');
