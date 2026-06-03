@@ -809,7 +809,15 @@ async function updateHUD() {
       const resW = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
       if(resW.ok) {
         const w = await resW.json();
-        document.getElementById("lobbyCredits").innerText = Math.floor(w.balance).toLocaleString();
+        const balance = Math.floor(w.balance);
+        document.getElementById("lobbyCredits").innerText = balance.toLocaleString();
+        localStorage.setItem("arcade_credits", balance);
+        
+        // Notificar al iframe si está abierto
+        const gameFrame = document.getElementById("gameFrame");
+        if(gameFrame && gameFrame.contentWindow) {
+          gameFrame.contentWindow.postMessage({ type: "credits_updated", balance }, "*");
+        }
       }
     }
   } catch(e) { console.log("HUD Error"); }
@@ -947,17 +955,45 @@ function moveCarousel(dir) {
 }
 
 async function buyCredits(amount) {
-  const res = await fetch(`${API_URL}/wallet/deposit`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username: currentUser, amount })
-  });
-  if(res.ok) { updateHUD(); closeModal('shopModal'); winAnim.smallWin(amount); }
+  try {
+    const res = await fetch(`${API_URL}/wallet/deposit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: currentUser, amount })
+    });
+    if(res.ok) { 
+      await updateHUD(); 
+      closeModal('shopModal'); 
+      winAnim.smallWin(amount); 
+    } else {
+      const err = await res.json();
+      alert("Error al comprar: " + (err.detail || "Error desconocido"));
+    }
+  } catch(e) {
+    alert("Error de conexión al comprar créditos.");
+  }
 }
 
 function doLogout() { localStorage.clear(); window.location.reload(); }
 
 window.onload = () => { if(currentUser) { document.getElementById("authScreen").classList.add("hidden"); document.getElementById("lobbyScreen").classList.remove("hidden"); initLobby(); } };
+
+// Escuchar mensajes de los juegos (iframes)
+window.addEventListener('message', (event) => {
+  if (!event.data) return;
+
+  // Si el juego nos dice que ha actualizado créditos
+  if (event.data.type === 'credits') {
+    const balance = Math.floor(event.data.value);
+    localStorage.setItem('arcade_credits', balance);
+    document.getElementById('lobbyCredits').innerText = balance.toLocaleString();
+  }
+
+  // Si el juego nos pide abrir la tienda
+  if (event.data.type === 'open_shop') {
+    openModal('shopModal');
+  }
+});
 </script>
 </body>
 </html>

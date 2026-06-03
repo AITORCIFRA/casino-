@@ -96,6 +96,7 @@ async def claim_battlepass_reward(username: str, request: BattlepassClaimRequest
         if not cursor:
              raise HTTPException(status_code=500, detail="Error al crear cursor")
         
+        cursor.execute("USE arcade_premium_db")
         cursor.execute(
             "UPDATE battlepass SET claimed_rewards = %s WHERE username = %s",
             (json.dumps(claimed_rewards), username)
@@ -123,6 +124,7 @@ async def get_leaderboard():
         cursor = conn.cursor(buffered=True)
         if not cursor:
              raise HTTPException(status_code=500, detail="Error al crear cursor")
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT username, points, rank_name FROM leagues ORDER BY points DESC LIMIT 50")
         rows = cursor.fetchall()
         cursor.close()
@@ -152,6 +154,7 @@ async def get_profile(username: str):
         raise HTTPException(status_code=500, detail="Error de base de datos")
     try:
         cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT username, unique_id, avatar_url, current_level, current_xp FROM players WHERE username = %s", (username,))
         player = cursor.fetchone()
         
@@ -181,6 +184,7 @@ async def get_friends(username: str):
         raise HTTPException(status_code=500, detail="Error de base de datos")
     try:
         cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor.execute("USE arcade_premium_db")
         # Amigos aceptados
         cursor.execute("""
             SELECT friend_username as username, p.avatar_url, p.unique_id 
@@ -212,6 +216,7 @@ async def add_friend(username: str, request: FriendActionRequest):
         raise HTTPException(status_code=500, detail="Error de base de datos")
     try:
         cursor = conn.cursor(buffered=True)
+        cursor.execute("USE arcade_premium_db")
         # Verificar si el amigo existe (puede ser por username o por unique_id)
         cursor.execute("SELECT username FROM players WHERE username = %s OR unique_id = %s", (request.friend_username, request.friend_username))
         target = cursor.fetchone()
@@ -240,6 +245,7 @@ async def get_recommendations(username: str):
         raise HTTPException(status_code=500, detail="Error de base de datos")
     try:
         cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor.execute("USE arcade_premium_db")
         # Recomendar jugadores que no sean amigos ni el propio usuario
         cursor.execute("""
             SELECT username, unique_id, avatar_url 

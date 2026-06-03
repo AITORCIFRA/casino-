@@ -24,6 +24,7 @@ async def register(data: AuthModel):
         if not cursor:
              raise HTTPException(status_code=500, detail="Error al crear cursor")
         
+        cursor.execute("USE arcade_premium_db")
         # Verificar si ya existe en users
         cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
         if cursor.fetchone():
@@ -51,6 +52,7 @@ async def login(data: AuthModel):
         if not cursor:
              raise HTTPException(status_code=500, detail="Error al crear cursor")
         
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT username, password FROM users WHERE username = %s", (data.username,))
         row = cursor.fetchone()
         cursor.close()

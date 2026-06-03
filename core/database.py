@@ -19,8 +19,15 @@ def get_db_connection() -> Optional[MySQLConnectionAbstract]:
         conn = mysql.connector.connect(**DB_CONFIG)
         return cast(MySQLConnectionAbstract, conn)
     except Error as e:
-        print(f"Error conectando a MySQL: {e}")
-        return None
+        # Si la base de datos no existe, conectar sin ella para crearla
+        try:
+            temp_config = DB_CONFIG.copy()
+            temp_config.pop('database')
+            conn = mysql.connector.connect(**temp_config)
+            return cast(MySQLConnectionAbstract, conn)
+        except Error as e2:
+            print(f"Error conectando a MySQL: {e2}")
+            return None
 
 def init_db():
     """Crea todas las tablas si no existen."""
@@ -103,32 +110,6 @@ def init_db():
             )
         """)
 
-        # Tabla claimed_rewards
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS claimed_rewards (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(50),
-                reward_type VARCHAR(20),
-                level_num INT NOT NULL,
-                claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (username) REFERENCES players(username) ON DELETE CASCADE,
-                UNIQUE KEY unique_claim (username, reward_type, level_num)
-            )
-        """)
-
-        # Tabla player_stats
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS player_stats (
-                username VARCHAR(50),
-                game_key VARCHAR(50),
-                partidas_jugadas INT DEFAULT 0,
-                partidas_ganadas INT DEFAULT 0,
-                total_apostado BIGINT DEFAULT 0,
-                PRIMARY KEY (username, game_key),
-                FOREIGN KEY (username) REFERENCES players(username) ON DELETE CASCADE
-            )
-        """)
-
         # Tabla de amigos
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS friends (
@@ -148,10 +129,6 @@ def init_db():
     finally:
         conn.close()
 
-# ------------------------------------------------------------
-# Funciones de usuario y saldo
-# ------------------------------------------------------------
-
 def generate_unique_id() -> str:
     import random
     import string
@@ -166,6 +143,8 @@ def ensure_user(username: str):
         cursor = conn.cursor()
         if not cursor:
             return
+        
+        cursor.execute("USE arcade_premium_db")
 
         cursor.execute("SELECT username FROM players WHERE username = %s", (username,))
         if not cursor.fetchone():
@@ -203,6 +182,7 @@ def get_balance(username: str) -> int:
         cursor = conn.cursor()
         if not cursor:
             return 0
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT creditos FROM usuarios WHERE username = %s", (username,))
         row = cursor.fetchone()
         cursor.close()
@@ -221,6 +201,7 @@ def set_balance(username: str, new_balance: int) -> bool:
         if not cursor:
             return False
         try:
+            cursor.execute("USE arcade_premium_db")
             cursor.execute(
                 "UPDATE usuarios SET creditos = %s WHERE username = %s",
                 (new_balance, username)
@@ -246,6 +227,7 @@ def add_transaction(username: str, tipo: str, juego: str, cantidad: int, saldo_r
         cursor = conn.cursor()
         if not cursor:
             return
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT id FROM usuarios WHERE username = %s", (username,))
         row = cursor.fetchone()
         if row and isinstance(row, (list, tuple)):
@@ -261,10 +243,6 @@ def add_transaction(username: str, tipo: str, juego: str, cantidad: int, saldo_r
     finally:
         conn.close()
 
-# ------------------------------------------------------------
-# Funciones battlepass
-# ------------------------------------------------------------
-
 def get_battlepass(username: str) -> Dict[str, Any]:
     conn = get_db_connection()
     if not conn:
@@ -273,6 +251,7 @@ def get_battlepass(username: str) -> Dict[str, Any]:
         cursor = conn.cursor()
         if not cursor:
             return {"level": 1, "xp": 0, "claimed_rewards": []}
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT level, xp, claimed_rewards FROM battlepass WHERE username = %s", (username,))
         row = cursor.fetchone()
         cursor.close()
@@ -285,44 +264,6 @@ def get_battlepass(username: str) -> Dict[str, Any]:
     finally:
         conn.close()
 
-def update_battlepass(username: str, xp_gain: int):
-    conn = get_db_connection()
-    if not conn:
-        return
-    try:
-        cursor = conn.cursor()
-        if not cursor:
-            return
-        cursor.execute("SELECT level, xp FROM battlepass WHERE username = %s", (username,))
-        row = cursor.fetchone()
-        if not row or not isinstance(row, (list, tuple)):
-            cursor.execute(
-                "INSERT INTO battlepass (username, level, xp, claimed_rewards) VALUES (%s, %s, %s, %s)",
-                (username, 1, 0, "[]")
-            )
-            conn.commit()
-            level = 1
-            current_xp = 0
-        else:
-            level = int(row[0])
-            current_xp = int(row[1])
-        
-        new_xp = current_xp + xp_gain
-        new_level = level + (new_xp // XP_PER_LEVEL)
-        new_xp = new_xp % XP_PER_LEVEL
-        cursor.execute(
-            "UPDATE battlepass SET level = %s, xp = %s WHERE username = %s",
-            (new_level, new_xp, username)
-        )
-        conn.commit()
-        cursor.close()
-    finally:
-        conn.close()
-
-# ------------------------------------------------------------
-# Funciones leagues
-# ------------------------------------------------------------
-
 def get_league(username: str) -> Dict[str, Any]:
     conn = get_db_connection()
     if not conn:
@@ -331,6 +272,7 @@ def get_league(username: str) -> Dict[str, Any]:
         cursor = conn.cursor()
         if not cursor:
             return {"points": 0, "rank": "Bronce"}
+        cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT points, rank_name FROM leagues WHERE username = %s", (username,))
         row = cursor.fetchone()
         cursor.close()
@@ -339,38 +281,6 @@ def get_league(username: str) -> Dict[str, Any]:
         else:
             ensure_user(username)
             return {"points": 0, "rank": "Bronce"}
-    finally:
-        conn.close()
-
-def update_league(username: str, points_gain: int):
-    conn = get_db_connection()
-    if not conn:
-        return
-    try:
-        cursor = conn.cursor()
-        if not cursor:
-            return
-        cursor.execute("SELECT points FROM leagues WHERE username = %s", (username,))
-        row = cursor.fetchone()
-        if not row or not isinstance(row, (list, tuple)):
-            cursor.execute(
-                "INSERT INTO leagues (username, points, rank_name) VALUES (%s, %s, %s)",
-                (username, points_gain, "Bronce")
-            )
-            new_points = points_gain
-        else:
-            new_points = int(row[0]) + points_gain
-            cursor.execute("UPDATE leagues SET points = %s WHERE username = %s", (new_points, username))
-
-        if new_points > 500:
-            rank = "Oro"
-        elif new_points > 200:
-            rank = "Plata"
-        else:
-            rank = "Bronce"
-        cursor.execute("UPDATE leagues SET rank_name = %s WHERE username = %s", (rank, username))
-        conn.commit()
-        cursor.close()
     finally:
         conn.close()
 
