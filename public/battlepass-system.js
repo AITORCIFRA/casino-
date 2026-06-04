@@ -34,10 +34,27 @@ class BattlePassSystem {
         const data = await res.json();
         this.renderBattlePass(data, username);
         document.getElementById('battlepassModal').classList.add('open');
+        this._loadProfile(username);
       }
     } catch(e) {
       console.log("Error cargando Pase de Batalla");
     }
+  }
+
+  async _loadProfile(username) {
+    try {
+      const res = await fetch(`${this.API_URL}/profile/${username}`);
+      if (!res.ok) return;
+      const profile = await res.json();
+      this.renderRubies(profile.rubies || 0);
+    } catch (e) {
+      console.log('Error cargando perfil', e);
+    }
+  }
+
+  renderRubies(rubies) {
+    const el = document.getElementById('bpRubies');
+    if (el) el.innerText = `Rubíes: ${rubies}`;
   }
 
   /**
@@ -58,6 +75,7 @@ class BattlePassSystem {
             <div style="background:rgba(255,215,0,0.1); padding:20px; border-radius:15px; border:2px solid rgba(255,215,0,0.3); margin-bottom:15px;">
               <div style="font-family:'Orbitron'; color:#FFD700; font-weight:900; margin-bottom:10px;">NIVEL ACTUAL</div>
               <div id="bpLevel" style="font-size:32px; color:#00FF99; font-weight:900;">Nivel 1</div>
+              <div id="bpRubies" style="margin-top:10px; font-family:'Orbitron'; font-size:14px; color:#38bdf8; font-weight:900;">Rubíes: 0</div>
               <div style="margin-top:15px;">
                 <div style="font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:5px;" id="bpXP">XP: 0/100</div>
                 <div style="background:rgba(0,255,153,0.1); height:8px; border-radius:4px; overflow:hidden; border:1px solid rgba(0,255,153,0.3);">
@@ -78,7 +96,8 @@ class BattlePassSystem {
             <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:20px;" id="scratchCardsContainer">
               <!-- Se generarán dinámicamente -->
             </div>
-            <button onclick="battlePass.playNewScratch()" style="width:100%; padding:12px; background:linear-gradient(135deg, #FFD700, #FFA500); color:#000; border:none; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; font-size:14px; letter-spacing:1px;">NUEVO RASCA</button>
+            <button onclick="battlePass.playNewScratch()" style="width:100%; padding:12px; background:linear-gradient(135deg, #FFD700, #FFA500); color:#000; border:none; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; font-size:14px; letter-spacing:1px; margin-bottom:10px;">NUEVO RASCA</button>
+            <button onclick="battlePass.buyLevels()" style="width:100%; padding:12px; background:linear-gradient(135deg, #10b981, #047857); color:#fff; border:none; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; font-size:14px; letter-spacing:1px;">COMPRAR 1 NIVEL — 200 RUBÍ</button>
           </div>
         </div>
         
@@ -297,6 +316,35 @@ class BattlePassSystem {
       }
     } catch(e) {
       console.log("Error comprando Pase");
+    }
+  }
+
+  async buyLevels(levels = 1) {
+    const username = localStorage.getItem('arcade_user');
+    if (!username) {
+      alert('❌ Inicia sesión para comprar niveles');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.API_URL}/battlepass/${username}/buy-levels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ levels })
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        alert('❌ ' + (error.detail || 'Error al comprar niveles'));
+        return;
+      }
+
+      const data = await res.json();
+      this.openBattlePassModal(username);
+      alert(`✅ Compraste ${levels} nivel(es)`);
+    } catch (e) {
+      console.log('Error comprando niveles', e);
+      alert('❌ Error de conexión');
     }
   }
 

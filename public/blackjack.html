@@ -212,7 +212,26 @@ h1{font-family:var(--font-d);font-size:2.5rem;letter-spacing:.2em;background:lin
 <script>
 let credits = 0;
 let bet = 0, phase = 'bet', deck = [], dealerCards = [], playerCards = [];
+const params = new URLSearchParams(window.location.search);
+let MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 1);
+let MAX_BET = parseInt(params.get('max_bet'));
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+const ROOM_ID = params.get('room');
 const SUITS=['♠','♥','♦','♣'];
+
+async function loadRoomMesaConfig() {
+  if (!ROOM_ID) return;
+  try {
+    const res = await fetch(`/api/tables/room/${encodeURIComponent(ROOM_ID)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data?.mesa) {
+      MIN_BET = data.mesa.min_bet;
+      MAX_BET = data.mesa.max_bet;
+    }
+  } catch (e) {}
+}
+window.addEventListener('load', loadRoomMesaConfig);
 const VALUES=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 
 // Carga asíncrona del monedero centralizado al arrancar
@@ -298,6 +317,10 @@ function renderHands(showDealer=false){
 
 function addBet(v){
   if(phase!=='bet') return;
+  if (bet + v > MAX_BET) {
+    setMsg(`La apuesta máxima es ${MAX_BET}`, 'push');
+    return;
+  }
   if(credits - bet < v) {
     triggerInsufficientFundsAlert();
     return;
@@ -326,6 +349,8 @@ function setButtons(dealing){
 async function deal(){
   if(phase!=='bet') return;
   if(bet===0){setMsg('Haz una apuesta primero','push');return;}
+  if(bet < MIN_BET){setMsg(`La apuesta mínima es ${MIN_BET}`,'push');return;}
+  if(bet > MAX_BET){setMsg(`La apuesta máxima es ${MAX_BET}`,'push');return;}
   if(deck.length<15) buildDeck();
   
   if(bet > credits) {
@@ -468,8 +493,14 @@ async function endRound(reason){
   if(reason==='bust') setMsg('✗ PASADA DE 21 — PERDISTE','lose');
 }
 
+function formatShortValue(value){
+  if (value >= 1000000) return (value/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (value >= 1000) return (value/1000).toFixed(1).replace(/\.0$/,'') + 'K';
+  return value.toString();
+}
+
 function updateUI(){
-  document.getElementById('cred').textContent = credits.toLocaleString('es-ES');
+  document.getElementById('cred').textContent = formatShortValue(credits);
   try{window.parent.postMessage({type:'credits',value:credits},'*');}catch(e){}
 }
 

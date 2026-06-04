@@ -72,6 +72,10 @@
   let isPlaying = false;
   let currentMultiplier = 1.0;
   let credits = 0;
+  const params = new URLSearchParams(window.location.search);
+  const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 10);
+  let MAX_BET = parseInt(params.get('max_bet'));
+  if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
   let insufficientLocked = false;
 
   function getUsername() {
@@ -125,7 +129,8 @@
     bet = parseInt(document.getElementById('betAmount').value);
     numMines = parseInt(document.getElementById('minesCount').value);
     
-    if(isNaN(bet) || bet <= 0) { alert("Mete una apuesta válida"); return; }
+    if(isNaN(bet) || bet < MIN_BET) { alert(`La apuesta mínima es ${MIN_BET}`); return; }
+    if(bet > MAX_BET) { alert(`La apuesta máxima es ${MAX_BET}`); return; }
     if(credits < bet) { handleInsufficientFunds(); return; }
 
     const success = await updateGlobalWallet(-bet);

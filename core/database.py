@@ -73,9 +73,19 @@ def init_db():
                 level INT DEFAULT 1,
                 xp INT DEFAULT 0,
                 claimed_rewards TEXT,
+                has_premium BOOLEAN DEFAULT FALSE,
+                free_spins INT DEFAULT 0,
                 FOREIGN KEY (username) REFERENCES players(username) ON DELETE CASCADE
             )
         """)
+        try:
+            cursor.execute("ALTER TABLE battlepass ADD COLUMN IF NOT EXISTS has_premium BOOLEAN DEFAULT FALSE")
+        except Error:
+            pass
+        try:
+            cursor.execute("ALTER TABLE battlepass ADD COLUMN IF NOT EXISTS free_spins INT DEFAULT 0")
+        except Error:
+            pass
 
         # Tabla leagues
         cursor.execute("""
@@ -93,9 +103,16 @@ def init_db():
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) NOT NULL UNIQUE,
                 creditos INT NOT NULL DEFAULT 50000,
+                rubies INT NOT NULL DEFAULT 0,
                 actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         """)
+        try:
+            cursor.execute("SHOW COLUMNS FROM usuarios LIKE 'rubies'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE usuarios ADD COLUMN rubies INT NOT NULL DEFAULT 0")
+        except Error:
+            pass
 
         # Tabla transacciones
         cursor.execute("""
@@ -163,11 +180,18 @@ def ensure_user(username: str):
                 (username, 0, "Bronce")
             )
 
+        try:
+            cursor.execute("SHOW COLUMNS FROM usuarios LIKE 'rubies'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE usuarios ADD COLUMN rubies INT NOT NULL DEFAULT 0")
+        except Error:
+            pass
+
         cursor.execute("SELECT id FROM usuarios WHERE username = %s", (username,))
         if not cursor.fetchone():
             cursor.execute(
-                "INSERT INTO usuarios (username, creditos) VALUES (%s, %s)",
-                (username, 50000)
+                "INSERT INTO usuarios (username, creditos, rubies) VALUES (%s, %s, %s)",
+                (username, 50000, 0)
             )
 
         conn.commit()
@@ -220,6 +244,50 @@ def set_balance(username: str, new_balance: int) -> bool:
     finally:
         conn.close()
 
+
+def get_rubies(username: str) -> int:
+    conn = get_db_connection()
+    if not conn:
+        return 0
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+            return 0
+        cursor.execute("USE arcade_premium_db")
+        cursor.execute("SELECT rubies FROM usuarios WHERE username = %s", (username,))
+        row = cursor.fetchone()
+        cursor.close()
+        if row and isinstance(row, (list, tuple)):
+            return int(row[0])
+        return 0
+    finally:
+        conn.close()
+
+
+def set_rubies(username: str, new_rubies: int) -> bool:
+    conn = get_db_connection()
+    if not conn:
+        return False
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+            return False
+        try:
+            cursor.execute("USE arcade_premium_db")
+            cursor.execute(
+                "UPDATE usuarios SET rubies = %s WHERE username = %s",
+                (new_rubies, username)
+            )
+            conn.commit()
+            return True
+        except Error:
+            return False
+        finally:
+            cursor.close()
+    finally:
+        conn.close()
+
+
 def add_transaction(username: str, tipo: str, juego: str, cantidad: int, saldo_resultante: int):
     conn = get_db_connection()
     if not conn:
@@ -244,24 +312,47 @@ def add_transaction(username: str, tipo: str, juego: str, cantidad: int, saldo_r
     finally:
         conn.close()
 
+
+def _ensure_battlepass_has_premium_column(cursor) -> None:
+    cursor.execute("USE arcade_premium_db")
+    cursor.execute("SHOW COLUMNS FROM battlepass LIKE 'has_premium'")
+    if not cursor.fetchone():
+        cursor.execute("ALTER TABLE battlepass ADD COLUMN has_premium BOOLEAN DEFAULT FALSE")
+
+
 def get_battlepass(username: str) -> Dict[str, Any]:
     conn = get_db_connection()
     if not conn:
-        return {"level": 1, "xp": 0, "claimed_rewards": []}
+        return {"level": 1, "xp": 0, "claimed_rewards": [], "has_premium": False, "free_spins": 0}
     try:
         cursor = conn.cursor()
         if not cursor:
-            return {"level": 1, "xp": 0, "claimed_rewards": []}
-        cursor.execute("USE arcade_premium_db")
-        cursor.execute("SELECT level, xp, claimed_rewards FROM battlepass WHERE username = %s", (username,))
+            return {"level": 1, "xp": 0, "claimed_rewards": [], "has_premium": False, "free_spins": 0}
+        try:
+            _ensure_battlepass_has_premium_column(cursor)
+        except Error:
+            pass
+        try:
+            cursor.execute("SHOW COLUMNS FROM battlepass LIKE 'free_spins'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE battlepass ADD COLUMN free_spins INT DEFAULT 0")
+        except Error:
+            pass
+        cursor.execute("SELECT level, xp, claimed_rewards, COALESCE(has_premium, FALSE), COALESCE(free_spins, 0) FROM battlepass WHERE username = %s", (username,))
         row = cursor.fetchone()
         cursor.close()
         if row and isinstance(row, (list, tuple)):
             claimed = json.loads(str(row[2])) if row[2] else []
-            return {"level": int(row[0]), "xp": int(row[1]), "claimed_rewards": claimed}
+            return {
+                "level": int(row[0]),
+                "xp": int(row[1]),
+                "claimed_rewards": claimed,
+                "has_premium": bool(row[3]),
+                "free_spins": int(row[4])
+            }
         else:
             ensure_user(username)
-            return {"level": 1, "xp": 0, "claimed_rewards": []}
+            return {"level": 1, "xp": 0, "claimed_rewards": [], "has_premium": False, "free_spins": 0}
     finally:
         conn.close()
 

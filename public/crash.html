@@ -272,6 +272,10 @@
   let startX, startY;
   let bets = {};
   let startTime = 0;
+  const params = new URLSearchParams(window.location.search);
+  const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 10);
+  let MAX_BET = parseInt(params.get('max_bet'));
+  if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
 
   // Sincronizar saldo inicial desde la Wallet centralizada al arrancar
   async function initGlobalWallet() {
@@ -413,6 +417,14 @@
     if (b.status === 'idle' && !isFlying) {
       let val = parseInt(amountInput.value);
       if (isNaN(val) || val <= 0) return;
+      if (val < MIN_BET) {
+        alert(`La apuesta mínima es ${MIN_BET}`);
+        return;
+      }
+      if (val > MAX_BET) {
+        alert(`La apuesta máxima es ${MAX_BET}`);
+        return;
+      }
       
       if (val > globalCredits) {
         triggerInsufficientFundsAlert();

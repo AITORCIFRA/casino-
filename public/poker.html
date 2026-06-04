@@ -124,8 +124,29 @@ body { background: #0f0c1b; color: #fff; font-family: 'Roboto', sans-serif; heig
 
 <script>
 const SUITS=['♠','♥','♦','♣'], VALS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const N_SEATS = 5;
-const SB=10, BB=20;
+const params = new URLSearchParams(window.location.search);
+let MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 10);
+let MAX_BET = parseInt(params.get('max_bet'));
+const ROOM_ID = params.get('room');
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+let SB = MIN_BET;
+let BB = Math.max(MIN_BET * 2, Math.min(MAX_BET, MIN_BET * 10));
+
+async function loadRoomMesaConfig() {
+  if (!ROOM_ID) return;
+  try {
+    const res = await fetch(`/api/tables/room/${encodeURIComponent(ROOM_ID)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data?.mesa) {
+      MIN_BET = data.mesa.min_bet;
+      MAX_BET = data.mesa.max_bet;
+      SB = MIN_BET;
+      BB = Math.max(MIN_BET * 2, Math.min(MAX_BET, MIN_BET * 10));
+    }
+  } catch (e) {}
+}
+window.addEventListener('load', loadRoomMesaConfig);
 const ROBOT_NAMES = ['Bot_1','Bot_2','Bot_3','Bot_4'];
 const ROBOT_AVATARS = [
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",

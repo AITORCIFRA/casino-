@@ -150,6 +150,15 @@ class BattlePassSidebar {
         border-color: rgba(255,215,0,0.3);
       }
       
+      .bp-reward-item.claimable {
+        border-color: #00FF99;
+        background: rgba(0,255,153,0.08);
+      }
+      
+      .bp-reward-item.claimable:hover {
+        background: rgba(0,255,153,0.12);
+      }
+      
       .bp-reward-item.claimed {
         background: rgba(0,255,153,0.1);
         border-color: rgba(0,255,153,0.3);
@@ -239,22 +248,23 @@ class BattlePassSidebar {
    * Renderizar el Pase de Batalla
    */
   renderBattlePass(data) {
-    const level = data.level || 1;
+    this.currentLevel = data.level || 1;
+    this.claimedRewards = new Set((data.claimed_rewards || []).map(String));
     const xp = data.xp || 0;
     
-    document.getElementById('bpSideLevel').innerText = level;
+    document.getElementById('bpSideLevel').innerText = this.currentLevel;
     document.getElementById('bpSideXPText').innerText = `${xp} / ${this.XP_PER_LEVEL}`;
     document.getElementById('bpSideXPBar').style.width = `${(xp / this.XP_PER_LEVEL) * 100}%`;
     
     // Generar recompensas
-    const rewards = this.generateRewards(level);
+    const rewards = this.generateRewards(this.currentLevel);
     const container = document.getElementById('bpRewardsScroll');
     container.innerHTML = rewards.map(r => `
-      <div class="bp-reward-item ${r.claimed ? 'claimed' : ''}" onclick="battlePassSidebar.claimReward(${r.level})">
+      <div class="bp-reward-item ${r.claimed ? 'claimed' : r.claimable ? 'claimable' : ''}" onclick="battlePassSidebar.claimReward(${r.level})">
         <div class="bp-reward-level">${r.level}</div>
         <div class="bp-reward-icon">${r.icon}</div>
         <div class="bp-reward-text">${r.text}</div>
-        <div class="bp-reward-check">${r.claimed ? '✓' : ''}</div>
+        <div class="bp-reward-check">${r.claimed ? '✓' : r.claimable ? 'COBRAR' : ''}</div>
       </div>
     `).join('');
   }
@@ -264,10 +274,13 @@ class BattlePassSidebar {
    */
   generateRewards(currentLevel) {
     const rewards = [];
+    const claimedRewards = this.claimedRewards || new Set();
     for (let i = 1; i <= this.MAX_LEVELS; i++) {
       let reward = {};
       reward.level = i;
-      reward.claimed = i <= currentLevel;
+      const rewardKey = `free:${i}`;
+      reward.claimed = claimedRewards.has(rewardKey);
+      reward.claimable = i <= currentLevel && !reward.claimed;
       
       // Recompensas cada 5 niveles
       if (i % 5 === 0) {
@@ -295,7 +308,41 @@ class BattlePassSidebar {
    * Reclamar recompensa
    */
   async claimReward(level) {
-    console.log(`Recompensa del nivel ${level} reclamada`);
+    const username = localStorage.getItem('arcade_user');
+    if (!username) {
+      alert('❌ Inicia sesión para reclamar recompensas');
+      return;
+    }
+    if (!this.currentLevel || level > this.currentLevel) {
+      alert('❌ Nivel no alcanzado');
+      return;
+    }
+    const rewardKey = `free:${level}`;
+    if (this.claimedRewards.has(rewardKey)) {
+      alert('✅ Recompensa ya reclamada');
+      return;
+    }
+    try {
+      const res = await fetch(`${this.API_URL}/battlepass/${encodeURIComponent(username)}/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, reward_type: 'free' })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert('❌ ' + (data.detail || 'No se pudo reclamar la recompensa'));
+        return;
+      }
+      alert(`✅ Recompensa nivel ${level} reclamada`);
+      this.claimedRewards = new Set((data.battlepass.claimed_rewards || []).map(String));
+      this.renderBattlePass(data.battlepass);
+      if (typeof updateHUD === 'function') updateHUD();
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'credits', value: data.new_balance }, '*');
+      }
+    } catch (e) {
+      alert('❌ Error al reclamar recompensa');
+    }
   }
 
   /**

@@ -12,6 +12,8 @@ from core.database import (
     update_league,
     get_balance,
     set_balance,
+    get_rubies,
+    set_rubies,
     add_transaction,
     get_db_connection
 )
@@ -51,6 +53,8 @@ def build_battlepass_summary(username: str) -> Dict[str, Any]:
         "total_xp": total_xp,
         "xp_needed": XP_PER_LEVEL,
         "claimed_rewards": bp.get("claimed_rewards", []),
+        "has_premium": bool(bp.get("has_premium", False)),
+        "free_spins": int(bp.get("free_spins", 0) or 0),
     }
 
 @router.get("/battlepass/{username}")
@@ -156,13 +160,14 @@ async def get_profile(username: str):
         cursor = conn.cursor(dictionary=True, buffered=True)
         cursor.execute("USE arcade_premium_db")
         cursor.execute("SELECT username, unique_id, avatar_url, current_level, current_xp FROM players WHERE username = %s", (username,))
-        player = cursor.fetchone()
+        player: Any = cursor.fetchone()
         
         if not player:
             raise HTTPException(status_code=404, detail="Jugador no encontrado")
             
         league = get_league(username)
         bp = build_battlepass_summary(username)
+        rubies = get_rubies(username)
         
         return {
             "username": player["username"],
@@ -172,7 +177,8 @@ async def get_profile(username: str):
             "xp": bp["xp"],
             "xp_needed": bp["xp_needed"],
             "league": league["rank"],
-            "points": league["points"]
+            "points": league["points"],
+            "rubies": rubies
         }
     finally:
         conn.close()
@@ -271,6 +277,12 @@ async def get_recommendations(username: str):
 class BuyBattlePassRequest(BaseModel):
     username: str
 
+class BuyRubiesRequest(BaseModel):
+    package_key: str
+
+class BuyBattlePassLevelRequest(BaseModel):
+    levels: int = Field(1, ge=1, le=10)
+
 class ClaimScratchPrizeRequest(BaseModel):
     username: str
     amount: int
@@ -279,6 +291,7 @@ class ClaimScratchPrizeRequest(BaseModel):
 async def buy_battlepass(request: BuyBattlePassRequest):
     """Compra el Pase de Batalla Premium (5€ = 5000 fichas)."""
     username = request.username
+    ensure_user(username)
     battlepass_cost = 5000  # 5 euros en fichas
     
     current_balance = get_balance(username)
@@ -288,11 +301,160 @@ async def buy_battlepass(request: BuyBattlePassRequest):
     new_balance = current_balance - battlepass_cost
     set_balance(username, new_balance)
     add_transaction(username, "compra_tienda", "battlepass", -battlepass_cost, new_balance)
+
+    # Asegurarse de que la columna `has_premium` existe antes de actualizarla.
+    get_battlepass(username)
+
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+            raise HTTPException(status_code=500, detail="Error al crear cursor")
+        cursor.execute("USE arcade_premium_db")
+        cursor.execute(
+            "UPDATE battlepass SET has_premium = TRUE WHERE username = %s",
+            (username,)
+        )
+        conn.commit()
+        cursor.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
     
     return {
         "success": True,
         "message": "Pase de Batalla comprado",
-        "new_balance": new_balance
+        "new_balance": new_balance,
+        "has_premium": True
+    }
+
+RUBIES_PACKAGES = {
+    "small": {"cost": 1000, "rubies": 100},
+    "medium": {"cost": 5000, "rubies": 550},
+    "large": {"cost": 10000, "rubies": 1200},
+}
+
+@router.post("/battlepass/{username}/buy-rubies")
+async def buy_rubies(username: str, request: BuyRubiesRequest):
+    ensure_user(username)
+    package = RUBIES_PACKAGES.get(request.package_key)
+    if not package:
+        raise HTTPException(status_code=400, detail="Paquete inválido")
+
+    current_balance = get_balance(username)
+    if current_balance < package["cost"]:
+        raise HTTPException(status_code=402, detail="Fichas insuficientes")
+
+    new_balance = current_balance - package["cost"]
+    set_balance(username, new_balance)
+
+    current_rubies = get_rubies(username)
+    new_rubies = current_rubies + package["rubies"]
+    if not set_rubies(username, new_rubies):
+        raise HTTPException(status_code=500, detail="Error actualizando rubíes")
+
+    add_transaction(username, "compra_tienda", "buy_rubies", -package["cost"], new_balance)
+
+    return {
+        "success": True,
+        "message": f"Compraste {package['rubies']} rubíes",
+        "new_balance": new_balance,
+        "new_rubies": new_rubies
+    }
+
+@router.post("/battlepass/{username}/buy-levels")
+async def buy_battlepass_levels(username: str, request: BuyBattlePassLevelRequest):
+    ensure_user(username)
+    levels = request.levels
+    cost_per_level = 200
+    total_cost = cost_per_level * levels
+
+    current_rubies = get_rubies(username)
+    if current_rubies < total_cost:
+        raise HTTPException(status_code=402, detail="Rubíes insuficientes")
+
+    new_rubies = current_rubies - total_cost
+    if not set_rubies(username, new_rubies):
+        raise HTTPException(status_code=500, detail="Error actualizando rubíes")
+
+    bp = get_battlepass(username)
+    current_level = int(bp.get("level", 1))
+    new_level = min(current_level + levels, 100)
+
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+            raise HTTPException(status_code=500, detail="Error al crear cursor")
+        cursor.execute("USE arcade_premium_db")
+        cursor.execute(
+            "UPDATE battlepass SET level = %s, xp = 0 WHERE username = %s",
+            (new_level, username)
+        )
+        conn.commit()
+        cursor.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
+    add_transaction(username, "compra_tienda", "buy_level", -total_cost, new_rubies)
+
+    return {
+        "success": True,
+        "message": f"Compraste {levels} nivel(es)",
+        "new_rubies": new_rubies,
+        "battlepass": build_battlepass_summary(username)
+    }
+
+@router.post("/battlepass/{username}/buy-premium-with-rubies")
+async def buy_battlepass_premium_with_rubies(username: str):
+    ensure_user(username)
+    premium_cost = 20000
+    current_rubies = get_rubies(username)
+
+    if current_rubies < premium_cost:
+        raise HTTPException(status_code=402, detail="Rubíes insuficientes")
+
+    bp = get_battlepass(username)
+    if bp.get("has_premium"):
+        raise HTTPException(status_code=400, detail="Ya tienes Premium")
+
+    new_rubies = current_rubies - premium_cost
+    if not set_rubies(username, new_rubies):
+        raise HTTPException(status_code=500, detail="Error actualizando rubíes")
+
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de conexión a la base de datos")
+    try:
+        cursor = conn.cursor()
+        if not cursor:
+            raise HTTPException(status_code=500, detail="Error al crear cursor")
+        cursor.execute("USE arcade_premium_db")
+        cursor.execute(
+            "UPDATE battlepass SET has_premium = TRUE WHERE username = %s",
+            (username,)
+        )
+        conn.commit()
+        cursor.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
+    add_transaction(username, "compra_tienda", "battlepass_rubies", -premium_cost, new_rubies)
+
+    return {
+        "success": True,
+        "message": "Pase premium comprado con rubíes",
+        "new_rubies": new_rubies,
+        "battlepass": build_battlepass_summary(username)
     }
 
 @router.post("/claim-scratch-prize")
@@ -318,6 +480,8 @@ async def claim_scratch_prize(request: ClaimScratchPrizeRequest):
 @router.post("/add-free-spins")
 async def add_free_spins(username: str, spins: int = 5):
     """Añade tiradas gratis al usuario."""
+    ensure_user(username)
+    get_battlepass(username)
     conn = get_db_connection()
     if not conn:
         raise HTTPException(status_code=500, detail="Error de base de datos")

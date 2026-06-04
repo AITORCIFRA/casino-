@@ -303,6 +303,25 @@ body {
   text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
 }
 
+.credits-shop-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 255, 153, 0.2);
+  background: rgba(0, 255, 153, 0.12);
+  color: #00FF99;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.credits-shop-btn:hover {
+  transform: scale(1.05);
+  background: rgba(0, 255, 153, 0.18);
+}
+
 .nav-menu-center {
   display: flex;
   gap: 12px;
@@ -626,6 +645,18 @@ body {
   border: none;
 }
 
+#gameErrorBanner {
+  display: none;
+  background: rgba(239, 68, 68, 0.95);
+  color: #fff;
+  padding: 12px 18px;
+  font-family: 'Orbitron';
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .top-bar { padding: 10px 15px; }
@@ -671,13 +702,20 @@ body {
     </div>
 
     <div class="credits-display">
-      <div class="credits-value" id="lobbyCredits">0</div>
-      <div style="font-size:11px; color:rgba(255,255,255,0.5); font-family:'Orbitron';">FICHAS</div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+        <div class="credits-value" id="lobbyCredits">0</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.5); font-family:'Orbitron';">FICHAS</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+        <div class="credits-value" id="lobbyRubies">0</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.5); font-family:'Orbitron';">RUBÍES</div>
+      </div>
+      <button class="credits-shop-btn" onclick="openModal('shopModal')">+</button>
     </div>
 
     <div class="nav-menu-center">
       <button class="menu-btn" onclick="openSocialModal()">👥 SOCIAL</button>
-      <button class="menu-btn gold" onclick="battlePassBrawl.loadBattlePass(currentUser)">🎫 PASE (100)</button>
+      <button id="battlePassBtn" class="menu-btn gold" onclick="openBattlePass()">🎫 PASE (100)</button>
       <button class="menu-btn gold" onclick="openModal('shopModal')">🛒 TIENDA</button>
       <button class="menu-btn" style="border-color:#EF4444;color:#EF4444" onclick="doLogout()">SALIR</button>
     </div>
@@ -753,23 +791,44 @@ body {
   </div>
 </div>
 
-<!-- ============ GAME CONTAINER ============ -->
+<div class="panel-modal" id="rubiesModal">
+  <div class="panel-container">
+    <span class="panel-close" onclick="closeModal('rubiesModal')">&times;</span>
+    <h2 style="font-family:'Orbitron'; color:#00FF99;">💎 TIENDA DE RUBÍES</h2>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:20px;">
+      <div style="background:rgba(56,189,248,0.08); padding:25px; border-radius:15px; text-align:center; border:2px solid rgba(56,189,248,0.25);">
+        <h3 style="font-family:'Orbitron'; font-size:16px; color:#38bdf8;">100 RUBÍES</h3>
+        <p style="color:#00FF99; margin:15px 0; font-family:'Orbitron'; font-weight:900;">1.000 FICHAS</p>
+        <button onclick="buyRubiesPackage('small')" style="width:100%; background:#38bdf8; color:#000; border:none; padding:12px; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer;">COMPRAR</button>
+      </div>
+      <div style="background:rgba(168,85,247,0.08); padding:25px; border-radius:15px; text-align:center; border:2px solid rgba(168,85,247,0.25);">
+        <h3 style="font-family:'Orbitron'; font-size:16px; color:#a855f7;">550 RUBÍES</h3>
+        <p style="color:#00FF99; margin:15px 0; font-family:'Orbitron'; font-weight:900;">5.000 FICHAS</p>
+        <button onclick="buyRubiesPackage('medium')" style="width:100%; background:#a855f7; color:#fff; border:none; padding:12px; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer;">COMPRAR</button>
+      </div>
+      <div style="background:rgba(249,115,22,0.08); padding:25px; border-radius:15px; text-align:center; border:2px solid rgba(249,115,22,0.25);">
+        <h3 style="font-family:'Orbitron'; font-size:16px; color:#f97316;">1.200 RUBÍES</h3>
+        <p style="color:#00FF99; margin:15px 0; font-family:'Orbitron'; font-weight:900;">10.000 FICHAS</p>
+        <button onclick="buyRubiesPackage('large')" style="width:100%; background:#f97316; color:#000; border:none; padding:12px; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer;">COMPRAR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="gameContainer">
   <div class="game-topbar">
-    <div style="font-family:'Orbitron'; font-weight:900; letter-spacing:1px; font-size:16px;" id="gameActiveTitle">JUEGO EN CURSO</div>
-    <button class="back-btn" onclick="closeGame()">← VOLVER AL LOBBY</button>
+    <div id="gameActiveTitle" style="font-family:'Orbitron'; font-size:14px; color:#00FF99;">CARGANDO JUEGO...</div>
+    <button class="back-btn" onclick="closeGame()">⟵ VOLVER</button>
   </div>
-  <iframe id="gameFrame" src=""></iframe>
+  <div id="gameErrorBanner"></div>
+  <iframe id="gameFrame"></iframe>
 </div>
 
 <script src="/animations.js"></script>
-<script src="/battlepass-brawl.js"></script>
-<script src="/betting-levels.js"></script>
-<script src="/table-lobby.js"></script>
-<script src="/social-play.js"></script>
 <script>
-const API_URL = "/api";
-let currentUser = localStorage.getItem("arcade_user") || null;
+window.currentUser = localStorage.getItem("arcade_user") || null;
+const API_URL = '/api';
+let currentUser = window.currentUser;
 let carouselIndex = 0;
 let hudInterval = null;
 const winAnim = new WinAnimation();
@@ -786,6 +845,48 @@ const GAMES = [
   { id: 'poker',    title: 'POKER TEXAS',    file: 'poker.html',    cat: 'mesa',   color: '#FF6B35', img: '/assets/games/ctMqgVaaG9Cs.jpg', minPlayers: 2 }
 ];
 
+const GAME_DEFAULT_LIMITS = {
+  'blackjack.html': { min: 10, max: 500 },
+  'roulette.html': { min: 1, max: 100 },
+  'poker.html': { min: 10, max: 40 },
+  'crash.html': { min: 10, max: 1000 },
+  'mines.html': { min: 10, max: 1000 },
+  'keno.html': { min: 1, max: 100 },
+  'plinko.html': { min: 1, max: 100 },
+  'slots.html': { min: 1, max: 100 },
+  '3_en_1.html': { min: 1, max: 100 },
+  'magic_trakka.html': { min: 1, max: 100 }
+};
+
+function getGameBetLimits(file, balance) {
+  const defaults = GAME_DEFAULT_LIMITS[file] || { min: 1, max: 100 };
+  let minBet = defaults.min;
+  let maxBet = defaults.max;
+
+  if (balance > 0) {
+    maxBet = Math.min(defaults.max, Math.max(defaults.min, balance));
+  }
+
+  return { min: minBet, max: maxBet };
+}
+
+function getGameByFile(file) {
+  return GAMES.find(g => g.file === file);
+}
+
+async function getRecommendedMesa(file) {
+  const game = getGameByFile(file);
+  if (!game || !currentUser) return null;
+  try {
+    const res = await fetch(`${API_URL}/tables/auto/${encodeURIComponent(currentUser)}/${encodeURIComponent(game.id)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.mesa_recomendada || null;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function doLogin(action) {
   const username = document.getElementById("loginUser").value.trim();
   const password = document.getElementById("loginPass").value.trim();
@@ -801,6 +902,7 @@ async function doLogin(action) {
       if (action === 'login') {
         localStorage.setItem("arcade_user", username);
         currentUser = username;
+        window.currentUser = username;
         document.getElementById("authScreen").classList.add("hidden");
         document.getElementById("lobbyScreen").classList.remove("hidden");
         initLobby();
@@ -820,6 +922,7 @@ async function updateHUD() {
       document.getElementById("lobbyAvatar").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${p.username}`;
       document.getElementById("lobbyLeagueBadge").innerText = p.league.toUpperCase();
       
+      document.getElementById("lobbyRubies").innerText = Math.floor(p.rubies || 0).toLocaleString();
       const resW = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
       if(resW.ok) {
         const w = await resW.json();
@@ -941,7 +1044,61 @@ async function openSocialModal() {
 function openModal(id) { document.getElementById(id).classList.add("open"); }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
 
-async function openTableLobby(gameId, gameFile) {
+function openBattlePass() {
+  const user = localStorage.getItem('arcade_user') || currentUser;
+  console.log('openBattlePass called', { user, battlePassBrawl: window.battlePassBrawl });
+  if (!user) {
+    alert('❌ Inicia sesión primero para abrir el pase.');
+    return;
+  }
+
+  const launch = () => {
+    if (window.battlePassBrawl && typeof window.battlePassBrawl.loadBattlePass === 'function') {
+      window.battlePassBrawl.loadBattlePass(user);
+      return true;
+    }
+    if (window.battlePassBrawl && typeof window.battlePassBrawl.show === 'function') {
+      window.battlePassBrawl.show();
+      return true;
+    }
+    if (window.battlePassBrawl) {
+      if (typeof window.battlePassBrawl._inject === 'function') {
+        try { window.battlePassBrawl._inject(); } catch (e) { console.error('battlePassBrawl._inject failed', e); }
+      }
+      if (typeof window.battlePassBrawl.show === 'function') {
+        window.battlePassBrawl.show();
+        return true;
+      }
+    }
+    return false;
+  };
+
+  if (launch()) return;
+
+  let retries = 0;
+  const interval = setInterval(() => {
+    retries += 1;
+    console.log('retry openBattlePass', retries, { battlePassBrawl: window.battlePassBrawl });
+    if (launch()) {
+      clearInterval(interval);
+      return;
+    }
+    if (retries >= 15) {
+      clearInterval(interval);
+      console.error('Battle Pass no disponible tras varios intentos.');
+      alert('❌ No se pudo abrir el pase. Recarga la página y vuelve a intentarlo.');
+    }
+  }, 100);
+}
+
+window.openBattlePass = openBattlePass;
+
+const battlePassButton = document.getElementById('battlePassBtn');
+if (battlePassButton) {
+  battlePassButton.addEventListener('click', openBattlePass);
+}
+
+window.openTableLobby = async function(gameId, gameFile) {
   if (!currentUser) { alert('Inicia sesión primero'); return; }
   // Obtener balance actual
   let balance = 0;
@@ -952,7 +1109,7 @@ async function openTableLobby(gameId, gameFile) {
   tableLobby.show(gameId, gameFile, balance);
 }
 
-function launchGame(file, roomId, mesa) {
+window.launchGame = async function(file, roomId, mesa) {
   if (!currentUser) { alert("Inicia sesión primero"); return; }
   document.getElementById("gameActiveTitle").innerText = file.replace(".html","").replace(/_/g, " ").toUpperCase();
   const gameFrame = document.getElementById("gameFrame");
@@ -961,12 +1118,31 @@ function launchGame(file, roomId, mesa) {
   if (mesa) {
     url += `&min_bet=${mesa.min_bet}&max_bet=${mesa.max_bet}&mesa=${encodeURIComponent(mesa.nombre)}`;
     localStorage.setItem('arcade_mesa', JSON.stringify(mesa));
+  } else {
+    const recommendedMesa = await getRecommendedMesa(file);
+    if (recommendedMesa) {
+      mesa = recommendedMesa;
+      url += `&min_bet=${recommendedMesa.min_bet}&max_bet=${recommendedMesa.max_bet}&mesa=${encodeURIComponent(recommendedMesa.nombre)}`;
+      localStorage.setItem('arcade_mesa', JSON.stringify(recommendedMesa));
+    } else {
+      const cachedBalance = parseInt(localStorage.getItem('arcade_credits')) || 0;
+      const limits = getGameBetLimits(file, cachedBalance);
+      url += `&min_bet=${limits.min}&max_bet=${limits.max}`;
+    }
   }
   gameFrame.src = url;
   document.getElementById("gameContainer").style.display = "flex";
   
+  gameFrame.onerror = function() {
+    const msg = 'No se pudo cargar el juego. Revisa tu conexión o inténtalo de nuevo.';
+    const banner = document.getElementById('gameErrorBanner');
+    if (banner) { banner.innerText = msg; banner.style.display = 'block'; }
+  };
+
   // Enviar créditos al iframe cuando cargue
   gameFrame.onload = function() {
+    const banner = document.getElementById('gameErrorBanner');
+    if (banner) { banner.style.display = 'none'; banner.innerText = ''; }
     fetch(`${API_URL}/wallet/balance/${currentUser}`)
       .then(r => r.json())
       .then(d => {
@@ -981,7 +1157,7 @@ function launchGame(file, roomId, mesa) {
   };
 }
 
-function closeGame() {
+window.closeGame = function() {
   document.getElementById("gameContainer").style.display = "none";
   document.getElementById("gameFrame").src = "";
   updateHUD();
@@ -1029,9 +1205,77 @@ async function buyCredits(amount) {
   }
 }
 
+async function buyRubiesPackage(packageKey) {
+  if(!currentUser) { alert('Inicia sesión primero'); return; }
+  const packageAmounts = { small: 100, medium: 550, large: 1200 };
+  try {
+    const res = await fetch(`${API_URL}/progression/battlepass/${encodeURIComponent(currentUser)}/buy-rubies`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ package_key: packageKey })
+    });
+    const data = await res.json();
+    if(!res.ok) {
+      alert('❌ ' + (data.detail || 'No se pudieron comprar rubíes'));
+      return;
+    }
+    document.getElementById('lobbyRubies').innerText = Math.floor(data.new_rubies || 0).toLocaleString();
+    closeModal('rubiesModal');
+    alert(`✅ Compraste ${packageAmounts[packageKey] || 0} rubíes`);
+  } catch (e) {
+    alert('❌ Error de conexión al comprar rubíes');
+  }
+}
+
+async function buyBattlepassLevels(levels = 1) {
+  if(!currentUser) { alert('Inicia sesión primero'); return; }
+  try {
+    const res = await fetch(`${API_URL}/progression/battlepass/${encodeURIComponent(currentUser)}/buy-levels`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ levels })
+    });
+    const data = await res.json();
+    if(!res.ok) {
+      alert('❌ ' + (data.detail || 'No se pudieron comprar niveles'));
+      return;
+    }
+    document.getElementById('lobbyRubies').innerText = Math.floor(data.new_rubies || 0).toLocaleString();
+    closeModal('rubiesModal');
+    alert(`✅ Compraste ${levels} nivel(es)`);
+  } catch (e) {
+    alert('❌ Error de conexión al comprar niveles');
+  }
+}
+
+async function buyBattlepassPremiumWithRubies() {
+  if(!currentUser) { alert('Inicia sesión primero'); return; }
+  try {
+    const res = await fetch(`${API_URL}/progression/battlepass/${encodeURIComponent(currentUser)}/buy-premium-with-rubies`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if(!res.ok) {
+      alert('❌ ' + (data.detail || 'No se pudo comprar el pase premium'));
+      return;
+    }
+    document.getElementById('lobbyRubies').innerText = Math.floor(data.new_rubies || 0).toLocaleString();
+    closeModal('rubiesModal');
+    alert('✅ Pase premium comprado con rubíes');
+    if(window.battlePassBrawl && typeof window.battlePassBrawl.loadBattlePass === 'function') {
+      window.battlePassBrawl.loadBattlePass(currentUser);
+    }
+  } catch (e) {
+    alert('❌ Error de conexión al comprar pase premium');
+  }
+}
+
 function doLogout() { localStorage.clear(); window.location.reload(); }
 
 window.onload = () => { if(currentUser) { document.getElementById("authScreen").classList.add("hidden"); document.getElementById("lobbyScreen").classList.remove("hidden"); initLobby(); } };
 </script>
+<script src="/battlepass-brawl.js"></script>
+<script src="/table-lobby.js"></script>
 </body>
 </html>

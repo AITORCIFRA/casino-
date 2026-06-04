@@ -49,7 +49,11 @@ body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; di
 <script>
 let credits = 0;
 let isDropping = false;
-const BET = 50;
+const params = new URLSearchParams(window.location.search);
+const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 1);
+let MAX_BET = parseInt(params.get('max_bet'));
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+const BET = Math.min(MAX_BET, Math.max(MIN_BET, 50));
 const winAnim = new WinAnimation();
 
 async function initCredits() {
@@ -63,8 +67,13 @@ function updateUI() {
 }
 
 async function dropBall() {
-  if (isDropping || credits < BET) {
-    if (credits < BET) WalletAPI.openShop();
+  if (isDropping) return;
+  if (BET < MIN_BET || BET > MAX_BET) {
+    document.getElementById('result').textContent = `Apuesta válida: ${MIN_BET}-${MAX_BET}`;
+    return;
+  }
+  if (credits < BET) {
+    WalletAPI.openShop();
     return;
   }
   

@@ -143,7 +143,39 @@ let currentMult = 1;
 let multStreak = 0;
 let strips = [], positions = [], stripEls = [];
 
-const BETS = [1,2,5,10,25,50,100];
+const params = new URLSearchParams(window.location.search);
+const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 1);
+let MAX_BET = parseInt(params.get('max_bet'));
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+
+function buildBetOptions(min, max) {
+  const base = [1,2,5,10,25,50,100];
+  const opts = [...new Set(base)];
+  while (opts[opts.length - 1] < max) {
+    const last = opts[opts.length - 1];
+    let next = last < 100 ? last * 2 : last < 1000 ? last * 2 : last < 10000 ? last * 5 : last * 10;
+    if (next <= last) next = last + Math.max(1, Math.floor(last * 0.1));
+    opts.push(next);
+    if (opts.length > 50) break;
+  }
+  const filtered = opts.filter(v => v >= min && v <= max);
+  if (filtered[0] !== min) filtered.unshift(min);
+  if (filtered[filtered.length - 1] !== max) filtered.push(max);
+  return [...new Set(filtered)].sort((a,b)=>a-b);
+}
+
+const BETS = buildBetOptions(MIN_BET, MAX_BET);
+
+function clampBetIdx() {
+  betIdx = Math.max(0, Math.min(BETS.length - 1, betIdx));
+  while (betIdx > 0 && BETS[betIdx] > MAX_BET) betIdx--;
+  while (betIdx < BETS.length - 1 && BETS[betIdx] < MIN_BET) betIdx++;
+  if (BETS[betIdx] > MAX_BET) betIdx = BETS.length - 1;
+}
+
+betIdx = BETS.findIndex(b => b >= MIN_BET);
+if (betIdx === -1) betIdx = BETS.length - 1;
+clampBetIdx();
 const SYMS   = ['7️⃣','💎','⭐','🔔','🍒','🍋','🍊','🍇','BAR','🍀'];
 const WGTS   = [  1,   3,   5,  10,  15,  20,  20,  15,   8,  10];
 const PAYS   = {'7️⃣':500,'💎':200,'⭐':100,'🔔':50,'🍒':25,'🍋':15,'🍊':10,'🍇':8,'BAR':5,'🍀':3};
@@ -160,6 +192,7 @@ function getUsername() {
 async function initCredits() {
   const bal = await WalletAPI.getBalance();
   credits = bal;
+  document.getElementById('betEl').textContent = BETS[betIdx];
   updateUI();
   setSpinAvailable();
 }
@@ -372,6 +405,7 @@ function showBanner(txt, sub, color) {
 function chBet(d) {
   if(spinning) return;
   betIdx = Math.max(0, Math.min(BETS.length-1, betIdx+d));
+  clampBetIdx();
   document.getElementById('betEl').textContent = BETS[betIdx];
   if(insufficientLocked && credits >= BETS[betIdx]) insufficientLocked = false;
   setSpinAvailable();

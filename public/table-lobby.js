@@ -401,4 +401,4 @@ class TableLobby {
   }
 }
 
-const tableLobby = new TableLobby();
+window.tableLobby = new TableLobby();

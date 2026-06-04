@@ -76,13 +76,7 @@ h1{font-family:'Playfair Display',serif;font-size:2rem;letter-spacing:.1em;backg
     <button class="clear-btn" onclick="clearBets()">Limpiar apuestas</button>
   </div>
   <div class="right">
-    <div><div class="sec-t">Ficha activa</div><div class="chips">
-      <div class="chip c1 sel" data-v="1" onclick="selChip(1)">1</div>
-      <div class="chip c5" data-v="5" onclick="selChip(5)">5</div>
-      <div class="chip c10" data-v="10" onclick="selChip(10)">10</div>
-      <div class="chip c25" data-v="25" onclick="selChip(25)">25</div>
-      <div class="chip c100" data-v="100" onclick="selChip(100)">100</div>
-    </div></div>
+    <div class="sec-t">Ficha activa</div><div class="chips" id="chipContainer"></div></div>
     <div><div class="sec-t">Apuestas externas</div>
     <div class="felt-table">
       <div class="felt-row">
@@ -114,6 +108,71 @@ h1{font-family:'Playfair Display',serif;font-size:2rem;letter-spacing:.1em;backg
 const RED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 const WO=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 let balance=0, chip=1, bets={}, spinning=false, spins=0, insufficientLocked=false;
+const params = new URLSearchParams(window.location.search);
+let MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 1);
+let MAX_BET = parseInt(params.get('max_bet'));
+const ROOM_ID = params.get('room');
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+
+async function loadRoomMesaConfig() {
+  if (!ROOM_ID) return;
+  try {
+    const res = await fetch(`/api/tables/room/${encodeURIComponent(ROOM_ID)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data?.mesa) {
+      MIN_BET = data.mesa.min_bet;
+      MAX_BET = data.mesa.max_bet;
+      clampChip();
+      renderChipButtons();
+      updateUI();
+    }
+  } catch (e) {}
+}
+window.addEventListener('load', loadRoomMesaConfig);
+
+function clampChip() {
+  if (chip < MIN_BET) chip = MIN_BET;
+  if (chip > MAX_BET) chip = MAX_BET;
+  if (document.getElementById('chipContainer')) updateSelectedChip();
+}
+
+function buildChipValues(min, max) {
+  const seeds = [1,5,10,25,50,100,250,500,1000,2500,5000,10000];
+  const values = new Set([min, max]);
+  for (const value of seeds) {
+    if (value >= min && value <= max) values.add(value);
+  }
+  let last = Math.max(...Array.from(values));
+  while (last < max && values.size < 14) {
+    const next = last < 100 ? last * 2 : last < 1000 ? last * 2 : last < 10000 ? last * 5 : last * 10;
+    if (next <= last) break;
+    values.add(next);
+    last = next;
+  }
+  return Array.from(values).filter(v => v >= min && v <= max).sort((a,b)=>a-b);
+}
+
+function renderChipButtons() {
+  const container = document.getElementById('chipContainer');
+  if (!container) return;
+  const chips = buildChipValues(MIN_BET, MAX_BET);
+  if (!chips.includes(chip)) chip = chips[0];
+  container.innerHTML = chips.map(v => {
+    const extraClass = ['c1','c5','c10','c25','c100'].includes('c'+v) ? ' c'+v : '';
+    return `<div class="chip${extraClass}" data-v="${v}" onclick="selChip(${v})">${v}</div>`;
+  }).join('');
+  updateSelectedChip();
+}
+
+function updateSelectedChip() {
+  document.querySelectorAll('#chipContainer .chip').forEach(c =>
+    c.classList.toggle('sel', Number(c.dataset.v) === chip)
+  );
+}
+
+clampChip();
+renderChipButtons();
 
 // Grid de números
 (()=>{const g=document.getElementById('ngrid');for(let n=1;n<=36;n++){const d=document.createElement('div');d.className='nc '+(RED.includes(n)?'is-red':'is-blk');d.textContent=n;d.id='nc_'+n;d.onclick=()=>bet('num_'+n);g.appendChild(d);}})();
@@ -125,6 +184,7 @@ function getUsername() {
 
 async function initCredits() {
   balance = await WalletAPI.getBalance();
+  clampChip();
   updateUI(false);
   setSpinAvailable();
 }
@@ -158,8 +218,14 @@ function pendingBetTotal() { return Object.values(bets).reduce((a,b)=>a+b,0); }
 
 function setMsg(t, c) { const m = document.getElementById('msg'); m.textContent = t; m.className = 'msg '+c; }
 
+function formatShortValue(value){
+  if (value >= 1000000) return (value/1000000).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (value >= 1000) return (value/1000).toFixed(1).replace(/\.0$/,'') + 'K';
+  return value.toString();
+}
+
 function updateUI(notify=true) {
-  document.getElementById('saldo').textContent = balance.toLocaleString('es-ES');
+  document.getElementById('saldo').textContent = formatShortValue(balance);
   document.getElementById('apostado').textContent = pendingBetTotal();
   document.getElementById('tiradas').textContent = spins;
   const pb = document.getElementById('pblist');
@@ -174,7 +240,11 @@ function betLabel(k) { return k.startsWith('num_') ? 'Pleno '+k.slice(4) :
 
 async function bet(t) {
   if(spinning) return;
+  if (chip < MIN_BET) { setMsg(`Apuesta mínima ${MIN_BET}`, 'lose'); return; }
+  if (chip > MAX_BET) { setMsg(`Apuesta máxima ${MAX_BET}`, 'lose'); return; }
   if(insufficientLocked || balance < chip) { handleInsufficientFunds(); return; }
+  const totalBet = pendingBetTotal() + chip;
+  if (totalBet > MAX_BET) { setMsg(`Límite de apuesta total ${MAX_BET}`, 'lose'); return; }
   bets[t] = (bets[t]||0) + chip;
   balance -= chip;
   updateUI();
@@ -275,7 +345,16 @@ async function finishSpin(result) {
   setSpinAvailable();
 }
 
-function selChip(v) { chip = v; document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',+c.dataset.v===v)); }
+function selChip(v) {
+  if (v < MIN_BET || v > MAX_BET) {
+    alert(`Ficha inválida. Usa entre ${MIN_BET} y ${MAX_BET}`);
+    return;
+  }
+  chip = v;
+  clampChip();
+  updateSelectedChip();
+  setMsg(`Ficha seleccionada: ${chip}`, 'neutral');
+}
 
 // Inicialización
 (async function() {

@@ -12,6 +12,7 @@ class BattlePassBrawl {
     this.hasPremium = false;
     this.currentLevel = 1;
     this.currentXP = 0;
+    this.rubies = 0;
     this._inject();
   }
 
@@ -97,6 +98,31 @@ class BattlePassBrawl {
         color: #fff;
         box-shadow: 0 0 20px rgba(168,85,247,0.4);
       }
+      .bp-buy-level-btn {
+        background: linear-gradient(135deg, #10b981, #047857);
+        color: #fff;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        font-weight: 900;
+        padding: 8px 18px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        letter-spacing: 1px;
+        box-shadow: 0 0 20px rgba(16,185,129,0.3);
+        transition: all 0.3s;
+      }
+      .bp-buy-level-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(16,185,129,0.5); }
+      .bp-rubies-badge {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12px;
+        font-weight: 900;
+        color: #38bdf8;
+        background: rgba(56,189,248,0.12);
+        border: 1px solid rgba(56,189,248,0.3);
+        padding: 6px 14px;
+        border-radius: 20px;
+      }
       .bp-close {
         background: rgba(239,68,68,0.15);
         border: 1px solid rgba(239,68,68,0.4);
@@ -109,6 +135,54 @@ class BattlePassBrawl {
         transition: all 0.3s;
       }
       .bp-close:hover { background: rgba(239,68,68,0.3); }
+
+      .bp-purchase-toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 10010;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 24px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(255,215,0,0.95), rgba(255,121,0,0.95));
+        box-shadow: 0 24px 80px rgba(255,160,0,0.25);
+        color: #111;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+        pointer-events: none;
+      }
+      .bp-purchase-toast.open {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .bp-toast-icon {
+        font-size: 28px;
+        animation: bpToastPulse 1.2s ease-in-out infinite;
+      }
+      .bp-toast-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        text-align: left;
+      }
+      .bp-toast-title {
+        font-size: 14px;
+        letter-spacing: 1px;
+      }
+      .bp-toast-subtitle {
+        font-size: 11px;
+        opacity: 0.85;
+        color: rgba(17,17,17,0.9);
+      }
+      @keyframes bpToastPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+      }
 
       /* XP Bar */
       .bp-xp-wrap {
@@ -235,6 +309,14 @@ class BattlePassBrawl {
         border-color: #00FF99;
         background: rgba(0,255,153,0.1);
       }
+      .bp-node.free.claimable .bp-node-box {
+        border-color: #00FF99;
+        background: rgba(0,255,153,0.12);
+        transform: scale(1.03);
+      }
+      .bp-node.free.claimable:hover .bp-node-box {
+        box-shadow: 0 0 18px rgba(0,255,153,0.35);
+      }
       .bp-node.free.locked .bp-node-box {
         opacity: 0.35;
       }
@@ -310,8 +392,12 @@ class BattlePassBrawl {
         <div class="bp-header">
           <div class="bp-title">🏆 PASE DE BATALLA</div>
           <div class="bp-level-badge" id="bpLevelBadge">Nivel 1 / 100</div>
+          <div class="bp-rubies-badge" id="bpRubiesBadge">Rubíes: 0</div>
           <button class="bp-premium-btn" id="bpPremiumBtn" onclick="battlePassBrawl.togglePremium()">
             👑 ACTIVAR PREMIUM — 5000 🪙
+          </button>
+          <button class="bp-buy-level-btn" id="bpBuyLevelBtn" onclick="battlePassBrawl.buyLevels()">
+            💎 COMPRAR 1 NIVEL — 200 RUBÍ
           </button>
           <button class="bp-close" onclick="battlePassBrawl.hide()">✕</button>
         </div>
@@ -336,6 +422,7 @@ class BattlePassBrawl {
       </div>
     `;
     document.body.appendChild(overlay);
+    this._createPurchaseToast();
 
     // Sincronizar scroll entre las dos filas
     const scrollP = overlay.querySelector('#bpScrollPremium');
@@ -365,10 +452,108 @@ class BattlePassBrawl {
     this.isVisible = false;
   }
 
+  async buyLevels(levels = 1) {
+    const username = window.currentUser || localStorage.getItem('arcade_user');
+    if (!username) {
+      alert('❌ Inicia sesión para comprar niveles');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.API_URL}/battlepass/${username}/buy-levels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ levels })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert('❌ ' + (err.detail || 'Error al comprar niveles'));
+        return;
+      }
+
+      const data = await res.json();
+      this.currentLevel = data.battlepass.level || this.currentLevel;
+      this.currentXP = data.battlepass.xp || this.currentXP;
+      this.rubies = data.new_rubies;
+      this._updateRubiesBadge();
+      this._renderTracks(this.currentLevel);
+      alert(`✅ Compraste ${levels} nivel(es)`);
+    } catch (e) {
+      console.log(e);
+      alert('❌ Error de conexión');
+    }
+  }
+
+  async claimReward(level) {
+    const username = window.currentUser || localStorage.getItem('arcade_user');
+    if (!username) {
+      alert('❌ Inicia sesión para reclamar recompensas');
+      return;
+    }
+    if (level > this.currentLevel) {
+      alert('❌ Nivel no alcanzado');
+      return;
+    }
+    const rewardKey = `free:${level}`;
+    if (this.claimedRewards && this.claimedRewards.has(rewardKey)) {
+      alert('✅ Recompensa ya reclamada');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${this.API_URL}/battlepass/${encodeURIComponent(username)}/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, reward_type: 'free' })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert('❌ ' + (data.detail || 'No se pudo reclamar la recompensa'));
+        return;
+      }
+      alert(`✅ Recompensa nivel ${level} reclamada`);
+      this.currentLevel = data.battlepass.level || this.currentLevel;
+      this.currentXP = data.battlepass.xp || this.currentXP;
+      this.claimedRewards = new Set((data.battlepass.claimed_rewards || []).map(String));
+      this._loadProfile(username);
+      this._renderTracks(this.currentLevel);
+      if (typeof updateHUD === 'function') updateHUD();
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'credits', value: data.new_balance }, '*');
+      }
+    } catch (e) {
+      console.log('Error reclamando recompensa', e);
+      alert('❌ Error de conexión al reclamar recompensa');
+    }
+  }
+
+  async _loadProfile(username) {
+    try {
+      const res = await fetch(`${this.API_URL}/profile/${username}`);
+      if (!res.ok) return;
+      const profile = await res.json();
+      this.rubies = profile.rubies || 0;
+      this._updateRubiesBadge();
+    } catch (e) {
+      console.log('Error cargando perfil', e);
+    }
+  }
+
+  _updateRubiesBadge() {
+    const badge = document.getElementById('bpRubiesBadge');
+    if (badge) {
+      badge.textContent = `Rubíes: ${this.rubies || 0}`;
+    }
+  }
+
   async togglePremium() {
     if (this.hasPremium) return;
-    const user = window.currentUser;
-    if (!user) return;
+    const user = window.currentUser || localStorage.getItem('arcade_user');
+    if (!user) {
+      alert('❌ Inicia sesión para activar Premium');
+      return;
+    }
     try {
       const res = await fetch(`${this.API_URL}/buy-battlepass`, {
         method: 'POST',
@@ -380,6 +565,7 @@ class BattlePassBrawl {
         document.getElementById('bpPremiumBtn').textContent = '👑 PREMIUM ACTIVADO';
         document.getElementById('bpPremiumBtn').classList.add('active');
         this._renderTracks(this.currentLevel);
+        this._showPurchaseToast();
         if (typeof updateHUD === 'function') updateHUD();
       } else {
         const err = await res.json();
@@ -397,6 +583,41 @@ class BattlePassBrawl {
         this.currentLevel = data.level || 1;
         this.currentXP = data.xp || 0;
         this.hasPremium = data.has_premium || false;
+        this.claimedRewards = new Set((data.claimed_rewards || []).map(String));
+        this.rubies = 0;
+
+        // Actualizar UI
+        document.getElementById('bpLevelBadge').innerText = `Nivel ${this.currentLevel} / 100`;
+        document.getElementById('bpXPLabel').innerText = `${this.currentXP} / ${this.XP_PER_LEVEL} XP`;
+        document.getElementById('bpXPFill').style.width = `${(this.currentXP / this.XP_PER_LEVEL) * 100}%`;
+        this._updateRubiesBadge();
+
+        const btn = document.getElementById('bpPremiumBtn');
+        if (this.hasPremium) {
+          btn.textContent = '👑 PREMIUM ACTIVADO';
+          btn.classList.add('active');
+        } else {
+          btn.textContent = '👑 ACTIVAR PREMIUM — 5000 🪙';
+          btn.classList.remove('active');
+        }
+
+        this._renderTracks(this.currentLevel);
+        this.show();
+        setTimeout(() => this._scrollToLevel(this.currentLevel), 150);
+        await this._loadProfile(username);
+      }
+    } catch (e) {
+      console.log('Error cargando Battle Pass', e);
+    }
+    if (!username) return;
+    try {
+      const res = await fetch(`${this.API_URL}/battlepass/${username}`);
+      if (res.ok) {
+        const data = await res.json();
+        this.currentLevel = data.level || 1;
+        this.currentXP = data.xp || 0;
+        this.hasPremium = data.has_premium || false;
+        this.claimedRewards = new Set((data.claimed_rewards || []).map(String));
 
         // Actualizar UI
         document.getElementById('bpLevelBadge').innerText = `Nivel ${this.currentLevel} / 100`;
@@ -449,9 +670,13 @@ class BattlePassBrawl {
       `;
 
       // Nodo Gratis
+      const claimKey = `free:${i}`;
+      const isClaimed = this.claimedRewards?.has(claimKey);
       const freeState = isActive ? 'active' : isClaimed ? 'claimed' : isLocked ? 'locked' : '';
+      const isClaimable = i <= level && !isClaimed;
+      const freeClasses = `${freeState}${isClaimable ? ' claimable' : ''}`;
       freeHTML += `
-        <div class="bp-node free ${freeState}" title="${freeReward.label}">
+        <div class="bp-node free ${freeClasses}" title="${freeReward.label}" ${isClaimable ? `onclick="battlePassBrawl.claimReward(${i})"` : ''}>
           <div class="bp-node-box">
             ${freeReward.icon}
             <div class="bp-reward-amount">${freeReward.amount}</div>
@@ -501,6 +726,28 @@ class BattlePassBrawl {
       });
     } catch(e) {}
   }
+
+  _createPurchaseToast() {
+    const toast = document.createElement('div');
+    toast.id = 'bp-purchase-toast';
+    toast.className = 'bp-purchase-toast';
+    toast.innerHTML = `
+      <span class="bp-toast-icon">✨</span>
+      <div class="bp-toast-text">
+        <div class="bp-toast-title">¡Pase Premium comprado!</div>
+        <div class="bp-toast-subtitle">Has desbloqueado el modo Oro del pase.</div>
+      </div>
+    `;
+    document.body.appendChild(toast);
+  }
+
+  _showPurchaseToast() {
+    const toast = document.getElementById('bp-purchase-toast');
+    if (!toast) return;
+    toast.classList.add('open');
+    setTimeout(() => toast.classList.remove('open'), 3200);
+  }
 }
 
 const battlePassBrawl = new BattlePassBrawl();
+window.battlePassBrawl = battlePassBrawl;

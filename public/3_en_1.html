@@ -35,6 +35,12 @@ body{background:#050508;color:#fff;font-family:'Rajdhani',sans-serif;overflow:hi
 </div>
 
 <script>
+const params = new URLSearchParams(window.location.search);
+const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 1);
+let MAX_BET = parseInt(params.get('max_bet'));
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+const BET = Math.min(MAX_BET, Math.max(MIN_BET, 10));
+
 let credits = 0;
 async function init() {
   credits = await WalletAPI.getBalance();
@@ -50,7 +56,11 @@ async function init() {
 }
 
 async function doSpin() {
-  const bet = 10;
+  const bet = BET;
+  if (bet < MIN_BET || bet > MAX_BET) {
+    alert(`La apuesta debe ser entre ${MIN_BET} y ${MAX_BET}`);
+    return;
+  }
   if (credits < bet) { WalletAPI.openShop(); return; }
   
   const res = await WalletAPI.transaccionar('3_en_1', -bet);
