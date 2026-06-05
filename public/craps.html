@@ -30,12 +30,12 @@ body {
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    padding: 8px 20px; 
+    padding: 0.6vmin 1.5vmin; 
     background: #0b1a27; 
-    border-bottom: 2px solid var(--gold); 
+    border-bottom: 0.15vmin solid var(--gold); 
 }
-.title { font-family: 'Orbitron'; font-size: 16px; color: var(--gold); font-weight: 900; }
-.credits { font-family: 'Orbitron'; color: var(--green); font-size: 14px; }
+.title { font-family: 'Orbitron'; font-size: 1.2vmin; color: var(--gold); font-weight: 900; }
+.credits { font-family: 'Orbitron'; color: var(--green); font-size: 1vmin; }
 
 .game-container { 
     flex: 1; 
@@ -46,6 +46,7 @@ body {
     justify-content: center;
     background: var(--felt); 
     overflow: hidden;
+    padding: 10px;
 }
 
 .timer-bar { 
@@ -73,18 +74,21 @@ body {
 
 /* MESA PRINCIPAL */
 .table-wrapper {
-    width: 96%;
-    height: 82%;
-    max-width: 1700px;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     background: var(--felt);
-    border: 25px solid #2d1b0f;
-    border-radius: 100px;
+    border: 2vmin solid #2d1b0f;
+    border-radius: 8vmin;
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 20px;
-    padding: 25px;
+    grid-template-columns: 1fr 18vmin;
+    gap: 1.2vmin;
+    padding: 1.5vmin;
     position: relative;
     box-shadow: inset 0 0 150px rgba(0,0,0,0.6), 0 40px 80px rgba(0,0,0,0.9);
+    transform-origin: center;
+    transform: scale(1);
 }
 
 /* MAIN AREA - NÚMEROS Y PASS */
@@ -97,31 +101,31 @@ body {
 /* FILAS DE NÚMEROS CON PESTAÑAS */
 .num-row-wrapper {
     display: grid;
-    grid-template-columns: 1fr 50px;
-    gap: 8px;
+    grid-template-columns: 1fr 3.5vmin;
+    gap: 0.6vmin;
     align-items: stretch;
 }
 
 .num-row {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
+    gap: 0.6vmin;
 }
 
 .num-cell {
     background: rgba(255,255,255,0.08);
-    border: 2px solid var(--border);
-    border-radius: 10px;
+    border: 0.15vmin solid var(--border);
+    border-radius: 0.7vmin;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 26px;
+    font-size: 2vmin;
     font-weight: 900;
     font-family: 'Orbitron';
     transition: 0.2s;
     position: relative;
-    min-height: 70px;
+    min-height: 5vmin;
 }
 .num-cell:hover { background: rgba(255,255,255,0.12); }
 .num-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); box-shadow: 0 0 12px rgba(0,255,153,0.4); }
@@ -129,12 +133,12 @@ body {
 
 .side-tab {
     background: rgba(0,0,0,0.2);
-    border: 2px solid var(--border);
-    border-radius: 10px;
+    border: 0.15vmin solid var(--border);
+    border-radius: 0.7vmin;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 0.8vmin;
     font-weight: 900;
     color: var(--gold);
     writing-mode: vertical-rl;
@@ -145,18 +149,18 @@ body {
 /* COME */
 .come-box {
     background: rgba(255,255,255,0.08);
-    border: 2px solid var(--border);
-    border-radius: 10px;
+    border: 0.15vmin solid var(--border);
+    border-radius: 0.7vmin;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 36px;
+    font-size: 3vmin;
     font-weight: 900;
     font-family: 'Orbitron';
     transition: 0.2s;
     position: relative;
-    min-height: 80px;
+    min-height: 6vmin;
     grid-column: 1;
 }
 .come-box:hover { background: rgba(255,255,255,0.12); }
@@ -172,9 +176,9 @@ body {
 
 .field-box {
     background: rgba(255,255,255,0.08);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
+    border: 0.15vmin solid var(--border);
+    border-radius: 0.7vmin;
+    padding: 0.8vmin;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -182,14 +186,14 @@ body {
     cursor: pointer;
     transition: 0.2s;
     position: relative;
-    gap: 5px;
+    gap: 0.3vmin;
 }
 .field-box:hover { background: rgba(255,255,255,0.12); }
 .field-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
 
-.field-label { font-size: 13px; font-weight: 900; }
-.field-nums { font-size: 18px; font-weight: 900; letter-spacing: 6px; font-family: 'Orbitron'; }
-.field-info { font-size: 11px; color: var(--gold); }
+.field-label { font-size: 1vmin; font-weight: 900; }
+.field-nums { font-size: 1.4vmin; font-weight: 900; letter-spacing: 0.4vmin; font-family: 'Orbitron'; }
+.field-info { font-size: 0.8vmin; color: var(--gold); }
 
 /* PASS LINE */
 .pass-wrapper {
@@ -207,25 +211,25 @@ body {
 
 .pass-cell {
     background: rgba(255,255,255,0.08);
-    border: 2px solid var(--border);
-    border-radius: 10px;
+    border: 0.15vmin solid var(--border);
+    border-radius: 0.7vmin;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 1.1vmin;
     font-weight: 900;
     transition: 0.2s;
     position: relative;
-    min-height: 80px;
+    min-height: 6vmin;
 }
 .pass-cell:hover { background: rgba(255,255,255,0.12); }
 .pass-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
 
 .pass-line {
     background: rgba(244,196,48,0.15) !important;
-    border: 3px solid var(--gold) !important;
-    font-size: 32px;
+    border: 0.25vmin solid var(--gold) !important;
+    font-size: 2.5vmin;
     color: var(--gold);
     font-family: 'Orbitron';
 }
@@ -242,21 +246,21 @@ body {
     z-index: 20;
 }
 .chip-img { 
-    width: 32px; 
-    height: 32px; 
+    width: 2.2vmin; 
+    height: 2.2vmin; 
     background-size: cover;
-    margin-top: -26px; 
+    margin-top: -1.8vmin; 
     filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
 }
 .bet-tag { 
     background: #000; 
     color: var(--green); 
-    font-size: 11px; 
-    padding: 2px 6px; 
-    border-radius: 4px; 
+    font-size: 0.8vmin; 
+    padding: 0.15vmin 0.4vmin; 
+    border-radius: 0.3vmin; 
     font-weight: 900; 
-    margin-bottom: 6px; 
-    border: 1px solid var(--green);
+    margin-bottom: 0.4vmin; 
+    border: 0.1vmin solid var(--green);
     white-space: nowrap;
 }
 
@@ -269,52 +273,52 @@ body {
 
 .prop-box {
     background: rgba(255,255,255,0.08);
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
+    border: 0.15vmin solid var(--border);
+    border-radius: 0.9vmin;
+    padding: 0.8vmin;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.6vmin;
 }
 
 .prop-title {
-    font-size: 13px;
+    font-size: 1vmin;
     font-weight: 900;
     color: var(--gold);
     text-align: center;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
+    border-bottom: 0.1vmin solid var(--border);
+    padding-bottom: 0.4vmin;
     text-transform: uppercase;
 }
 
 .prop-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 0.4vmin;
 }
 
 .prop-cell {
     background: rgba(255,255,255,0.08);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    border: 0.1vmin solid var(--border);
+    border-radius: 0.6vmin;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 8px;
-    font-size: 12px;
+    padding: 0.5vmin;
+    font-size: 0.9vmin;
     font-weight: 900;
     transition: 0.2s;
     position: relative;
-    min-height: 60px;
-    gap: 3px;
+    min-height: 4.5vmin;
+    gap: 0.2vmin;
 }
 .prop-cell:hover { background: rgba(255,255,255,0.12); }
 .prop-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
 .prop-cell.winning { background: rgba(255,255,255,0.3) !important; }
 
-.dice-icon { font-size: 20px; }
+.dice-icon { font-size: 1.5vmin; }
 
 .horn-cell {
     grid-column: span 2;
@@ -372,39 +376,39 @@ body {
 /* CONTROLES */
 .controls { 
     background: #0b1a27; 
-    padding: 12px 30px; 
+    padding: 0.8vmin 2vmin; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    border-top: 2px solid var(--gold); 
+    border-top: 0.15vmin solid var(--gold); 
 }
 
-.chips-tray { display: flex; gap: 12px; }
+.chips-tray { display: flex; gap: 0.8vmin; }
 .c-btn { 
-    width: 60px; 
-    height: 60px; 
+    width: 4.5vmin; 
+    height: 4.5vmin; 
     border-radius: 50%; 
     background-size: cover;
     cursor: pointer; 
     transition: 0.2s; 
     position: relative; 
-    border: 2px solid transparent;
+    border: 0.15vmin solid transparent;
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
-.c-btn:hover { transform: translateY(-5px); }
-.c-btn.sel { transform: scale(1.1) translateY(-5px); border-color: #fff; box-shadow: 0 0 15px #fff; }
-.c-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; color: #fff; text-shadow: 0 0 5px #000; font-size: 14px; }
+.c-btn:hover { transform: translateY(-0.3vmin); }
+.c-btn.sel { transform: scale(1.1) translateY(-0.3vmin); border-color: #fff; box-shadow: 0 0 15px #fff; }
+.c-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; color: #fff; text-shadow: 0 0 5px #000; font-size: 1vmin; }
 
 .roll-btn { 
-    width: 140px; 
-    height: 60px; 
+    width: 10vmin; 
+    height: 4.5vmin; 
     background: linear-gradient(135deg, #cc0000, #800000); 
-    border: 3px solid #fff; 
-    border-radius: 12px;
+    border: 0.25vmin solid #fff; 
+    border-radius: 0.9vmin;
     color: #fff; 
     font-family: 'Orbitron'; 
     font-weight: 900; 
-    font-size: 20px; 
+    font-size: 1.5vmin; 
     cursor: pointer; 
     box-shadow: 0 6px 15px rgba(0,0,0,0.5);
 }
