@@ -270,6 +270,45 @@ async def get_recommendations(username: str):
         conn.close()
 
 
+
+class AddXPRequest(BaseModel):
+    xp: int = Field(1, ge=1)
+
+@router.post("/battlepass/{username}/xp")
+async def add_xp(username: str, request: AddXPRequest):
+    ensure_user(username)
+    bp = get_battlepass(username)
+    current_xp = int(bp.get("xp", 0) or 0)
+    current_level = int(bp.get("level", 1) or 1)
+    
+    new_xp = current_xp + request.xp
+    levels_gained = new_xp // XP_PER_LEVEL
+    final_xp = new_xp % XP_PER_LEVEL
+    new_level = min(current_level + levels_gained, 100)
+
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Error de base de datos")
+    try:
+        cursor = conn.cursor()
+        cursor.execute("USE arcade_premium_db")
+        cursor.execute(
+            "UPDATE battlepass SET level = %s, xp = %s WHERE username = %s",
+            (new_level, final_xp, username)
+        )
+        conn.commit()
+        cursor.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
+    return {
+        "success": True,
+        "battlepass": build_battlepass_summary(username),
+        "levels_gained": levels_gained
+    }
+
 # ============================================================
 # Endpoints del Pase de Batalla Premium
 # ============================================================
@@ -339,29 +378,22 @@ RUBIES_PACKAGES = {
 
 @router.post("/battlepass/{username}/buy-rubies")
 async def buy_rubies(username: str, request: BuyRubiesRequest):
+    """Añade rubíes sin coste de fichas (moneda premium)."""
     ensure_user(username)
     package = RUBIES_PACKAGES.get(request.package_key)
     if not package:
         raise HTTPException(status_code=400, detail="Paquete inválido")
-
-    current_balance = get_balance(username)
-    if current_balance < package["cost"]:
-        raise HTTPException(status_code=402, detail="Fichas insuficientes")
-
-    new_balance = current_balance - package["cost"]
-    set_balance(username, new_balance)
 
     current_rubies = get_rubies(username)
     new_rubies = current_rubies + package["rubies"]
     if not set_rubies(username, new_rubies):
         raise HTTPException(status_code=500, detail="Error actualizando rubíes")
 
-    add_transaction(username, "compra_tienda", "buy_rubies", -package["cost"], new_balance)
+    add_transaction(username, "compra_tienda", "buy_rubies", package["rubies"], new_rubies)
 
     return {
         "success": True,
-        "message": f"Compraste {package['rubies']} rubíes",
-        "new_balance": new_balance,
+        "message": f"Obtuviste {package['rubies']} rubíes",
         "new_rubies": new_rubies
     }
 

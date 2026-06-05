@@ -13,6 +13,7 @@ class BattlePassBrawl {
     this.currentLevel = 1;
     this.currentXP = 0;
     this.rubies = 0;
+    this.claimedRewards = new Set();
     this._inject();
   }
 
@@ -443,7 +444,12 @@ class BattlePassBrawl {
   }
 
   show() {
-    document.getElementById('bp-brawl-overlay').classList.add('open');
+    const overlay = document.getElementById('bp-brawl-overlay');
+    if (!overlay) {
+      requestAnimationFrame(() => this.show());
+      return;
+    }
+    overlay.classList.add('open');
     this.isVisible = true;
   }
 
@@ -459,6 +465,14 @@ class BattlePassBrawl {
       return;
     }
 
+    // Animación de "cargando" en el botón
+    const btn = document.getElementById('bpBuyLevelBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '⏳ Comprando...';
+      btn.style.opacity = '0.7';
+    }
+
     try {
       const res = await fetch(`${this.API_URL}/battlepass/${username}/buy-levels`, {
         method: 'POST',
@@ -468,21 +482,193 @@ class BattlePassBrawl {
 
       if (!res.ok) {
         const err = await res.json();
-        alert('❌ ' + (err.detail || 'Error al comprar niveles'));
+        this._showLevelErrorAnim(err.detail || 'Rubíes insuficientes');
+        if (btn) { btn.disabled = false; btn.textContent = '💎 COMPRAR 1 NIVEL — 200 RUBÍ'; btn.style.opacity = '1'; }
         return;
       }
 
       const data = await res.json();
+      const oldLevel = this.currentLevel;
       this.currentLevel = data.battlepass.level || this.currentLevel;
       this.currentXP = data.battlepass.xp || this.currentXP;
       this.rubies = data.new_rubies;
+
+      // Actualizar badge de nivel con animación
+      const badge = document.getElementById('bpLevelBadge');
+      if (badge) {
+        badge.style.transition = 'all 0.3s';
+        badge.style.transform = 'scale(1.3)';
+        badge.style.color = '#FFD700';
+        badge.innerText = `Nivel ${this.currentLevel} / 100`;
+        setTimeout(() => { badge.style.transform = 'scale(1)'; badge.style.color = ''; }, 400);
+      }
+
       this._updateRubiesBadge();
       this._renderTracks(this.currentLevel);
-      alert(`✅ Compraste ${levels} nivel(es)`);
+      if (btn) { btn.disabled = false; btn.textContent = '💎 COMPRAR 1 NIVEL — 200 RUBÍ'; btn.style.opacity = '1'; }
+
+      // 🎉 ANIMACIÓN LUDÓPATA DE NIVEL SUBIDO
+      this._showLevelUpBoom(oldLevel, this.currentLevel);
+
     } catch (e) {
       console.log(e);
       alert('❌ Error de conexión');
+      if (btn) { btn.disabled = false; btn.textContent = '💎 COMPRAR 1 NIVEL — 200 RUBÍ'; btn.style.opacity = '1'; }
     }
+  }
+
+  _showLevelUpBoom(oldLevel, newLevel) {
+    // Crear overlay de celebración
+    const boom = document.createElement('div');
+    boom.id = 'bp-levelup-boom';
+    boom.style.cssText = `
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      pointer-events: none; overflow: hidden;
+    `;
+
+    // Confeti
+    const colors = ['#FFD700','#FF4500','#00FF99','#00BFFF','#FF69B4','#a855f7'];
+    let confettiHTML = '';
+    for (let i = 0; i < 60; i++) {
+      const x = Math.random() * 100;
+      const delay = Math.random() * 0.6;
+      const dur = 0.8 + Math.random() * 0.8;
+      const size = 6 + Math.random() * 10;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const rot = Math.random() * 360;
+      confettiHTML += `<div style="
+        position:absolute; top:-20px; left:${x}%;
+        width:${size}px; height:${size * 0.5}px;
+        background:${color}; border-radius:2px;
+        animation: bpConfettiFall ${dur}s ${delay}s ease-in forwards;
+        transform: rotate(${rot}deg);
+      "></div>`;
+    }
+
+    // Textos de motivación que rotan
+    const messages = [
+      '🔥 ¡NIVEL SUBIDO!',
+      '⚡ ¡IMPARABLE!',
+      '🏆 ¡ERES UN CRACK!',
+      '💥 ¡OTRO NIVEL MÁS!',
+      '🎯 ¡A POR EL SIGUIENTE!',
+      '🚀 ¡AL INFINITO!',
+    ];
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+
+    boom.innerHTML = `
+      <style>
+        @keyframes bpConfettiFall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes bpBoomPop {
+          0% { transform: scale(0.3) rotate(-5deg); opacity: 0; }
+          60% { transform: scale(1.15) rotate(2deg); opacity: 1; }
+          80% { transform: scale(0.95) rotate(-1deg); }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes bpLevelNum {
+          0% { transform: translateY(40px); opacity: 0; }
+          50% { transform: translateY(-10px); opacity: 1; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes bpPulseGlow {
+          0%, 100% { text-shadow: 0 0 20px #FFD700, 0 0 40px #FFD700; }
+          50% { text-shadow: 0 0 60px #FFD700, 0 0 100px #FFA500, 0 0 20px #fff; }
+        }
+        @keyframes bpShake {
+          0%,100% { transform: translateX(0); }
+          20% { transform: translateX(-8px) rotate(-2deg); }
+          40% { transform: translateX(8px) rotate(2deg); }
+          60% { transform: translateX(-5px); }
+          80% { transform: translateX(5px); }
+        }
+        @keyframes bpCoinSpin {
+          0% { transform: rotateY(0deg) scale(0); opacity:0; }
+          30% { opacity: 1; }
+          100% { transform: rotateY(720deg) scale(1.2) translateY(-60px); opacity:0; }
+        }
+      </style>
+      ${confettiHTML}
+      <div style="
+        animation: bpBoomPop 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(20,0,40,0.97), rgba(10,10,30,0.97));
+        border: 3px solid #FFD700;
+        border-radius: 24px;
+        padding: 40px 60px;
+        box-shadow: 0 0 80px rgba(255,215,0,0.6), inset 0 0 40px rgba(255,215,0,0.05);
+        position: relative; overflow: hidden;
+      ">
+        <!-- Destello de fondo -->
+        <div style="
+          position:absolute; inset:0; border-radius:21px;
+          background: radial-gradient(ellipse at center, rgba(255,215,0,0.15) 0%, transparent 70%);
+          animation: bpPulseGlow 0.8s ease-in-out 3;
+        "></div>
+
+        <div style="
+          font-family:'Orbitron',sans-serif;
+          font-size: clamp(14px, 3vw, 20px);
+          color: #aaa; letter-spacing: 4px; margin-bottom: 8px;
+        ">NIVEL DESBLOQUEADO</div>
+
+        <div style="
+          font-family:'Orbitron',sans-serif;
+          font-size: clamp(60px, 12vw, 100px);
+          font-weight: 900; color: #FFD700;
+          line-height: 1;
+          animation: bpLevelNum 0.4s 0.2s both, bpPulseGlow 1s 0.6s infinite;
+          text-shadow: 0 0 30px #FFD700;
+        ">${newLevel}</div>
+
+        <div style="
+          font-family:'Orbitron',sans-serif;
+          font-size: clamp(16px, 3vw, 22px);
+          font-weight:900; color:#fff;
+          letter-spacing: 2px; margin-top: 10px;
+          animation: bpShake 0.5s 0.6s both;
+        ">${msg}</div>
+
+        ${newLevel % 5 === 0 ? `<div style="
+          margin-top:16px; padding: 8px 20px;
+          background: linear-gradient(135deg,#FFD700,#FFA500);
+          color:#000; font-family:'Orbitron'; font-weight:900;
+          border-radius:20px; font-size:13px; letter-spacing:1px;
+          animation: bpBoomPop 0.3s 0.8s both;
+        ">🎁 ¡NIVEL ESPECIAL! RECOMPENSA DESBLOQUEADA</div>` : ''}
+
+        <div style="
+          margin-top:20px;
+          font-size:28px;
+          animation: bpCoinSpin 1s 0.3s both;
+          display:inline-block;
+        ">💎</div>
+      </div>
+    `;
+
+    document.body.appendChild(boom);
+    setTimeout(() => boom.remove(), 3000);
+  }
+
+  _showLevelErrorAnim(msg) {
+    const err = document.createElement('div');
+    err.style.cssText = `
+      position:fixed; bottom:40px; left:50%; transform:translateX(-50%);
+      background:linear-gradient(135deg,#7f1d1d,#450a0a);
+      border:2px solid #EF4444; border-radius:16px;
+      padding:16px 32px; z-index:99999;
+      font-family:'Orbitron',sans-serif; color:#FCA5A5;
+      font-size:14px; font-weight:900; letter-spacing:1px;
+      box-shadow:0 0 30px rgba(239,68,68,0.4);
+      animation:bpSlideUp 0.3s ease;
+    `;
+    err.innerHTML = `<style>@keyframes bpSlideUp{from{transform:translateX(-50%) translateY(40px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}</style>❌ ${msg}`;
+    document.body.appendChild(err);
+    setTimeout(() => err.remove(), 2500);
   }
 
   async claimReward(level) {
@@ -607,37 +793,8 @@ class BattlePassBrawl {
         await this._loadProfile(username);
       }
     } catch (e) {
-      console.log('Error cargando Battle Pass', e);
+      console.error('Error cargando Battle Pass', e);
     }
-    if (!username) return;
-    try {
-      const res = await fetch(`${this.API_URL}/battlepass/${username}`);
-      if (res.ok) {
-        const data = await res.json();
-        this.currentLevel = data.level || 1;
-        this.currentXP = data.xp || 0;
-        this.hasPremium = data.has_premium || false;
-        this.claimedRewards = new Set((data.claimed_rewards || []).map(String));
-
-        // Actualizar UI
-        document.getElementById('bpLevelBadge').innerText = `Nivel ${this.currentLevel} / 100`;
-        document.getElementById('bpXPLabel').innerText = `${this.currentXP} / ${this.XP_PER_LEVEL} XP`;
-        document.getElementById('bpXPFill').style.width = `${(this.currentXP / this.XP_PER_LEVEL) * 100}%`;
-
-        const btn = document.getElementById('bpPremiumBtn');
-        if (this.hasPremium) {
-          btn.textContent = '👑 PREMIUM ACTIVADO';
-          btn.classList.add('active');
-        } else {
-          btn.textContent = '👑 ACTIVAR PREMIUM — 5000 🪙';
-          btn.classList.remove('active');
-        }
-
-        this._renderTracks(this.currentLevel);
-        this.show();
-        setTimeout(() => this._scrollToLevel(this.currentLevel), 150);
-      }
-    } catch(e) { console.error('Error cargando Pase:', e); }
   }
 
   _renderTracks(level) {
@@ -671,9 +828,9 @@ class BattlePassBrawl {
 
       // Nodo Gratis
       const claimKey = `free:${i}`;
-      const isClaimed = this.claimedRewards?.has(claimKey);
-      const freeState = isActive ? 'active' : isClaimed ? 'claimed' : isLocked ? 'locked' : '';
-      const isClaimable = i <= level && !isClaimed;
+      const isFreeClaimed = this.claimedRewards ? this.claimedRewards.has(claimKey) : false;
+      const freeState = isActive ? 'active' : isFreeClaimed ? 'claimed' : isLocked ? 'locked' : '';
+      const isClaimable = i <= level && !isFreeClaimed;
       const freeClasses = `${freeState}${isClaimable ? ' claimable' : ''}`;
       freeHTML += `
         <div class="bp-node free ${freeClasses}" title="${freeReward.label}" ${isClaimable ? `onclick="battlePassBrawl.claimReward(${i})"` : ''}>
@@ -749,5 +906,14 @@ class BattlePassBrawl {
   }
 }
 
-const battlePassBrawl = new BattlePassBrawl();
-window.battlePassBrawl = battlePassBrawl;
+// Instanciar cuando el DOM esté listo
+function _initBattlePassBrawl() {
+  const bp = new BattlePassBrawl();
+  window.battlePassBrawl = bp;
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initBattlePassBrawl);
+} else {
+  _initBattlePassBrawl();
+}

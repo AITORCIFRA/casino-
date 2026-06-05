@@ -97,7 +97,7 @@ class BattlePassSystem {
               <!-- Se generarán dinámicamente -->
             </div>
             <button onclick="battlePass.playNewScratch()" style="width:100%; padding:12px; background:linear-gradient(135deg, #FFD700, #FFA500); color:#000; border:none; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; font-size:14px; letter-spacing:1px; margin-bottom:10px;">NUEVO RASCA</button>
-            <button onclick="battlePass.buyLevels()" style="width:100%; padding:12px; background:linear-gradient(135deg, #10b981, #047857); color:#fff; border:none; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; font-size:14px; letter-spacing:1px;">COMPRAR 1 NIVEL — 200 RUBÍ</button>
+            <button onclick="window.battlePassBrawl ? window.battlePassBrawl.buyLevels(1) : battlePass.buyLevels(1)" style="width:100%; padding:12px; background:linear-gradient(135deg, #10b981, #047857); color:#fff; border:none; border-radius:10px; font-family:'Orbitron'; font-weight:900; cursor:pointer; font-size:14px; letter-spacing:1px;">COMPRAR 1 NIVEL — 200 RUBÍ</button>
           </div>
         </div>
         
