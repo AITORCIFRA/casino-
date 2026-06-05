@@ -1099,13 +1099,15 @@ window.launchGame = async function(file, roomId, mesa) {
   let url = `/${file}?u=${encodeURIComponent(currentUser)}`;
   if (roomId) url += `&room=${encodeURIComponent(roomId)}`;
   if (mesa) {
-    url += `&min_bet=${mesa.min_bet}&max_bet=${mesa.max_bet}&mesa=${encodeURIComponent(mesa.nombre)}`;
+    const mesaData = encodeURIComponent(JSON.stringify(mesa));
+    url += `&min_bet=${mesa.min_bet}&max_bet=${mesa.max_bet}&mesa=${encodeURIComponent(mesa.nombre)}&mesa_data=${mesaData}`;
     localStorage.setItem('arcade_mesa', JSON.stringify(mesa));
   } else {
     const recommendedMesa = await getRecommendedMesa(file);
     if (recommendedMesa) {
       mesa = recommendedMesa;
-      url += `&min_bet=${recommendedMesa.min_bet}&max_bet=${recommendedMesa.max_bet}&mesa=${encodeURIComponent(recommendedMesa.nombre)}`;
+      const mesaData = encodeURIComponent(JSON.stringify(recommendedMesa));
+      url += `&min_bet=${recommendedMesa.min_bet}&max_bet=${recommendedMesa.max_bet}&mesa=${encodeURIComponent(recommendedMesa.nombre)}&mesa_data=${mesaData}`;
       localStorage.setItem('arcade_mesa', JSON.stringify(recommendedMesa));
     } else {
       const cachedBalance = parseInt(localStorage.getItem('arcade_credits')) || 0;
