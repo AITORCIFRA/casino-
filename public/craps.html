@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRAPS ULTIMATE</title>
+<title>CRAPS POKERIST CLONE</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/js/wallet.js"></script>
 <script src="/js/curtain-effect.js"></script>
 <script src="/animations.js"></script>
 <style>
 :root { 
-    --felt: #1a5a7a; 
+    --felt: #1a6b8f; 
     --gold: #f4c430; 
-    --border: #4a8aaa;
+    --border: #4a9aaa;
     --green: #00ff99;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
@@ -33,7 +33,6 @@ body {
     padding: 8px 20px; 
     background: #0b1a27; 
     border-bottom: 2px solid var(--gold); 
-    z-index: 100; 
 }
 .title { font-family: 'Orbitron'; font-size: 16px; color: var(--gold); font-weight: 900; }
 .credits { font-family: 'Orbitron'; color: var(--green); font-size: 14px; }
@@ -61,118 +60,155 @@ body {
 
 .status-msg { 
     position: absolute; 
-    top: 20px; 
+    top: 15px; 
     left: 50%; 
     transform: translateX(-50%); 
     font-family: 'Orbitron'; 
-    font-size: 16px; 
+    font-size: 18px; 
     color: var(--gold); 
     font-weight: 900; 
     z-index: 100; 
     text-transform: uppercase;
-    text-align: center;
 }
 
 /* MESA PRINCIPAL */
 .table-wrapper {
-    width: 95%;
-    height: 85%;
-    max-width: 1600px;
+    width: 96%;
+    height: 82%;
+    max-width: 1700px;
     background: var(--felt);
-    border: 20px solid #2d1b0f;
-    border-radius: 80px;
+    border: 25px solid #2d1b0f;
+    border-radius: 100px;
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 15px;
-    padding: 20px;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    padding: 25px;
     position: relative;
-    box-shadow: inset 0 0 100px rgba(0,0,0,0.5), 0 30px 60px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 150px rgba(0,0,0,0.6), 0 40px 80px rgba(0,0,0,0.9);
 }
 
-/* LADO IZQUIERDO - NÚMEROS Y PASS */
+/* MAIN AREA - NÚMEROS Y PASS */
 .main-area {
     display: flex;
     flex-direction: column;
+    gap: 12px;
+}
+
+/* FILAS DE NÚMEROS CON PESTAÑAS */
+.num-row-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 50px;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.num-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
     gap: 8px;
 }
 
-/* NÚMEROS SUPERIORES */
-.numbers-section {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 6px;
-    height: 70px;
-}
-
-.num-box {
+.num-cell {
     background: rgba(255,255,255,0.08);
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: 0.2s;
-    position: relative;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 900;
     font-family: 'Orbitron';
-    color: #fff;
+    transition: 0.2s;
+    position: relative;
+    min-height: 70px;
 }
-.num-box:hover { background: rgba(255,255,255,0.12); }
-.num-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); box-shadow: 0 0 10px rgba(0,255,153,0.3); }
-.num-box.winning { background: rgba(255,255,255,0.3) !important; box-shadow: 0 0 20px #fff; }
+.num-cell:hover { background: rgba(255,255,255,0.12); }
+.num-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); box-shadow: 0 0 12px rgba(0,255,153,0.4); }
+.num-cell.winning { background: rgba(255,255,255,0.35) !important; box-shadow: 0 0 25px #fff; }
+
+.side-tab {
+    background: rgba(0,0,0,0.2);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--gold);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+}
 
 /* COME */
 .come-box {
     background: rgba(255,255,255,0.08);
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    height: 60px;
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 900;
     font-family: 'Orbitron';
     transition: 0.2s;
+    position: relative;
+    min-height: 80px;
+    grid-column: 1;
 }
 .come-box:hover { background: rgba(255,255,255,0.12); }
 .come-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
 
 /* FIELD */
+.field-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 50px;
+    gap: 8px;
+    align-items: stretch;
+}
+
 .field-box {
     background: rgba(255,255,255,0.08);
     border: 2px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    height: 70px;
     transition: 0.2s;
+    position: relative;
+    gap: 5px;
 }
 .field-box:hover { background: rgba(255,255,255,0.12); }
 .field-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
-.field-label { font-size: 12px; font-weight: 900; }
-.field-nums { font-size: 16px; font-weight: 900; letter-spacing: 4px; margin: 3px 0; }
-.field-info { font-size: 10px; color: var(--gold); }
+
+.field-label { font-size: 13px; font-weight: 900; }
+.field-nums { font-size: 18px; font-weight: 900; letter-spacing: 6px; font-family: 'Orbitron'; }
+.field-info { font-size: 11px; color: var(--gold); }
 
 /* PASS LINE */
-.pass-section {
+.pass-wrapper {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    gap: 6px;
-    height: 80px;
+    grid-template-columns: 1fr 50px;
+    gap: 8px;
+    align-items: stretch;
 }
 
-.pass-box {
+.pass-section {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr 1fr;
+    gap: 8px;
+}
+
+.pass-cell {
     background: rgba(255,255,255,0.08);
     border: 2px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,24 +216,25 @@ body {
     font-size: 14px;
     font-weight: 900;
     transition: 0.2s;
+    position: relative;
+    min-height: 80px;
 }
-.pass-box:hover { background: rgba(255,255,255,0.12); }
-.pass-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
+.pass-cell:hover { background: rgba(255,255,255,0.12); }
+.pass-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
 
 .pass-line {
-    background: rgba(244,196,48,0.1) !important;
+    background: rgba(244,196,48,0.15) !important;
     border: 3px solid var(--gold) !important;
-    font-size: 28px;
+    font-size: 32px;
     color: var(--gold);
     font-family: 'Orbitron';
 }
 
-/* CHIPS */
+/* CHIPS POSITIONING */
 .chip-stack { 
     position: absolute; 
-    bottom: 50%; 
-    left: 50%;
-    transform: translate(-50%, 50%);
+    bottom: 8px; 
+    right: 8px;
     display: flex; 
     flex-direction: column-reverse; 
     align-items: center; 
@@ -208,8 +245,8 @@ body {
     width: 32px; 
     height: 32px; 
     background-size: cover;
-    margin-top: -28px; 
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+    margin-top: -26px; 
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
 }
 .bet-tag { 
     background: #000; 
@@ -218,62 +255,71 @@ body {
     padding: 2px 6px; 
     border-radius: 4px; 
     font-weight: 900; 
-    margin-bottom: 5px; 
+    margin-bottom: 6px; 
     border: 1px solid var(--green);
+    white-space: nowrap;
 }
 
-/* LADO DERECHO - PROP BETS */
+/* PROP AREA - DERECHA */
 .prop-area {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .prop-box {
     background: rgba(255,255,255,0.08);
     border: 2px solid var(--border);
-    border-radius: 8px;
-    padding: 8px;
+    border-radius: 12px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .prop-title {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 900;
     color: var(--gold);
     text-align: center;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 4px;
+    padding-bottom: 6px;
+    text-transform: uppercase;
 }
 
 .prop-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px;
+    gap: 6px;
 }
 
 .prop-cell {
     background: rgba(255,255,255,0.08);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 6px;
+    padding: 8px;
     font-size: 12px;
     font-weight: 900;
     transition: 0.2s;
-    min-height: 50px;
+    position: relative;
+    min-height: 60px;
+    gap: 3px;
 }
 .prop-cell:hover { background: rgba(255,255,255,0.12); }
 .prop-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
 .prop-cell.winning { background: rgba(255,255,255,0.3) !important; }
 
-.dice-icon { font-size: 18px; margin-bottom: 2px; }
+.dice-icon { font-size: 20px; }
+
+.horn-cell {
+    grid-column: span 2;
+    min-height: 50px;
+}
 
 /* DICE PIT */
 .dice-pit { 
@@ -281,8 +327,8 @@ body {
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%); 
-    width: 300px; 
-    height: 150px; 
+    width: 350px; 
+    height: 180px; 
     pointer-events: none; 
     z-index: 200; 
 }
@@ -298,30 +344,30 @@ body {
 .dice-container.active { display: flex; }
 
 .die-3d { 
-    width: 50px; 
-    height: 50px; 
+    width: 55px; 
+    height: 55px; 
     position: absolute; 
     transform-style: preserve-3d; 
 }
 .face { 
     position: absolute; 
-    width: 50px; 
-    height: 50px; 
+    width: 55px; 
+    height: 55px; 
     background: #cc0000; 
     border: 1px solid #900; 
-    border-radius: 8px; 
+    border-radius: 10px; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-size: 32px; 
+    font-size: 36px; 
     color: #fff; 
 }
-.f1 { transform: rotateY(0deg) translateZ(25px); }
-.f2 { transform: rotateY(90deg) translateZ(25px); }
-.f3 { transform: rotateX(90deg) translateZ(25px); }
-.f4 { transform: rotateX(-90deg) translateZ(25px); }
-.f5 { transform: rotateY(-90deg) translateZ(25px); }
-.f6 { transform: rotateY(180deg) translateZ(25px); }
+.f1 { transform: rotateY(0deg) translateZ(27.5px); }
+.f2 { transform: rotateY(90deg) translateZ(27.5px); }
+.f3 { transform: rotateX(90deg) translateZ(27.5px); }
+.f4 { transform: rotateX(-90deg) translateZ(27.5px); }
+.f5 { transform: rotateY(-90deg) translateZ(27.5px); }
+.f6 { transform: rotateY(180deg) translateZ(27.5px); }
 
 /* CONTROLES */
 .controls { 
@@ -369,7 +415,7 @@ body {
 <body>
 
 <div class="header">
-    <div class="title">🎲 CRAPS ULTIMATE</div>
+    <div class="title">🎲 CRAPS POKERIST</div>
     <div class="credits">SALDO: <span id="balance">0</span></div>
 </div>
 
@@ -380,31 +426,69 @@ body {
     <div class="table-wrapper">
         <!-- LADO IZQUIERDO -->
         <div class="main-area">
-            <!-- NÚMEROS -->
-            <div class="numbers-section">
-                <div class="num-box" data-bet="num4" onclick="placeBet('num4', this)">4</div>
-                <div class="num-box" data-bet="num5" onclick="placeBet('num5', this)">5</div>
-                <div class="num-box" data-bet="num6" onclick="placeBet('num6', this)">6</div>
-                <div class="num-box" data-bet="num8" onclick="placeBet('num8', this)">8</div>
-                <div class="num-box" data-bet="num9" onclick="placeBet('num9', this)">9</div>
-                <div class="num-box" data-bet="num10" onclick="placeBet('num10', this)">10</div>
+            <!-- LAY ROW -->
+            <div class="num-row-wrapper">
+                <div class="num-row">
+                    <div class="num-cell" data-bet="lay4" onclick="placeBet('lay4', this)">1 to 2</div>
+                    <div class="num-cell" data-bet="lay5" onclick="placeBet('lay5', this)">2 to 3</div>
+                    <div class="num-cell" data-bet="lay6" onclick="placeBet('lay6', this)">5 to 6</div>
+                    <div class="num-cell" data-bet="lay8" onclick="placeBet('lay8', this)">5 to 6</div>
+                    <div class="num-cell" data-bet="lay9" onclick="placeBet('lay9', this)">2 to 3</div>
+                    <div class="num-cell" data-bet="lay10" onclick="placeBet('lay10', this)">1 to 2</div>
+                </div>
+                <div class="side-tab">LAY</div>
+            </div>
+
+            <!-- PLACE ROW -->
+            <div class="num-row-wrapper">
+                <div class="num-row">
+                    <div class="num-cell" data-bet="num4" onclick="placeBet('num4', this)">4</div>
+                    <div class="num-cell" data-bet="num5" onclick="placeBet('num5', this)">5</div>
+                    <div class="num-cell" data-bet="num6" onclick="placeBet('num6', this)">6</div>
+                    <div class="num-cell" data-bet="num8" onclick="placeBet('num8', this)">8</div>
+                    <div class="num-cell" data-bet="num9" onclick="placeBet('num9', this)">9</div>
+                    <div class="num-cell" data-bet="num10" onclick="placeBet('num10', this)">10</div>
+                </div>
+                <div class="side-tab">PLACE</div>
+            </div>
+
+            <!-- BUY ROW -->
+            <div class="num-row-wrapper">
+                <div class="num-row">
+                    <div class="num-cell" data-bet="buy4" onclick="placeBet('buy4', this)">2 to 1</div>
+                    <div class="num-cell" data-bet="buy5" onclick="placeBet('buy5', this)">3 to 2</div>
+                    <div class="num-cell" data-bet="buy6" onclick="placeBet('buy6', this)">6 to 5</div>
+                    <div class="num-cell" data-bet="buy8" onclick="placeBet('buy8', this)">6 to 5</div>
+                    <div class="num-cell" data-bet="buy9" onclick="placeBet('buy9', this)">3 to 2</div>
+                    <div class="num-cell" data-bet="buy10" onclick="placeBet('buy10', this)">2 to 1</div>
+                </div>
+                <div class="side-tab">BUY</div>
             </div>
 
             <!-- COME -->
-            <div class="come-box" data-bet="come" onclick="placeBet('come', this)">COME</div>
+            <div class="num-row-wrapper">
+                <div class="come-box" data-bet="come" onclick="placeBet('come', this)">COME</div>
+                <div class="side-tab">COME</div>
+            </div>
 
             <!-- FIELD -->
-            <div class="field-box" data-bet="field" onclick="placeBet('field', this)">
-                <div class="field-label">FIELD</div>
-                <div class="field-nums">2 3 4 9 10 11 12</div>
-                <div class="field-info">2×3 | 12×3</div>
+            <div class="field-wrapper">
+                <div class="field-box" data-bet="field" onclick="placeBet('field', this)">
+                    <div class="field-label">FIELD</div>
+                    <div class="field-nums">2 3 4 9 10 11 12</div>
+                    <div class="field-info">2×3 | 12×3</div>
+                </div>
+                <div class="side-tab">FIELD</div>
             </div>
 
             <!-- PASS LINE -->
-            <div class="pass-section">
-                <div class="pass-box dont-pass" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS</div>
-                <div class="pass-box pass-line" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
-                <div class="pass-box" data-bet="odds" onclick="placeBet('odds', this)">ODDS</div>
+            <div class="pass-wrapper">
+                <div class="pass-section">
+                    <div class="pass-cell" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS</div>
+                    <div class="pass-cell pass-line" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
+                    <div class="pass-cell" data-bet="odds" onclick="placeBet('odds', this)">ODDS</div>
+                </div>
+                <div class="side-tab">PASS</div>
             </div>
         </div>
 
@@ -434,9 +518,9 @@ body {
                 </div>
             </div>
 
-            <!-- HORN -->
+            <!-- HORN BET -->
             <div class="prop-box">
-                <div class="prop-cell" style="grid-column: span 2; min-height: 40px;" data-bet="horn" onclick="placeBet('horn', this)">HORN BET</div>
+                <div class="prop-cell horn-cell" data-bet="horn" onclick="placeBet('horn', this)">HORN BET</div>
             </div>
         </div>
 
@@ -465,7 +549,7 @@ let balance = 0;
 let currentC = 100;
 let bets = {};
 let isRolling = false;
-let bettingTime = 10;
+let bettingTime = 12;
 let timerInterval;
 
 const chipImages = { 100: '/assets/chips/chip_red.png', 200: '/assets/chips/chip_blue.png', 300: '/assets/chips/chip_green.png', 500: '/assets/chips/chip_black.png' };
@@ -584,17 +668,18 @@ async function doRoll() {
         const d1 = document.getElementById('die1'), d2 = document.getElementById('die2');
         const faceRots = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
 
+        // ANIMACIÓN LENTA
         d1.style.transition = 'none'; d2.style.transition = 'none';
-        d1.style.transform = 'translate(-150px, -300px) rotate(0deg)';
-        d2.style.transform = 'translate(150px, -300px) rotate(0deg)';
+        d1.style.transform = 'translate(-150px, -400px) rotate(0deg)';
+        d2.style.transform = 'translate(150px, -400px) rotate(0deg)';
         
         setTimeout(() => {
-            d1.style.transition = 'transform 0.6s ease-out';
-            d2.style.transition = 'transform 0.6s ease-out';
+            d1.style.transition = 'transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            d2.style.transition = 'transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             const r1 = faceRots[lastDice[0]], r2 = faceRots[lastDice[1]];
-            d1.style.transform = `translate(-30px, 0) rotateX(${720 + r1[0]}deg) rotateY(${720 + r1[1]}deg)`;
-            d2.style.transform = `translate(30px, 0) rotateX(${720 + r2[0]}deg) rotateY(${720 + r2[1]}deg)`;
-        }, 50);
+            d1.style.transform = `translate(-40px, 0) rotateX(${1080 + r1[0]}deg) rotateY(${1080 + r1[1]}deg)`;
+            d2.style.transform = `translate(40px, 0) rotateX(${1080 + r2[0]}deg) rotateY(${1080 + r2[1]}deg)`;
+        }, 100);
 
         setTimeout(() => {
             document.getElementById('statusMsg').textContent = "PAGANDO...";
@@ -609,8 +694,8 @@ async function doRoll() {
 
             setTimeout(() => {
                 startNewRound();
-            }, 1200);
-        }, 750);
+            }, 2000);
+        }, 2200);
 
     } catch (e) {
         console.error(e);
