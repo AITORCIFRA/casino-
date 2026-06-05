@@ -98,6 +98,27 @@ async def roll_dice(req: CrapsPlayRequest):
         else:
             win = 0
 
+    elif req.bet_type == "craps3": # 3 específico
+        if total == 3:
+            win = req.bet_amount * 16 # 15 a 1
+            message += " - ¡ACE DEUCE!"
+        else:
+            win = 0
+
+    elif req.bet_type == "dont_pass":
+        if total in [2, 3]:
+            win = req.bet_amount * 2
+            message += " - ¡DON'T PASS WIN!"
+        elif total == 12:
+            win = req.bet_amount # PUSH
+            message += " - DON'T PASS PUSH"
+        elif total in [7, 11]:
+            win = 0
+            message += " - DON'T PASS LOSE"
+        else:
+            win = req.bet_amount # Punto establecido
+            message += " - PUNTO ESTABLECIDO"
+
     elif req.bet_type.startswith("hard"):
         val = int(req.bet_type.replace("hard", ""))
         # Hardways: 4, 6, 8, 10 (Pares)

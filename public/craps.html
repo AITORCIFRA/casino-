@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRAPS PRO — POKERIST STYLE</title>
+<title>CRAPS ULTIMATE — POKERIST PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/js/wallet.js"></script>
 <script src="/js/curtain-effect.js"></script>
@@ -12,9 +12,9 @@
 :root { 
     --felt-blue: #143d59; 
     --gold: #c9a84c; 
-    --border: rgba(255,255,255,0.2); 
-    --text-dim: rgba(255,255,255,0.6); 
+    --border: rgba(255,255,255,0.25); 
     --neon-green: #00ff99;
+    --win-bg: rgba(255, 255, 255, 0.15);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 body { 
@@ -49,13 +49,13 @@ body {
     align-items: center; 
     background: radial-gradient(circle, #1a4d6e 0%, #050a0f 100%); 
     overflow: hidden;
-    perspective: 1200px;
+    perspective: 1500px;
 }
 
 /* TIMER BAR */
 .timer-container {
     width: 100%;
-    height: 4px;
+    height: 6px;
     background: rgba(255,255,255,0.1);
     position: absolute;
     top: 0;
@@ -69,78 +69,78 @@ body {
     transition: width 1s linear;
 }
 
-/* MESA PROFESIONAL */
+/* MESA PROFESIONAL MEJORADA */
 .craps-table { 
-    width: 95%; 
-    max-width: 1400px; 
-    height: 550px; 
+    width: 98%; 
+    max-width: 1500px; 
+    height: 600px; 
     background: var(--felt-blue); 
-    border: 20px solid #3d2b1f; 
-    border-radius: 100px; 
+    border: 25px solid #2d1b0f; 
+    border-radius: 120px; 
     position: relative; 
-    box-shadow: inset 0 0 150px rgba(0,0,0,0.8), 0 50px 100px rgba(0,0,0,0.9);
-    margin-top: 20px;
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.9), 0 60px 120px rgba(0,0,0,1);
+    margin-top: 15px;
     display: flex;
-    padding: 30px;
-    gap: 20px;
-    transform: rotateX(15deg);
+    padding: 40px;
+    gap: 15px;
+    transform: rotateX(20deg);
     transform-style: preserve-3d;
 }
 
-/* SECCIONES */
-.left-layout { flex: 2.5; display: grid; grid-template-rows: 1fr 1.5fr 1.2fr 0.8fr; gap: 5px; }
-.right-layout { flex: 1.2; display: grid; grid-template-rows: 1.5fr 1.5fr 1fr; gap: 5px; border-left: 2px solid var(--border); padding-left: 15px; }
+/* SECCIONES DEL TABLERO PROFESIONAL */
+.wing-layout { flex: 2; display: flex; flex-direction: column; gap: 4px; }
+.center-layout { flex: 1.2; display: flex; flex-direction: column; gap: 4px; border-left: 2px solid var(--border); padding-left: 10px; }
 
 /* CASILLAS */
 .bet-area { 
-    border: 1px solid var(--border); 
-    border-radius: 4px; 
+    border: 1.5px solid var(--border); 
+    border-radius: 6px; 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
     text-align: center; 
     cursor: pointer; 
-    transition: 0.1s; 
+    transition: 0.2s; 
     position: relative; 
+    background: rgba(255,255,255,0.02);
 }
-.bet-area:hover { background: rgba(255,255,255,0.05); }
-.bet-area.active { background: rgba(0,255,153,0.1); border-color: var(--neon-green); }
+.bet-area:hover { background: rgba(255,255,255,0.08); }
+.bet-area.active { background: rgba(0,255,153,0.15); border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0,255,153,0.3); }
+.bet-area.winning { background: rgba(255, 255, 255, 0.25) !important; border-color: #fff !important; box-shadow: 0 0 30px #fff; z-index: 10; }
 
 .bet-label { font-family: 'Orbitron'; font-size: 11px; font-weight: 900; color: #fff; text-transform: uppercase; }
 .bet-sub { font-size: 9px; color: var(--gold); font-weight: bold; }
 
-/* GRID NÚMEROS */
-.numbers-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
-.num-box { height: 80px; }
-.num-val { font-size: 32px; font-weight: 900; font-family: 'Orbitron'; }
+/* WING COMPONENTS */
+.point-numbers { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; height: 90px; }
+.come-section { height: 140px; font-size: 40px; font-weight: 900; font-family: 'Orbitron'; letter-spacing: 20px; }
+.field-section { height: 110px; }
+.field-nums { font-size: 26px; font-weight: 900; font-family: 'Orbitron'; letter-spacing: 10px; margin: 5px 0; }
+.bottom-lines { display: flex; gap: 4px; height: 70px; }
+.pass-line { flex: 3; border: 4px solid var(--gold); border-radius: 0 0 60px 60px; font-size: 24px; font-weight: 900; color: var(--gold); font-family: 'Orbitron'; }
+.dont-pass { flex: 1; font-size: 12px; font-weight: 900; border-color: #aaa; color: #ccc; }
 
-/* COME & FIELD */
-.come-area { background: rgba(255,255,255,0.03); font-size: 36px; font-weight: 900; letter-spacing: 15px; font-family: 'Orbitron'; }
-.field-area { display: flex; flex-direction: column; gap: 2px; }
-.field-nums { font-size: 24px; font-weight: 900; letter-spacing: 8px; font-family: 'Orbitron'; }
+/* CENTER PROP BETS */
+.prop-group { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.hardway-box { height: 65px; }
+.one-roll-box { height: 55px; }
+.any7-box { height: 60px; grid-column: span 2; background: rgba(204,0,0,0.1); }
+.any-craps-box { height: 60px; grid-column: span 2; background: rgba(0,0,0,0.2); }
 
-/* PASS LINE */
-.pass-line { border: 4px solid var(--gold); border-radius: 0 0 50px 50px; height: 60px; font-size: 22px; font-weight: 900; color: var(--gold); font-family: 'Orbitron'; }
-
-/* PROP BETS (RIGHT SIDE) */
-.prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-.hardway-box { height: 60px; }
-.one-roll-box { height: 50px; }
-
-/* DICE AREA (PIT) */
+/* DICE PIT */
 .dice-pit { 
     position: absolute; 
     top: 50%; 
     left: 50%; 
-    transform: translate(-50%, -50%) translateZ(50px); 
-    width: 500px; 
-    height: 300px; 
+    transform: translate(-50%, -50%) translateZ(100px); 
+    width: 600px; 
+    height: 350px; 
     pointer-events: none; 
-    z-index: 50; 
+    z-index: 200; 
 }
 
-/* DADOS 3D MEJORADOS */
+/* DADOS 3D */
 .dice-container { 
     position: absolute; 
     width: 100%; 
@@ -153,80 +153,33 @@ body {
 .dice-container.active { display: flex; }
 
 .die-3d { 
-    width: 60px; 
-    height: 60px; 
+    width: 70px; 
+    height: 70px; 
     position: absolute; 
     transform-style: preserve-3d; 
-    transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.3, 1.1); 
 }
 .face { 
     position: absolute; 
-    width: 60px; 
-    height: 60px; 
+    width: 70px; 
+    height: 70px; 
     background: #cc0000; 
-    border: 1px solid #900; 
-    border-radius: 12px; 
+    border: 2px solid #900; 
+    border-radius: 14px; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-size: 40px; 
+    font-size: 45px; 
     color: #fff; 
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5); 
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5); 
 }
-.f1 { transform: rotateY(0deg) translateZ(30px); }
-.f2 { transform: rotateY(90deg) translateZ(30px); }
-.f3 { transform: rotateX(90deg) translateZ(30px); }
-.f4 { transform: rotateX(-90deg) translateZ(30px); }
-.f5 { transform: rotateY(-90deg) translateZ(30px); }
-.f6 { transform: rotateY(180deg) translateZ(30px); }
+.f1 { transform: rotateY(0deg) translateZ(35px); }
+.f2 { transform: rotateY(90deg) translateZ(35px); }
+.f3 { transform: rotateX(90deg) translateZ(35px); }
+.f4 { transform: rotateX(-90deg) translateZ(35px); }
+.f5 { transform: rotateY(-90deg) translateZ(35px); }
+.f6 { transform: rotateY(180deg) translateZ(35px); }
 
-/* CONTROLES */
-.controls-bar { 
-    background: #0b1a27; 
-    padding: 15px 40px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    border-top: 2px solid var(--gold); 
-}
-.chips-tray { display: flex; gap: 15px; }
-.c-btn { 
-    width: 65px; 
-    height: 65px; 
-    border-radius: 50%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    background-size: cover;
-    background-position: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    position: relative;
-}
-.c-btn:hover { transform: translateY(-8px); }
-.c-btn.sel { transform: scale(1.2) translateY(-8px); box-shadow: 0 0 25px rgba(255,255,255,0.4); border: 3px solid #fff; }
-.c-val { position: absolute; font-weight: 900; font-size: 16px; color: #fff; text-shadow: 0 0 5px #000; pointer-events: none; }
-
-.action-btns { display: flex; gap: 20px; align-items: center; }
-.roll-btn { 
-    width: 160px; 
-    height: 65px; 
-    background: linear-gradient(135deg, #cc0000, #800000); 
-    border: 3px solid #fff; 
-    border-radius: 15px;
-    color: #fff; 
-    font-family: 'Orbitron'; 
-    font-weight: 900; 
-    font-size: 24px; 
-    cursor: pointer; 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    transition: 0.2s;
-}
-.roll-btn:active { transform: scale(0.95); }
-.roll-btn:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
-
-/* CHIP STACK ON TABLE - ADAPTIVE */
+/* CHIPS */
 .chip-stack { 
     position: absolute; 
     bottom: 50%; 
@@ -239,56 +192,110 @@ body {
     z-index: 20;
 }
 .chip-img { 
-    width: 28px; 
-    height: 28px; 
+    width: 32px; 
+    height: 32px; 
     background-size: cover;
-    margin-top: -24px; 
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+    margin-top: -28px; 
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,0.6));
 }
 .bet-tag { 
-    background: rgba(0,0,0,0.85); 
+    background: #000; 
     color: var(--neon-green); 
-    font-size: 11px; 
-    padding: 2px 6px; 
-    border-radius: 4px; 
-    font-weight: bold; 
-    margin-bottom: 5px; 
-    border: 1px solid var(--neon-green);
+    font-size: 12px; 
+    padding: 2px 8px; 
+    border-radius: 5px; 
+    font-weight: 900; 
+    margin-bottom: 8px; 
+    border: 1.5px solid var(--neon-green);
     white-space: nowrap;
 }
 
-/* POPUPS */
+/* PAYOUT ANIMATION */
+.payout-float {
+    position: absolute;
+    color: #fff;
+    font-family: 'Orbitron';
+    font-weight: 900;
+    font-size: 24px;
+    text-shadow: 0 0 10px #000;
+    pointer-events: none;
+    z-index: 300;
+    animation: floatUp 1.5s forwards;
+}
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+
+/* CONTROLES */
+.controls-bar { 
+    background: #0b1a27; 
+    padding: 15px 40px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-top: 2px solid var(--gold); 
+}
+.chips-tray { display: flex; gap: 20px; }
+.c-btn { 
+    width: 75px; 
+    height: 75px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+    position: relative;
+}
+.c-btn:hover { transform: translateY(-10px); }
+.c-btn.sel { transform: scale(1.2) translateY(-10px); box-shadow: 0 0 30px rgba(255,255,255,0.5); border: 4px solid #fff; }
+.c-val { position: absolute; font-weight: 900; font-size: 18px; color: #fff; text-shadow: 0 0 8px #000; pointer-events: none; }
+
+.roll-btn { 
+    width: 180px; 
+    height: 70px; 
+    background: linear-gradient(135deg, #cc0000, #800000); 
+    border: 4px solid #fff; 
+    border-radius: 20px;
+    color: #fff; 
+    font-family: 'Orbitron'; 
+    font-weight: 900; 
+    font-size: 28px; 
+    cursor: pointer; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    transition: 0.2s;
+}
+
+.status-msg {
+    position: absolute;
+    top: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Orbitron';
+    font-size: 24px;
+    color: var(--gold);
+    font-weight: 900;
+    text-transform: uppercase;
+    z-index: 100;
+    letter-spacing: 5px;
+}
+
 .result-popup { 
     position: absolute; 
     top: 25%; 
     left: 50%; 
     transform: translateX(-50%); 
     font-family: 'Bebas Neue'; 
-    font-size: 90px; 
+    font-size: 100px; 
     color: var(--neon-green); 
-    text-shadow: 0 0 30px #000; 
-    z-index: 200; 
+    text-shadow: 0 0 40px #000; 
+    z-index: 500; 
     opacity: 0; 
     pointer-events: none; 
-}
-@keyframes showResult { 
-    0% { opacity: 0; transform: translateX(-50%) scale(0.5); } 
-    20% { opacity: 1; transform: translateX(-50%) scale(1.2); } 
-    80% { opacity: 1; transform: translateX(-50%) scale(1); } 
-    100% { opacity: 0; transform: translateX(-50%) translateY(-150px); } 
-}
-
-.status-msg {
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Orbitron';
-    font-size: 20px;
-    color: var(--gold);
-    font-weight: 900;
-    text-transform: uppercase;
-    z-index: 100;
 }
 
 </style>
@@ -296,72 +303,64 @@ body {
 <body>
 
 <div class="header">
-    <div class="title">🎲 CRAPS ULTIMATE — POKERIST EDITION</div>
+    <div class="title">🎲 CRAPS ULTIMATE — POKERIST PRO</div>
     <div class="credits">SALDO: <span id="balance">0</span></div>
 </div>
 
 <div class="game-container">
     <div class="timer-container"><div class="timer-bar" id="timerBar"></div></div>
-    <div class="status-msg" id="statusMsg">HAGAN SUS APUESTAS</div>
+    <div class="status-msg" id="statusMsg">PREPARADO</div>
 
     <div class="craps-table">
-        <!-- LADO IZQUIERDO (MAIN LAYOUT) -->
-        <div class="left-layout">
-            <div class="numbers-grid">
-                <div class="bet-area num-box" data-bet="num4" onclick="placeBet('num4', this)"><div class="num-val">4</div><div class="bet-sub">2 A 1</div></div>
-                <div class="bet-area num-box" data-bet="num5" onclick="placeBet('num5', this)"><div class="num-val">5</div><div class="bet-sub">2 A 1</div></div>
-                <div class="bet-area num-box" data-bet="num6" onclick="placeBet('num6', this)"><div class="num-val">SIX</div><div class="bet-sub">2 A 1</div></div>
-                <div class="bet-area num-box" data-bet="num8" onclick="placeBet('num8', this)"><div class="num-val">8</div><div class="bet-sub">2 A 1</div></div>
-                <div class="bet-area num-box" data-bet="num9" onclick="placeBet('num9', this)"><div class="num-val">NINE</div><div class="bet-sub">2 A 1</div></div>
-                <div class="bet-area num-box" data-bet="num10" onclick="placeBet('num10', this)"><div class="num-val">10</div><div class="bet-sub">2 A 1</div></div>
+        <!-- WING LAYOUT (PRINCIPAL) -->
+        <div class="wing-layout">
+            <div class="point-numbers">
+                <div class="bet-area" data-bet="num4" onclick="placeBet('num4', this)"><div class="bet-label">4</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area" data-bet="num5" onclick="placeBet('num5', this)"><div class="bet-label">5</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area" data-bet="num6" onclick="placeBet('num6', this)"><div class="bet-label">SIX</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area" data-bet="num8" onclick="placeBet('num8', this)"><div class="bet-label">8</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area" data-bet="num9" onclick="placeBet('num9', this)"><div class="bet-label">NINE</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area" data-bet="num10" onclick="placeBet('num10', this)"><div class="bet-label">10</div><div class="bet-sub">2 A 1</div></div>
             </div>
-            <div class="bet-area come-area" data-bet="come" onclick="placeBet('come', this)">COME</div>
-            <div class="bet-area field-area" data-bet="field" onclick="placeBet('field', this)">
+            <div class="bet-area come-section" data-bet="come" onclick="placeBet('come', this)">COME</div>
+            <div class="bet-area field-section" data-bet="field" onclick="placeBet('field', this)">
                 <div class="bet-label">FIELD</div>
                 <div class="field-nums">2 3 4 9 10 11 12</div>
-                <div class="bet-sub">2 PAGA DOBLE | 12 PAGA TRIPLE</div>
+                <div class="bet-sub">2 (x2) | 12 (x3)</div>
             </div>
-            <div class="bet-area pass-line" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
+            <div class="bottom-lines">
+                <div class="bet-area dont-pass" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS BAR</div>
+                <div class="bet-area pass-line" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
+            </div>
         </div>
 
-        <!-- LADO DERECHO (PROP BETS) -->
-        <div class="right-layout">
-            <div class="prop-grid">
+        <!-- CENTER LAYOUT (PROPOSITION BETS) -->
+        <div class="center-layout">
+            <div class="prop-group">
                 <div class="bet-area hardway-box" data-bet="hard4" onclick="placeBet('hard4', this)"><div class="bet-label">HARD 4</div><div class="bet-sub">8 A 1</div></div>
                 <div class="bet-area hardway-box" data-bet="hard6" onclick="placeBet('hard6', this)"><div class="bet-label">HARD 6</div><div class="bet-sub">10 A 1</div></div>
                 <div class="bet-area hardway-box" data-bet="hard8" onclick="placeBet('hard8', this)"><div class="bet-label">HARD 8</div><div class="bet-sub">10 A 1</div></div>
                 <div class="bet-area hardway-box" data-bet="hard10" onclick="placeBet('hard10', this)"><div class="bet-label">HARD 10</div><div class="bet-sub">8 A 1</div></div>
             </div>
-            <div class="prop-grid">
-                <div class="bet-area one-roll-box" data-bet="any7" onclick="placeBet('any7', this)"><div class="bet-label">ANY 7</div><div class="bet-sub">5 A 1</div></div>
-                <div class="bet-area one-roll-box" data-bet="craps" onclick="placeBet('craps', this)"><div class="bet-label">ANY CRAPS</div><div class="bet-sub">8 A 1</div></div>
-                <div class="bet-area one-roll-box" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="bet-label">YO 11</div><div class="bet-sub">16 A 1</div></div>
-                <div class="bet-area one-roll-box" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="bet-label">12</div><div class="bet-sub">31 A 1</div></div>
+            <div class="bet-area any7-box" data-bet="any7" onclick="placeBet('any7', this)"><div class="bet-label">ANY SEVEN</div><div class="bet-sub">5 A 1</div></div>
+            <div class="prop-group">
                 <div class="bet-area one-roll-box" data-bet="snakeeyes" onclick="placeBet('snakeeyes', this)"><div class="bet-label">2</div><div class="bet-sub">31 A 1</div></div>
-                <div class="bet-area one-roll-box" data-bet="horn" onclick="placeBet('horn', this)"><div class="bet-label">HORN</div><div class="bet-sub">VARIES</div></div>
+                <div class="bet-area one-roll-box" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="bet-label">12</div><div class="bet-sub">31 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="bet-label">YO 11</div><div class="bet-sub">16 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="craps3" onclick="placeBet('craps3', this)"><div class="bet-label">3</div><div class="bet-sub">16 A 1</div></div>
             </div>
-            <div class="bet-area" data-bet="big68" onclick="placeBet('big68', this)">
-                <div class="bet-label">BIG 6 & 8</div>
-                <div class="bet-sub">1 A 1</div>
-            </div>
+            <div class="bet-area any-craps-box" data-bet="craps" onclick="placeBet('craps', this)"><div class="bet-label">ANY CRAPS</div><div class="bet-sub">8 A 1</div></div>
         </div>
 
-        <!-- PIT CENTRAL PARA DADOS -->
         <div class="dice-pit">
             <div class="dice-container" id="diceBox">
-                <div class="die-3d" id="die1">
-                    <div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div>
-                    <div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div>
-                </div>
-                <div class="die-3d" id="die2">
-                    <div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div>
-                    <div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div>
-                </div>
+                <div class="die-3d" id="die1"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
+                <div class="die-3d" id="die2"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
             </div>
         </div>
     </div>
 
-    <div class="result-popup" id="resPopup">SEVEN OUT!</div>
+    <div class="result-popup" id="resPopup">WIN!</div>
 </div>
 
 <div class="controls-bar">
@@ -371,10 +370,7 @@ body {
         <div class="c-btn" style="background-image:url('/assets/chips/chip_green.png')" onclick="setC(100, this)"><div class="c-val">100</div></div>
         <div class="c-btn" style="background-image:url('/assets/chips/chip_black.png')" onclick="setC(500, this)"><div class="c-val">500</div></div>
     </div>
-
-    <div class="action-btns">
-        <button class="roll-btn" id="rollBtn" onclick="doRoll()">LANZAR</button>
-    </div>
+    <button class="roll-btn" id="rollBtn" onclick="forceRoll()">LANZAR</button>
 </div>
 
 <script>
@@ -382,26 +378,34 @@ let balance = 0;
 let currentC = 10;
 let bets = {};
 let isRolling = false;
-let bettingTime = 15;
+let bettingTime = 12;
 let timerInterval;
-const MAX_BETS = 5;
+const MAX_BETS = 8;
 
-const chipImages = {
-    10: '/assets/chips/chip_red.png',
-    50: '/assets/chips/chip_blue.png',
-    100: '/assets/chips/chip_green.png',
-    500: '/assets/chips/chip_black.png'
-};
+const chipImages = { 10: '/assets/chips/chip_red.png', 50: '/assets/chips/chip_blue.png', 100: '/assets/chips/chip_green.png', 500: '/assets/chips/chip_black.png' };
 
 async function init() {
     balance = await WalletAPI.getBalance();
     updateUI();
-    startBettingTimer();
+    startNewRound();
 }
 
 function updateUI() {
     document.getElementById('balance').textContent = balance.toLocaleString();
     window.parent.postMessage({ type: 'credits', value: balance }, '*');
+}
+
+function startNewRound() {
+    isRolling = false;
+    bets = {};
+    document.querySelectorAll('.bet-area').forEach(a => {
+        a.classList.remove('active', 'winning');
+        const s = a.querySelector('.chip-stack');
+        if (s) s.remove();
+    });
+    document.getElementById('rollBtn').disabled = false;
+    document.getElementById('diceBox').style.display = 'none';
+    startBettingTimer();
 }
 
 function startBettingTimer() {
@@ -417,13 +421,14 @@ function startBettingTimer() {
         bar.style.width = (timeLeft / bettingTime * 100) + "%";
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            if (Object.keys(bets).length > 0) {
-                doRoll();
-            } else {
-                startBettingTimer(); // Reiniciar si no hay apuestas
-            }
+            if (Object.keys(bets).length > 0) doRoll();
+            else startBettingTimer();
         }
     }, 1000);
+}
+
+function forceRoll() {
+    if (Object.keys(bets).length > 0) doRoll();
 }
 
 function setC(v, el) {
@@ -435,10 +440,7 @@ function setC(v, el) {
 
 function placeBet(type, el) {
     if (isRolling) return;
-    if (Object.keys(bets).length >= MAX_BETS && !bets[type]) {
-        alert("Máximo " + MAX_BETS + " tipos de apuestas permitidas");
-        return;
-    }
+    if (Object.keys(bets).length >= MAX_BETS && !bets[type]) return;
     if (balance < currentC) { WalletAPI.openShop(); return; }
 
     bets[type] = (bets[type] || 0) + currentC;
@@ -453,8 +455,6 @@ function placeBet(type, el) {
         el.appendChild(stack);
     }
     stack.innerHTML = `<div class="bet-tag">${bets[type].toLocaleString()}</div>`;
-    
-    // Crear imagen de ficha adaptada
     const cImg = document.createElement('div');
     cImg.className = 'chip-img';
     cImg.style.backgroundImage = `url('${chipImages[currentC]}')`;
@@ -466,102 +466,78 @@ async function doRoll() {
     isRolling = true;
     clearInterval(timerInterval);
     document.getElementById('rollBtn').disabled = true;
-    document.getElementById('statusMsg').textContent = "LANZANDO DADOS...";
+    document.getElementById('statusMsg').textContent = "LANZANDO...";
     document.getElementById('statusMsg').style.color = "#fff";
 
     try {
-        let totalWin = 0;
+        let results = [];
         let finalBal = balance;
-        let lastRes = null;
+        let lastDice = [1, 1];
 
         for (let type in bets) {
             const res = await fetch('/api/games/craps/roll', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: WalletAPI.getUsername(),
-                    bet_amount: bets[type],
-                    bet_type: type
-                })
+                body: JSON.stringify({ username: WalletAPI.getUsername(), bet_amount: bets[type], bet_type: type })
             });
             const data = await res.json();
-            totalWin += data.win_amount;
+            results.push({ type, win: data.win_amount });
             finalBal = data.new_balance;
-            lastRes = data;
+            lastDice = data.dice;
         }
 
         const box = document.getElementById('diceBox');
         box.style.display = 'flex';
-        box.classList.add('active');
-        
-        const d1 = document.getElementById('die1');
-        const d2 = document.getElementById('die2');
+        const d1 = document.getElementById('die1'), d2 = document.getElementById('die2');
         const faceRots = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
 
-        // ANIMACIÓN DE CAÍDA Y REBOTE
         d1.style.transition = 'none'; d2.style.transition = 'none';
-        // Empiezan desde arriba (fuera de cámara)
-        d1.style.transform = 'translate(-200px, -600px) translateZ(300px) rotate(0deg)';
-        d2.style.transform = 'translate(200px, -600px) translateZ(300px) rotate(0deg)';
+        d1.style.transform = 'translate(-300px, -800px) translateZ(500px) rotate(0deg)';
+        d2.style.transform = 'translate(300px, -800px) translateZ(500px) rotate(0deg)';
         
         setTimeout(() => {
-            // Caída a la mesa
-            d1.style.transition = 'transform 0.8s ease-in';
-            d2.style.transition = 'transform 0.8s ease-in';
-            d1.style.transform = 'translate(-80px, 0px) translateZ(0px) rotateX(360deg) rotateY(360deg)';
-            d2.style.transform = 'translate(80px, 0px) translateZ(0px) rotateX(-360deg) rotateY(-360deg)';
-            
-            setTimeout(() => {
-                // Rebote final y posición de cara
-                d1.style.transition = 'transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                d2.style.transition = 'transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                
-                const r1 = faceRots[lastRes.dice[0]];
-                const r2 = faceRots[lastRes.dice[1]];
-                
-                d1.style.transform = `translate(-50px, -20px) rotateX(${720 + r1[0]}deg) rotateY(${720 + r1[1]}deg)`;
-                d2.style.transform = `translate(50px, 20px) rotateX(${720 + r2[0]}deg) rotateY(${720 + r2[1]}deg)`;
-            }, 800);
+            d1.style.transition = 'transform 1s cubic-bezier(0.2, 0.8, 0.3, 1.1)';
+            d2.style.transition = 'transform 1s cubic-bezier(0.2, 0.8, 0.3, 1.1)';
+            const r1 = faceRots[lastDice[0]], r2 = faceRots[lastDice[1]];
+            d1.style.transform = `translate(-60px, 0) rotateX(${1440 + r1[0]}deg) rotateY(${1440 + r1[1]}deg)`;
+            d2.style.transform = `translate(60px, 0) rotateX(${1440 + r2[0]}deg) rotateY(${1440 + r2[1]}deg)`;
         }, 50);
 
         setTimeout(() => {
-            const pop = document.getElementById('resPopup');
-            pop.textContent = lastRes.message.split(' - ')[0].replace('Tirada: ', '');
-            if (totalWin > 0) {
-                pop.textContent += " - WIN!";
-                pop.style.color = '#00ff99';
-                if (typeof WinAnimation !== 'undefined') new WinAnimation().start();
-            } else {
-                pop.style.color = '#ff4d4d';
-            }
-            pop.style.animation = 'none';
-            void pop.offsetWidth;
-            pop.style.animation = 'showResult 2s forwards';
-            
-            balance = finalBal;
-            updateUI();
-            
-            // Limpiar mesa
-            bets = {};
-            document.querySelectorAll('.bet-area').forEach(a => {
-                a.classList.remove('active');
-                const s = a.querySelector('.chip-stack');
-                if (s) s.remove();
+            // FASE DE PAGO
+            document.getElementById('statusMsg').textContent = "PAGANDO...";
+            let totalWin = 0;
+            results.forEach(r => {
+                const el = document.querySelector(`[data-bet="${r.type}"]`);
+                if (r.win > 0) {
+                    totalWin += r.win;
+                    el.classList.add('winning');
+                    // Animación de flotar premio
+                    const float = document.createElement('div');
+                    float.className = 'payout-float';
+                    float.textContent = `+${r.win}`;
+                    el.appendChild(float);
+                }
             });
 
+            if (totalWin > 0) {
+                const pop = document.getElementById('resPopup');
+                pop.textContent = `WIN +${totalWin}`;
+                pop.style.animation = 'showResult 2s forwards';
+                if (typeof WinAnimation !== 'undefined') new WinAnimation().start();
+            }
+
+            balance = finalBal;
+            updateUI();
+
             setTimeout(() => {
-                isRolling = false;
-                document.getElementById('rollBtn').disabled = false;
-                box.style.display = 'none';
-                startBettingTimer();
-            }, 2000);
-        }, 2000);
+                startNewRound();
+            }, 3000);
+        }, 1500);
 
     } catch (e) {
         console.error(e);
-        isRolling = false;
-        document.getElementById('rollBtn').disabled = false;
-        startBettingTimer();
+        startNewRound();
     }
 }
 
