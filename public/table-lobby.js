@@ -248,6 +248,91 @@ class TableLobby {
         .tl-grid { grid-template-columns: 1fr; }
         #tableLobbyPanel { padding: 15px; }
       }
+
+      /* Animación de Telón Brawl Stars */
+      #tlCurtain {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      #tlCurtain.active { display: block; }
+      
+      .tl-curtain-half {
+        position: absolute;
+        width: 100%;
+        height: 50%;
+        background: var(--curtain-color, #E5E4E2);
+        left: 0;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
+      }
+      .tl-curtain-top { top: 0; transform: translateY(-100%); border-bottom: 5px solid #fff; }
+      .tl-curtain-bottom { bottom: 0; transform: translateY(100%); border-top: 5px solid #fff; }
+      
+      #tlCurtain.active .tl-curtain-top { transform: translateY(0); }
+      #tlCurtain.active .tl-curtain-bottom { transform: translateY(0); }
+      #tlCurtain.open .tl-curtain-top { transform: translateY(-100%); }
+      #tlCurtain.open .tl-curtain-bottom { transform: translateY(100%); }
+
+      .tl-curtain-content {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      #tlCurtain.active .tl-curtain-content { opacity: 1; transform: scale(1); }
+      #tlCurtain.open .tl-curtain-content { opacity: 0; transform: scale(1.5); }
+
+      .tl-curtain-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 80px;
+        font-weight: 900;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 60px var(--curtain-color);
+        letter-spacing: 10px;
+        text-align: center;
+        line-height: 1;
+        animation: tlPulse 1.5s ease-in-out infinite;
+      }
+      .tl-curtain-subtitle {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 24px;
+        color: #fff;
+        margin-top: 20px;
+        letter-spacing: 5px;
+        opacity: 0.8;
+      }
+      @keyframes tlPulse {
+        0%, 100% { transform: scale(1); filter: brightness(1); }
+        50% { transform: scale(1.05); filter: brightness(1.3); }
+      }
+
+      /* Efecto de partículas/destellos */
+      .tl-sparkle {
+        position: absolute;
+        background: #fff;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: tlSparkleAnim 1s linear forwards;
+      }
+      @keyframes tlSparkleAnim {
+        0% { transform: scale(0) rotate(0deg); opacity: 1; }
+        100% { transform: scale(1) rotate(180deg); opacity: 0; }
+      }
     `;
     document.head.appendChild(style);
 
@@ -271,6 +356,18 @@ class TableLobby {
       </div>
     `;
     document.body.appendChild(overlay);
+
+    const curtain = document.createElement('div');
+    curtain.id = 'tlCurtain';
+    curtain.innerHTML = `
+      <div class="tl-curtain-half tl-curtain-top"></div>
+      <div class="tl-curtain-half tl-curtain-bottom"></div>
+      <div class="tl-curtain-content">
+        <div class="tl-curtain-title" id="tlCurtainTitle">PLATINO</div>
+        <div class="tl-curtain-subtitle" id="tlCurtainSubtitle">SALÓN DE ÉLITE</div>
+      </div>
+    `;
+    document.body.appendChild(curtain);
   }
 
   async show(game, gameFile, balance) {
@@ -371,6 +468,12 @@ class TableLobby {
       const data = await res.json();
       if (res.ok) {
         this.currentRoomId = data.room_id;
+        
+        // Animación de Telón para niveles altos (6+)
+        if (nivel >= 6) {
+          await this._playCurtainAnimation(data.mesa);
+        }
+
         this.hide();
         // Lanzar el juego con la mesa seleccionada
         if (typeof launchGame === 'function') {
@@ -380,6 +483,57 @@ class TableLobby {
         alert('❌ ' + (data.detail || 'Error al unirse'));
       }
     } catch(e) { alert('❌ Error de conexión'); }
+  }
+
+  async _playCurtainAnimation(mesa) {
+    return new Promise(resolve => {
+      const curtain = document.getElementById('tlCurtain');
+      const title = document.getElementById('tlCurtainTitle');
+      const subtitle = document.getElementById('tlCurtainSubtitle');
+      
+      // Configurar colores y textos
+      curtain.style.setProperty('--curtain-color', mesa.color);
+      
+      // Extraer tipo (SALÓN, LIGA, CLUB) del nombre
+      let type = "MESA";
+      if (mesa.nombre.toUpperCase().includes("SALÓN")) type = "SALÓN";
+      else if (mesa.nombre.toUpperCase().includes("LIGA")) type = "LIGA";
+      else if (mesa.nombre.toUpperCase().includes("CLUB")) type = "CLUB";
+      else if (mesa.nombre.toUpperCase().includes("MESA")) type = "MESA";
+      
+      title.innerText = mesa.nombre.split(' ').pop(); // Última palabra (Platino, Diamante, etc)
+      subtitle.innerText = mesa.nombre.toUpperCase();
+      
+      curtain.classList.add('active');
+      
+      // Efecto de destellos ludópatas
+      const interval = setInterval(() => {
+        this._createSparkle(mesa.color);
+      }, 50);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        curtain.classList.add('open');
+        setTimeout(() => {
+          curtain.classList.remove('active', 'open');
+          resolve();
+        }, 800);
+      }, 2000);
+    });
+  }
+
+  _createSparkle(color) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'tl-sparkle';
+    const size = Math.random() * 15 + 5;
+    sparkle.style.width = size + 'px';
+    sparkle.style.height = size + 'px';
+    sparkle.style.left = Math.random() * 100 + 'vw';
+    sparkle.style.top = Math.random() * 100 + 'vh';
+    sparkle.style.background = color;
+    sparkle.style.boxShadow = `0 0 ${size}px #fff`;
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 1000);
   }
 
   async autoJoin() {
