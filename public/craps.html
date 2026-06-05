@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRAPS POKERIST ULTIMATE</title>
+<title>CRAPS POKERIST PREMIUM</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/js/wallet.js"></script>
 <script src="/js/curtain-effect.js"></script>
@@ -11,13 +11,14 @@
 <style>
 :root { 
     --felt: #1a6b8f; 
+    --felt-dark: #0d3b4f;
     --gold: #f4c430; 
-    --border: #4a9aaa;
+    --border: rgba(255, 255, 255, 0.2);
     --green: #00ff99;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 body { 
-    background: #0a0e12; 
+    background: #050a0f; 
     color: #fff; 
     font-family: 'Rajdhani', sans-serif; 
     height: 100vh; 
@@ -26,16 +27,19 @@ body {
     flex-direction: column; 
 }
 
+/* HEADER PREMIUM */
 .header { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    padding: 0.6vmin 1.5vmin; 
-    background: #0b1a27; 
-    border-bottom: 0.15vmin solid var(--gold); 
+    padding: 0.6vmin 2vmin; 
+    background: linear-gradient(to bottom, #162a3d, #0b1a27); 
+    border-bottom: 0.2vmin solid var(--gold); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    z-index: 100;
 }
-.title { font-family: 'Orbitron'; font-size: 1.2vmin; color: var(--gold); font-weight: 900; }
-.credits { font-family: 'Orbitron'; color: var(--green); font-size: 1vmin; }
+.title { font-family: 'Orbitron'; font-size: 1.4vmin; color: var(--gold); font-weight: 900; text-shadow: 0 0 10px rgba(244,196,48,0.5); }
+.credits { font-family: 'Orbitron'; color: var(--green); font-size: 1.2vmin; font-weight: 700; }
 
 .game-container { 
     flex: 1; 
@@ -44,9 +48,19 @@ body {
     flex-direction: column; 
     align-items: center; 
     justify-content: center;
-    background: var(--felt); 
+    background: radial-gradient(circle, var(--felt) 0%, var(--felt-dark) 100%); 
     overflow: hidden;
-    padding: 0.6vmin;
+    padding: 1vmin;
+}
+
+/* TEXTURA DE TAPETE */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('https://www.transparenttextures.com/patterns/felt.png');
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .timer-bar { 
@@ -54,119 +68,107 @@ body {
     top: 0; 
     left: 0; 
     width: 100%; 
-    height: 0.2vmin; 
+    height: 0.3vmin; 
     background: var(--green); 
+    box-shadow: 0 0 10px var(--green);
     z-index: 150; 
 }
 
 .status-msg { 
     position: absolute; 
-    top: 1.2vmin; 
+    top: 2vmin; 
     left: 50%; 
     transform: translateX(-50%); 
     font-family: 'Orbitron'; 
-    font-size: 1.3vmin; 
+    font-size: 1.5vmin; 
     color: var(--gold); 
     font-weight: 900; 
     z-index: 100; 
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
-/* GANANCIA FLOTANTE */
+/* GANANCIA PREMIUM */
 .win-display {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: 'Bebas Neue';
-    font-size: 8vmin;
-    color: var(--green);
+    font-size: 10vmin;
+    color: #fff;
     font-weight: 900;
-    text-shadow: 0 0 30px var(--green), 0 0 60px rgba(0,255,153,0.5);
+    text-shadow: 0 0 20px var(--green), 0 0 40px var(--green);
     z-index: 500;
     opacity: 0;
     pointer-events: none;
-    animation: winPulse 2.5s ease-out forwards;
 }
 
-@keyframes winPulse {
-    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-    50% { opacity: 1; }
-    100% { opacity: 0; transform: translate(-50%, -150%) scale(1.5); }
+@keyframes winShow {
+    0% { opacity: 0; transform: translate(-50%, -30%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(1.5); }
 }
 
-/* MESA PRINCIPAL */
+/* MESA */
 .table-wrapper {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
+    width: 98%;
+    height: 85%;
     background: var(--felt);
-    border: 2vmin solid #2d1b0f;
-    border-radius: 8vmin;
+    border: 2.5vmin solid #2d1b0f;
+    border-radius: 10vmin;
     display: grid;
-    grid-template-columns: 1fr 18vmin;
-    gap: 1.2vmin;
-    padding: 1.5vmin;
+    grid-template-columns: 1fr 22vmin;
+    gap: 1.5vmin;
+    padding: 2vmin;
     position: relative;
-    box-shadow: inset 0 0 150px rgba(0,0,0,0.6), 0 40px 80px rgba(0,0,0,0.9);
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.8), 0 50px 100px rgba(0,0,0,0.9);
+    transform: perspective(1000px) rotateX(5deg);
 }
 
-/* MAIN AREA */
-.main-area {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9vmin;
-}
+.main-area { display: flex; flex-direction: column; gap: 1vmin; }
 
-/* FILA DE NÚMEROS CON CONTROLES */
-.num-row-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 3.5vmin;
-    gap: 0.6vmin;
-    align-items: stretch;
-}
-
-.num-row {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.6vmin;
-}
-
-.num-cell {
-    background: rgba(255,255,255,0.08);
-    border: 0.15vmin solid var(--border);
-    border-radius: 0.7vmin;
+/* CELDAS DE APUESTA */
+.bet-cell {
+    background: rgba(255,255,255,0.03);
+    border: 0.2vmin solid var(--border);
+    border-radius: 1vmin;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 2vmin;
-    font-weight: 900;
-    font-family: 'Orbitron';
-    transition: 0.2s;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    min-height: 5vmin;
-    gap: 0.3vmin;
+    overflow: hidden;
 }
-.num-cell:hover { background: rgba(255,255,255,0.12); }
-.num-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); box-shadow: 0 0 12px rgba(0,255,153,0.4); }
-.num-cell.winning { background: rgba(255,255,255,0.35) !important; box-shadow: 0 0 25px #fff; }
+.bet-cell:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); }
+.bet-cell.active { background: rgba(0,255,153,0.1); border-color: var(--green); box-shadow: inset 0 0 15px rgba(0,255,153,0.2); }
+.bet-cell.winning { background: rgba(255,255,255,0.2) !important; border-color: #fff !important; box-shadow: 0 0 30px #fff; z-index: 10; }
 
-.num-label { font-size: 1.8vmin; }
-.num-controls { font-size: 0.7vmin; display: flex; gap: 0.2vmin; }
-.ctrl-btn { width: 1.2vmin; height: 1.2vmin; border-radius: 50%; background: rgba(0,0,0,0.3); border: 0.1vmin solid var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6vmin; font-weight: 900; color: var(--gold); }
-.ctrl-btn:hover { background: rgba(0,0,0,0.5); }
+/* NÚMEROS */
+.num-row-wrapper { display: grid; grid-template-columns: 1fr 4vmin; gap: 0.8vmin; }
+.num-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.8vmin; }
+.num-box { min-height: 8vmin; font-family: 'Orbitron'; font-weight: 900; font-size: 2.5vmin; }
+.num-sub { font-size: 0.8vmin; color: var(--gold); margin-top: 0.3vmin; }
+
+.num-controls { display: flex; gap: 0.4vmin; margin-top: 0.5vmin; }
+.c-e-btn { 
+    width: 1.8vmin; height: 1.8vmin; border-radius: 50%; 
+    background: #000; border: 0.15vmin solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9vmin; font-weight: 900; color: var(--gold);
+}
 
 .side-tab {
-    background: rgba(0,0,0,0.2);
-    border: 0.15vmin solid var(--border);
-    border-radius: 0.7vmin;
+    background: rgba(0,0,0,0.3);
+    border: 0.2vmin solid var(--border);
+    border-radius: 1vmin;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8vmin;
+    font-size: 1vmin;
     font-weight: 900;
     color: var(--gold);
     writing-mode: vertical-rl;
@@ -174,99 +176,33 @@ body {
     transform: rotate(180deg);
 }
 
-/* COME */
-.come-box {
-    background: rgba(255,255,255,0.08);
-    border: 0.15vmin solid var(--border);
-    border-radius: 0.7vmin;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 3vmin;
-    font-weight: 900;
-    font-family: 'Orbitron';
-    transition: 0.2s;
-    position: relative;
-    min-height: 6vmin;
-    grid-column: 1;
-}
-.come-box:hover { background: rgba(255,255,255,0.12); }
-.come-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
+/* COME & FIELD */
+.come-box { min-height: 9vmin; font-size: 4vmin; font-weight: 900; font-family: 'Orbitron'; letter-spacing: 2vmin; }
+.field-box { min-height: 9vmin; gap: 0.5vmin; }
+.field-nums { font-size: 2vmin; font-weight: 900; letter-spacing: 0.8vmin; font-family: 'Orbitron'; }
 
-/* FIELD */
-.field-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 3.5vmin;
-    gap: 0.6vmin;
-    align-items: stretch;
+/* PASS LINE PREMIUM */
+.pass-section { display: grid; grid-template-columns: 1fr 2.5fr 1fr; gap: 0.8vmin; }
+.pass-line-box { 
+    background: rgba(244,196,48,0.1) !important; 
+    border: 0.4vmin solid var(--gold) !important; 
+    font-size: 3vmin; font-family: 'Orbitron'; color: var(--gold);
+    border-radius: 1.5vmin;
 }
 
-.field-box {
-    background: rgba(255,255,255,0.08);
-    border: 0.15vmin solid var(--border);
-    border-radius: 0.7vmin;
-    padding: 0.8vmin;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.2s;
-    position: relative;
-    gap: 0.3vmin;
-}
-.field-box:hover { background: rgba(255,255,255,0.12); }
-.field-box.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
-
-.field-label { font-size: 1vmin; font-weight: 900; }
-.field-nums { font-size: 1.4vmin; font-weight: 900; letter-spacing: 0.4vmin; font-family: 'Orbitron'; }
-.field-info { font-size: 0.8vmin; color: var(--gold); }
-
-/* PASS LINE */
-.pass-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 3.5vmin;
-    gap: 0.6vmin;
-    align-items: stretch;
-}
-
-.pass-section {
-    display: grid;
-    grid-template-columns: 1fr 2.5fr 1fr;
-    gap: 0.6vmin;
-}
-
-.pass-cell {
-    background: rgba(255,255,255,0.08);
-    border: 0.15vmin solid var(--border);
-    border-radius: 0.7vmin;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.1vmin;
-    font-weight: 900;
-    transition: 0.2s;
-    position: relative;
-    min-height: 6vmin;
-}
-.pass-cell:hover { background: rgba(255,255,255,0.12); }
-.pass-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
-
-.pass-line {
-    background: rgba(244,196,48,0.15) !important;
-    border: 0.25vmin solid var(--gold) !important;
-    font-size: 2.5vmin;
-    color: var(--gold);
-    font-family: 'Orbitron';
-}
+/* PROP AREA */
+.prop-area { display: flex; flex-direction: column; gap: 1vmin; }
+.prop-group { background: rgba(0,0,0,0.2); border: 0.2vmin solid var(--border); border-radius: 1.5vmin; padding: 1vmin; display: flex; flex-direction: column; gap: 0.8vmin; }
+.prop-title { font-size: 1.1vmin; font-weight: 900; color: var(--gold); text-align: center; border-bottom: 0.1vmin solid var(--border); padding-bottom: 0.5vmin; margin-bottom: 0.5vmin; }
+.prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6vmin; }
+.prop-cell { min-height: 6vmin; font-size: 1vmin; font-weight: 900; }
+.dice-icon { font-size: 2vmin; margin-bottom: 0.3vmin; }
 
 /* CHIPS */
 .chip-stack { 
     position: absolute; 
-    bottom: 0.4vmin; 
-    right: 0.4vmin;
+    bottom: 0.8vmin; 
+    right: 0.8vmin;
     display: flex; 
     flex-direction: column-reverse; 
     align-items: center; 
@@ -274,95 +210,22 @@ body {
     z-index: 20;
 }
 .chip-img { 
-    width: 2.2vmin; 
-    height: 2.2vmin; 
+    width: 2.8vmin; 
+    height: 2.8vmin; 
     background-size: cover;
-    margin-top: -1.8vmin; 
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.7));
+    margin-top: -2.2vmin; 
+    filter: drop-shadow(0 3px 4px rgba(0,0,0,0.8));
 }
 .bet-tag { 
     background: #000; 
     color: var(--green); 
-    font-size: 0.8vmin; 
-    padding: 0.15vmin 0.4vmin; 
-    border-radius: 0.3vmin; 
+    font-size: 0.9vmin; 
+    padding: 0.2vmin 0.6vmin; 
+    border-radius: 0.4vmin; 
     font-weight: 900; 
-    margin-bottom: 0.4vmin; 
+    margin-bottom: 0.5vmin; 
     border: 0.1vmin solid var(--green);
-    white-space: nowrap;
-}
-
-/* ANIMACIÓN DE FICHA VOLANDO */
-.chip-flying {
-    position: fixed !important;
-    animation: chipFly 1.5s ease-in forwards !important;
-    z-index: 1000 !important;
-}
-
-@keyframes chipFly {
-    0% { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--tx), var(--ty)) scale(0.3); opacity: 0; }
-}
-
-/* PROP AREA */
-.prop-area {
-    display: flex;
-    flex-direction: column;
-    gap: 0.9vmin;
-}
-
-.prop-box {
-    background: rgba(255,255,255,0.08);
-    border: 0.15vmin solid var(--border);
-    border-radius: 0.9vmin;
-    padding: 0.8vmin;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6vmin;
-}
-
-.prop-title {
-    font-size: 1vmin;
-    font-weight: 900;
-    color: var(--gold);
-    text-align: center;
-    border-bottom: 0.1vmin solid var(--border);
-    padding-bottom: 0.4vmin;
-    text-transform: uppercase;
-}
-
-.prop-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4vmin;
-}
-
-.prop-cell {
-    background: rgba(255,255,255,0.08);
-    border: 0.1vmin solid var(--border);
-    border-radius: 0.6vmin;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0.5vmin;
-    font-size: 0.9vmin;
-    font-weight: 900;
-    transition: 0.2s;
-    position: relative;
-    min-height: 4.5vmin;
-    gap: 0.2vmin;
-}
-.prop-cell:hover { background: rgba(255,255,255,0.12); }
-.prop-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); }
-.prop-cell.winning { background: rgba(255,255,255,0.3) !important; }
-
-.dice-icon { font-size: 1.5vmin; }
-
-.horn-cell {
-    grid-column: span 2;
-    min-height: 4vmin;
+    box-shadow: 0 0 10px rgba(0,255,153,0.3);
 }
 
 /* DICE PIT */
@@ -371,8 +234,8 @@ body {
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%); 
-    width: 350px; 
-    height: 180px; 
+    width: 400px; 
+    height: 200px; 
     pointer-events: none; 
     z-index: 200; 
 }
@@ -382,212 +245,212 @@ body {
     align-items: center; 
     justify-content: center; 
     perspective: 1000px; 
-    width: 100%;
-    height: 100%;
 }
 .dice-container.active { display: flex; }
 
 .die-3d { 
-    width: 55px; 
-    height: 55px; 
+    width: 60px; 
+    height: 60px; 
     position: absolute; 
     transform-style: preserve-3d; 
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
 }
 .face { 
     position: absolute; 
-    width: 55px; 
-    height: 55px; 
-    background: #cc0000; 
-    border: 1px solid #900; 
-    border-radius: 10px; 
+    width: 60px; 
+    height: 60px; 
+    background: radial-gradient(circle at 30% 30%, #ff3333, #990000); 
+    border: 1px solid #660000; 
+    border-radius: 12px; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-size: 36px; 
+    font-size: 40px; 
     color: #fff; 
 }
-.f1 { transform: rotateY(0deg) translateZ(27.5px); }
-.f2 { transform: rotateY(90deg) translateZ(27.5px); }
-.f3 { transform: rotateX(90deg) translateZ(27.5px); }
-.f4 { transform: rotateX(-90deg) translateZ(27.5px); }
-.f5 { transform: rotateY(-90deg) translateZ(27.5px); }
-.f6 { transform: rotateY(180deg) translateZ(27.5px); }
+.f1 { transform: rotateY(0deg) translateZ(30px); }
+.f2 { transform: rotateY(90deg) translateZ(30px); }
+.f3 { transform: rotateX(90deg) translateZ(30px); }
+.f4 { transform: rotateX(-90deg) translateZ(30px); }
+.f5 { transform: rotateY(-90deg) translateZ(30px); }
+.f6 { transform: rotateY(180deg) translateZ(30px); }
 
 /* CONTROLES */
 .controls { 
-    background: #0b1a27; 
-    padding: 0.8vmin 2vmin; 
+    background: linear-gradient(to top, #050a0f, #0b1a27); 
+    padding: 1.5vmin 4vmin; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    border-top: 0.15vmin solid var(--gold); 
+    border-top: 0.2vmin solid var(--gold); 
 }
 
-.chips-tray { display: flex; gap: 0.8vmin; }
+.chips-tray { display: flex; gap: 1.5vmin; }
 .c-btn { 
-    width: 4.5vmin; 
-    height: 4.5vmin; 
+    width: 6vmin; 
+    height: 6vmin; 
     border-radius: 50%; 
     background-size: cover;
     cursor: pointer; 
-    transition: 0.2s; 
+    transition: 0.3s; 
     position: relative; 
-    border: 0.15vmin solid transparent;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    border: 0.2vmin solid transparent;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
 }
-.c-btn:hover { transform: translateY(-0.3vmin); }
-.c-btn.sel { transform: scale(1.1) translateY(-0.3vmin); border-color: #fff; box-shadow: 0 0 15px #fff; }
-.c-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; color: #fff; text-shadow: 0 0 5px #000; font-size: 1vmin; }
+.c-btn:hover { transform: translateY(-0.8vmin) scale(1.1); }
+.c-btn.sel { transform: translateY(-0.8vmin) scale(1.1); border-color: #fff; box-shadow: 0 0 20px #fff; }
+.c-val { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 900; color: #fff; text-shadow: 0 0 8px #000; font-size: 1.2vmin; }
 
 .roll-btn { 
-    width: 10vmin; 
-    height: 4.5vmin; 
+    width: 15vmin; 
+    height: 6vmin; 
     background: linear-gradient(135deg, #cc0000, #800000); 
-    border: 0.25vmin solid #fff; 
-    border-radius: 0.9vmin;
+    border: 0.3vmin solid #fff; 
+    border-radius: 1.5vmin;
     color: #fff; 
     font-family: 'Orbitron'; 
     font-weight: 900; 
-    font-size: 1.5vmin; 
+    font-size: 2vmin; 
     cursor: pointer; 
-    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    transition: 0.2s;
 }
+.roll-btn:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.2); }
 .roll-btn:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
+
+/* ANIMACIÓN DE FICHA VOLANDO */
+.chip-flying {
+    position: fixed !important;
+    animation: chipFly 1.2s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards !important;
+    z-index: 1000 !important;
+}
+
+@keyframes chipFly {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
+}
 
 </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="title">🎲 CRAPS POKERIST</div>
+    <div class="title">🎰 VEGAS CRAPS PREMIUM</div>
     <div class="credits">SALDO: <span id="balance">0</span></div>
 </div>
 
 <div class="game-container">
     <div class="timer-bar" id="timerBar"></div>
     <div class="status-msg" id="statusMsg">APUESTA: PASS O DON'T PASS</div>
-    <div class="win-display" id="winDisplay"></div>
+    <div id="winDisplay" class="win-display"></div>
 
     <div class="table-wrapper">
-        <!-- LADO IZQUIERDO -->
         <div class="main-area">
-            <!-- LAY ROW -->
+            <!-- LAY -->
             <div class="num-row-wrapper">
                 <div class="num-row">
-                    <div class="num-cell" data-bet="lay4" onclick="placeBet('lay4', this)"><div class="num-label">1 to 2</div></div>
-                    <div class="num-cell" data-bet="lay5" onclick="placeBet('lay5', this)"><div class="num-label">2 to 3</div></div>
-                    <div class="num-cell" data-bet="lay6" onclick="placeBet('lay6', this)"><div class="num-label">5 to 6</div></div>
-                    <div class="num-cell" data-bet="lay8" onclick="placeBet('lay8', this)"><div class="num-label">5 to 6</div></div>
-                    <div class="num-cell" data-bet="lay9" onclick="placeBet('lay9', this)"><div class="num-label">2 to 3</div></div>
-                    <div class="num-cell" data-bet="lay10" onclick="placeBet('lay10', this)"><div class="num-label">1 to 2</div></div>
+                    <div class="bet-cell num-box" data-bet="lay4" onclick="placeBet('lay4', this)"><div class="num-sub">1 to 2</div></div>
+                    <div class="bet-cell num-box" data-bet="lay5" onclick="placeBet('lay5', this)"><div class="num-sub">2 to 3</div></div>
+                    <div class="bet-cell num-box" data-bet="lay6" onclick="placeBet('lay6', this)"><div class="num-sub">5 to 6</div></div>
+                    <div class="bet-cell num-box" data-bet="lay8" onclick="placeBet('lay8', this)"><div class="num-sub">5 to 6</div></div>
+                    <div class="bet-cell num-box" data-bet="lay9" onclick="placeBet('lay9', this)"><div class="num-sub">2 to 3</div></div>
+                    <div class="bet-cell num-box" data-bet="lay10" onclick="placeBet('lay10', this)"><div class="num-sub">1 to 2</div></div>
                 </div>
                 <div class="side-tab">LAY</div>
             </div>
 
-            <!-- PLACE ROW CON CONTROLES C/E -->
+            <!-- PLACE CON C/E -->
             <div class="num-row-wrapper">
                 <div class="num-row">
-                    <div class="num-cell" data-bet="num4" onclick="placeBet('num4', this)">
+                    <div class="bet-cell num-box" data-bet="num4" onclick="placeBet('num4', this)">
                         <div class="num-label">4</div>
-                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
                     </div>
-                    <div class="num-cell" data-bet="num5" onclick="placeBet('num5', this)">
+                    <div class="bet-cell num-box" data-bet="num5" onclick="placeBet('num5', this)">
                         <div class="num-label">5</div>
-                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
                     </div>
-                    <div class="num-cell" data-bet="num6" onclick="placeBet('num6', this)">
+                    <div class="bet-cell num-box" data-bet="num6" onclick="placeBet('num6', this)">
                         <div class="num-label">6</div>
-                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
                     </div>
-                    <div class="num-cell" data-bet="num8" onclick="placeBet('num8', this)">
+                    <div class="bet-cell num-box" data-bet="num8" onclick="placeBet('num8', this)">
                         <div class="num-label">8</div>
-                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
                     </div>
-                    <div class="num-cell" data-bet="num9" onclick="placeBet('num9', this)">
+                    <div class="bet-cell num-box" data-bet="num9" onclick="placeBet('num9', this)">
                         <div class="num-label">9</div>
-                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
                     </div>
-                    <div class="num-cell" data-bet="num10" onclick="placeBet('num10', this)">
+                    <div class="bet-cell num-box" data-bet="num10" onclick="placeBet('num10', this)">
                         <div class="num-label">10</div>
-                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
                     </div>
                 </div>
                 <div class="side-tab">PLACE</div>
             </div>
 
-            <!-- BUY ROW -->
+            <!-- BUY -->
             <div class="num-row-wrapper">
                 <div class="num-row">
-                    <div class="num-cell" data-bet="buy4" onclick="placeBet('buy4', this)"><div class="num-label">2 to 1</div></div>
-                    <div class="num-cell" data-bet="buy5" onclick="placeBet('buy5', this)"><div class="num-label">3 to 2</div></div>
-                    <div class="num-cell" data-bet="buy6" onclick="placeBet('buy6', this)"><div class="num-label">6 to 5</div></div>
-                    <div class="num-cell" data-bet="buy8" onclick="placeBet('buy8', this)"><div class="num-label">6 to 5</div></div>
-                    <div class="num-cell" data-bet="buy9" onclick="placeBet('buy9', this)"><div class="num-label">3 to 2</div></div>
-                    <div class="num-cell" data-bet="buy10" onclick="placeBet('buy10', this)"><div class="num-label">2 to 1</div></div>
+                    <div class="bet-cell num-box" data-bet="buy4" onclick="placeBet('buy4', this)"><div class="num-sub">2 to 1</div></div>
+                    <div class="bet-cell num-box" data-bet="buy5" onclick="placeBet('buy5', this)"><div class="num-sub">3 to 2</div></div>
+                    <div class="bet-cell num-box" data-bet="buy6" onclick="placeBet('buy6', this)"><div class="num-sub">6 to 5</div></div>
+                    <div class="bet-cell num-box" data-bet="buy8" onclick="placeBet('buy8', this)"><div class="num-sub">6 to 5</div></div>
+                    <div class="bet-cell num-box" data-bet="buy9" onclick="placeBet('buy9', this)"><div class="num-sub">3 to 2</div></div>
+                    <div class="bet-cell num-box" data-bet="buy10" onclick="placeBet('buy10', this)"><div class="num-sub">2 to 1</div></div>
                 </div>
                 <div class="side-tab">BUY</div>
             </div>
 
-            <!-- COME -->
             <div class="num-row-wrapper">
-                <div class="come-box" data-bet="come" onclick="placeBet('come', this)">COME</div>
+                <div class="bet-cell come-box" data-bet="come" onclick="placeBet('come', this)">COME</div>
                 <div class="side-tab">COME</div>
             </div>
 
-            <!-- FIELD -->
-            <div class="field-wrapper">
-                <div class="field-box" data-bet="field" onclick="placeBet('field', this)">
+            <div class="num-row-wrapper">
+                <div class="bet-cell field-box" data-bet="field" onclick="placeBet('field', this)">
                     <div class="field-label">FIELD</div>
                     <div class="field-nums">2 3 4 9 10 11 12</div>
-                    <div class="field-info">2×3 | 12×3</div>
+                    <div class="field-info">2×2 | 12×3</div>
                 </div>
                 <div class="side-tab">FIELD</div>
             </div>
 
-            <!-- PASS LINE -->
-            <div class="pass-wrapper">
+            <div class="num-row-wrapper">
                 <div class="pass-section">
-                    <div class="pass-cell" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS</div>
-                    <div class="pass-cell pass-line" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
-                    <div class="pass-cell" data-bet="odds" onclick="placeBet('odds', this)">ODDS</div>
+                    <div class="bet-cell pass-cell" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS</div>
+                    <div class="bet-cell pass-cell pass-line-box" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
+                    <div class="bet-cell pass-cell" data-bet="odds" onclick="placeBet('odds', this)">ODDS</div>
                 </div>
                 <div class="side-tab">PASS</div>
             </div>
         </div>
 
-        <!-- LADO DERECHO -->
         <div class="prop-area">
-            <!-- HARDWAYS -->
-            <div class="prop-box">
+            <div class="prop-group">
                 <div class="prop-title">HARDWAYS</div>
                 <div class="prop-grid">
-                    <div class="prop-cell" data-bet="hard4" onclick="placeBet('hard4', this)"><div class="dice-icon">⚁⚁</div><div>9 A 1</div></div>
-                    <div class="prop-cell" data-bet="hard6" onclick="placeBet('hard6', this)"><div class="dice-icon">⚂⚂</div><div>7 A 1</div></div>
-                    <div class="prop-cell" data-bet="hard8" onclick="placeBet('hard8', this)"><div class="dice-icon">⚃⚃</div><div>7 A 1</div></div>
-                    <div class="prop-cell" data-bet="hard10" onclick="placeBet('hard10', this)"><div class="dice-icon">⚄⚄</div><div>9 A 1</div></div>
+                    <div class="bet-cell prop-cell" data-bet="hard4" onclick="placeBet('hard4', this)"><div class="dice-icon">⚁⚁</div><div>9 A 1</div></div>
+                    <div class="bet-cell prop-cell" data-bet="hard6" onclick="placeBet('hard6', this)"><div class="dice-icon">⚂⚂</div><div>7 A 1</div></div>
+                    <div class="bet-cell prop-cell" data-bet="hard8" onclick="placeBet('hard8', this)"><div class="dice-icon">⚃⚃</div><div>7 A 1</div></div>
+                    <div class="bet-cell prop-cell" data-bet="hard10" onclick="placeBet('hard10', this)"><div class="dice-icon">⚄⚄</div><div>9 A 1</div></div>
                 </div>
             </div>
-
-            <!-- ONE ROLL BETS -->
-            <div class="prop-box">
+            <div class="prop-group">
                 <div class="prop-title">ONE ROLL</div>
                 <div class="prop-grid">
-                    <div class="prop-cell" data-bet="any7" onclick="placeBet('any7', this)"><div>ANY 7</div><div>4 A 1</div></div>
-                    <div class="prop-cell" data-bet="snakeeyes" onclick="placeBet('snakeeyes', this)"><div class="dice-icon">⚀⚀</div><div>30 A 1</div></div>
-                    <div class="prop-cell" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="dice-icon">⚅⚅</div><div>30 A 1</div></div>
-                    <div class="prop-cell" data-bet="craps" onclick="placeBet('craps', this)"><div>ANY CRAPS</div><div>7 A 1</div></div>
-                    <div class="prop-cell" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="dice-icon">⚄⚅</div><div>15 A 1</div></div>
-                    <div class="prop-cell" data-bet="craps3" onclick="placeBet('craps3', this)"><div class="dice-icon">⚀⚁</div><div>15 A 1</div></div>
+                    <div class="bet-cell prop-cell" data-bet="any7" onclick="placeBet('any7', this)">ANY 7<br>4 A 1</div>
+                    <div class="bet-cell prop-cell" data-bet="snakeeyes" onclick="placeBet('snakeeyes', this)"><div class="dice-icon">⚀⚀</div>30 A 1</div>
+                    <div class="bet-cell prop-cell" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="dice-icon">⚅⚅</div>30 A 1</div>
+                    <div class="bet-cell prop-cell" data-bet="craps" onclick="placeBet('craps', this)">ANY CRAPS<br>7 A 1</div>
+                    <div class="bet-cell prop-cell" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="dice-icon">⚄⚅</div>15 A 1</div>
+                    <div class="bet-cell prop-cell" data-bet="craps3" onclick="placeBet('craps3', this)"><div class="dice-icon">⚀⚁</div>15 A 1</div>
+                    <div class="bet-cell prop-cell horn-cell" data-bet="horn" onclick="placeBet('horn', this)">HORN BET</div>
                 </div>
-            </div>
-
-            <!-- HORN BET -->
-            <div class="prop-box">
-                <div class="prop-cell horn-cell" data-bet="horn" onclick="placeBet('horn', this)">HORN BET</div>
             </div>
         </div>
 
-        <!-- DICE PIT -->
         <div class="dice-pit">
             <div class="dice-container" id="diceBox">
                 <div class="die-3d" id="die1"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
@@ -631,7 +494,7 @@ function updateUI() {
 function startNewRound() {
     isRolling = false;
     bets = {};
-    document.querySelectorAll('[data-bet]').forEach(a => {
+    document.querySelectorAll('.bet-cell').forEach(a => {
         a.classList.remove('active', 'winning');
         const s = a.querySelector('.chip-stack');
         if (s) s.remove();
@@ -722,7 +585,7 @@ async function doRoll() {
                 body: JSON.stringify({ username: WalletAPI.getUsername(), bet_amount: bets[type], bet_type: type })
             });
             const data = await res.json();
-            results.push({ type, win: data.win_amount, amount: bets[type] });
+            results.push({ type, win: data.win_amount });
             finalBal = data.new_balance;
             lastDice = data.dice;
             if (data.win_amount > 0) totalWin += data.win_amount;
@@ -730,61 +593,53 @@ async function doRoll() {
 
         const box = document.getElementById('diceBox');
         box.style.display = 'flex';
+        box.classList.add('active');
         const d1 = document.getElementById('die1'), d2 = document.getElementById('die2');
         const faceRots = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
 
-        // ANIMACIÓN LENTA
         d1.style.transition = 'none'; d2.style.transition = 'none';
-        d1.style.transform = 'translate(-150px, -400px) rotate(0deg)';
-        d2.style.transform = 'translate(150px, -400px) rotate(0deg)';
+        d1.style.transform = 'translate(-200px, -500px) rotate(0deg)';
+        d2.style.transform = 'translate(200px, -500px) rotate(0deg)';
         
         setTimeout(() => {
-            d1.style.transition = 'transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            d2.style.transition = 'transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            d1.style.transition = 'transform 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            d2.style.transition = 'transform 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             const r1 = faceRots[lastDice[0]], r2 = faceRots[lastDice[1]];
-            d1.style.transform = `translate(-40px, 0) rotateX(${1080 + r1[0]}deg) rotateY(${1080 + r1[1]}deg)`;
-            d2.style.transform = `translate(40px, 0) rotateX(${1080 + r2[0]}deg) rotateY(${1080 + r2[1]}deg)`;
+            d1.style.transform = `translate(-45px, 0) rotateX(${1440 + r1[0]}deg) rotateY(${1440 + r1[1]}deg)`;
+            d2.style.transform = `translate(45px, 0) rotateX(${1440 + r2[0]}deg) rotateY(${1440 + r2[1]}deg)`;
         }, 100);
 
         setTimeout(() => {
             document.getElementById('statusMsg').textContent = "PAGANDO...";
             
-            // MARCAR GANADORES
             results.forEach(r => {
                 if (r.win > 0) {
                     const el = document.querySelector(`[data-bet="${r.type}"]`);
                     el.classList.add('winning');
                     
-                    // ANIMACIÓN DE FICHAS VOLANDO AL SALDO
                     const stack = el.querySelector('.chip-stack');
                     if (stack) {
                         const rect = stack.getBoundingClientRect();
                         const balanceRect = document.getElementById('balance').getBoundingClientRect();
-                        
                         const chip = stack.querySelector('.chip-img');
                         if (chip) {
-                            const flyChip = chip.cloneNode(true);
-                            flyChip.classList.add('chip-flying');
-                            flyChip.style.left = rect.left + 'px';
-                            flyChip.style.top = rect.top + 'px';
-                            flyChip.style.setProperty('--tx', (balanceRect.left - rect.left) + 'px');
-                            flyChip.style.setProperty('--ty', (balanceRect.top - rect.top) + 'px');
-                            document.body.appendChild(flyChip);
-                            
-                            setTimeout(() => flyChip.remove(), 1500);
+                            const fly = chip.cloneNode(true);
+                            fly.classList.add('chip-flying');
+                            fly.style.left = rect.left + 'px';
+                            fly.style.top = rect.top + 'px';
+                            fly.style.setProperty('--tx', (balanceRect.left - rect.left) + 'px');
+                            fly.style.setProperty('--ty', (balanceRect.top - rect.top) + 'px');
+                            document.body.appendChild(fly);
+                            setTimeout(() => fly.remove(), 1200);
                         }
                     }
                 }
             });
 
-            // MOSTRAR GANANCIA TOTAL
             if (totalWin > 0) {
-                const winDisplay = document.getElementById('winDisplay');
-                winDisplay.textContent = `+${totalWin}`;
-                winDisplay.style.animation = 'none';
-                setTimeout(() => {
-                    winDisplay.style.animation = 'winPulse 2.5s ease-out forwards';
-                }, 10);
+                const winPop = document.getElementById('winDisplay');
+                winPop.textContent = `+${totalWin.toLocaleString()}`;
+                winPop.style.animation = 'winShow 2.5s forwards';
             }
 
             balance = finalBal;
@@ -793,7 +648,7 @@ async function doRoll() {
             setTimeout(() => {
                 startNewRound();
             }, 2500);
-        }, 2200);
+        }, 2400);
 
     } catch (e) {
         console.error(e);
