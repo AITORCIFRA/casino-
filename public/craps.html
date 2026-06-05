@@ -16,27 +16,48 @@
     --green: #00ff99;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+html, body { width: 100%; height: 100%; }
 body { 
     background: #050a0f; 
     color: #fff; 
     font-family: 'Rajdhani', sans-serif; 
-    height: 100vh; 
     overflow: hidden; 
     display: flex; 
     flex-direction: column; 
 }
 
+.viewport { 
+    flex: 1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: #050a0f;
+}
+
+.game-wrapper {
+    width: 1920px;
+    height: 1080px;
+    background: #050a0f;
+    display: flex;
+    flex-direction: column;
+    transform-origin: center;
+    position: relative;
+}
+
+/* HEADER */
 .header { 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    padding: 1vmin 3vmin; 
+    padding: 15px 30px; 
     background: linear-gradient(to bottom, #162a3d, #0b1a27); 
-    border-bottom: 0.3vmin solid var(--gold); 
+    border-bottom: 2px solid var(--gold); 
+    height: 60px;
 }
-.title { font-family: 'Orbitron'; font-size: 2vmin; color: var(--gold); font-weight: 900; }
-.credits { font-family: 'Orbitron'; color: var(--green); font-size: 1.8vmin; font-weight: 700; }
+.title { font-family: 'Orbitron'; font-size: 24px; color: var(--gold); font-weight: 900; }
+.credits { font-family: 'Orbitron'; color: var(--green); font-size: 18px; font-weight: 700; }
 
+/* GAME AREA */
 .game-container { 
     flex: 1; 
     position: relative; 
@@ -45,8 +66,7 @@ body {
     align-items: center; 
     justify-content: center;
     background: radial-gradient(circle, var(--felt) 0%, #0d3b4f 100%); 
-    overflow: hidden;
-    padding: 2vmin;
+    padding: 20px;
 }
 
 .timer-bar { 
@@ -54,23 +74,22 @@ body {
     top: 0; 
     left: 0; 
     width: 100%; 
-    height: 0.4vmin; 
+    height: 3px; 
     background: var(--green); 
     z-index: 150; 
 }
 
 .status-msg { 
     position: absolute; 
-    top: 3vmin; 
+    top: 30px; 
     left: 50%; 
     transform: translateX(-50%); 
     font-family: 'Orbitron'; 
-    font-size: 2.2vmin; 
+    font-size: 20px; 
     color: var(--gold); 
     font-weight: 900; 
     z-index: 100; 
     text-transform: uppercase;
-    text-shadow: 0 0 15px rgba(0,0,0,0.8);
 }
 
 .win-display {
@@ -79,7 +98,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: 'Bebas Neue';
-    font-size: 15vmin;
+    font-size: 120px;
     color: #fff;
     font-weight: 900;
     text-shadow: 0 0 30px var(--green), 0 0 60px var(--green);
@@ -95,26 +114,27 @@ body {
     100% { opacity: 0; transform: translate(-50%, -80%) scale(1.5); }
 }
 
+/* MESA */
 .table-wrapper {
-    width: 100%;
-    height: 100%;
+    width: 1600px;
+    height: 700px;
     background: var(--felt);
-    border: 3vmin solid #2d1b0f;
-    border-radius: 12vmin;
+    border: 30px solid #2d1b0f;
+    border-radius: 120px;
     display: grid;
-    grid-template-columns: 1fr 28vmin;
-    gap: 2vmin;
-    padding: 3vmin;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    padding: 30px;
     position: relative;
-    box-shadow: inset 0 0 150px rgba(0,0,0,0.8), 0 60px 120px rgba(0,0,0,0.9);
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.8), 0 50px 100px rgba(0,0,0,0.9);
 }
 
-.main-area { display: flex; flex-direction: column; gap: 1.5vmin; }
+.main-area { display: flex; flex-direction: column; gap: 15px; }
 
 .bet-cell {
     background: rgba(255,255,255,0.04);
-    border: 0.25vmin solid var(--border);
-    border-radius: 1.5vmin;
+    border: 2px solid var(--border);
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -129,36 +149,37 @@ body {
 .bet-cell.winning { background: rgba(255,255,255,0.25) !important; border-color: #fff !important; box-shadow: 0 0 40px #fff; }
 
 /* NÚMEROS */
-.num-row-wrapper { display: grid; grid-template-columns: 1fr 5vmin; gap: 1vmin; }
-.num-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1vmin; }
+.num-row-wrapper { display: grid; grid-template-columns: 1fr 50px; gap: 10px; }
+.num-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .num-box { 
-    min-height: 12vmin; 
+    min-height: 100px; 
     font-family: 'Orbitron'; 
     font-weight: 900; 
-    font-size: 5vmin; 
+    font-size: 48px; 
     display: flex;
     flex-direction: column;
-    gap: 0.8vmin;
+    gap: 8px;
 }
-.num-label { font-size: 5vmin; }
-.num-sub { font-size: 1.2vmin; color: var(--gold); }
+.num-label { font-size: 48px; }
+.num-sub { font-size: 12px; color: var(--gold); }
+.num-text { font-size: 14px; color: var(--gold); font-weight: 700; }
 
-.num-controls { display: flex; gap: 0.6vmin; }
+.num-controls { display: flex; gap: 6px; }
 .c-e-btn { 
-    width: 2.5vmin; height: 2.5vmin; border-radius: 50%; 
-    background: #000; border: 0.2vmin solid var(--gold);
+    width: 24px; height: 24px; border-radius: 50%; 
+    background: #000; border: 2px solid var(--gold);
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.3vmin; font-weight: 900; color: var(--gold);
+    font-size: 11px; font-weight: 900; color: var(--gold);
 }
 
 .side-tab {
     background: rgba(0,0,0,0.4);
-    border: 0.25vmin solid var(--border);
-    border-radius: 1.5vmin;
+    border: 2px solid var(--border);
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4vmin;
+    font-size: 14px;
     font-weight: 900;
     color: var(--gold);
     writing-mode: vertical-rl;
@@ -168,93 +189,93 @@ body {
 
 /* COME */
 .come-box { 
-    min-height: 14vmin; 
-    font-size: 6vmin; 
+    min-height: 120px; 
+    font-size: 60px; 
     font-weight: 900; 
     font-family: 'Orbitron'; 
-    letter-spacing: 3vmin;
+    letter-spacing: 30px;
 }
 
-/* FIELD CON CÍRCULOS */
-.field-wrapper { display: grid; grid-template-columns: 1fr 5vmin; gap: 1vmin; }
+/* FIELD */
+.field-wrapper { display: grid; grid-template-columns: 1fr 50px; gap: 10px; }
 .field-box { 
-    min-height: 14vmin; 
-    gap: 1vmin;
+    min-height: 120px; 
+    gap: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-.field-label { font-size: 1.8vmin; font-weight: 900; }
+.field-label { font-size: 18px; font-weight: 900; }
 .field-nums { 
-    font-size: 3.5vmin; 
+    font-size: 32px; 
     font-weight: 900; 
-    letter-spacing: 1.2vmin; 
+    letter-spacing: 10px; 
     font-family: 'Orbitron';
     display: flex;
-    gap: 0.8vmin;
+    gap: 8px;
 }
 .field-num-circle {
-    width: 4.5vmin;
-    height: 4.5vmin;
-    border: 0.3vmin solid var(--gold);
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--gold);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3vmin;
+    font-size: 28px;
     font-weight: 900;
 }
-.field-info { font-size: 1.2vmin; color: var(--gold); }
+.field-info { font-size: 12px; color: var(--gold); }
 
 /* PASS LINE */
-.pass-wrapper { display: grid; grid-template-columns: 1fr 5vmin; gap: 1vmin; }
-.pass-section { display: grid; grid-template-columns: 1fr 2.5fr 1fr; gap: 1vmin; }
-.pass-cell { min-height: 14vmin; font-size: 1.5vmin; font-weight: 900; }
+.pass-wrapper { display: grid; grid-template-columns: 1fr 50px; gap: 10px; }
+.pass-section { display: grid; grid-template-columns: 1fr 2.5fr 1fr; gap: 10px; }
+.pass-cell { min-height: 120px; font-size: 15px; font-weight: 900; }
 .pass-line-box { 
     background: rgba(244,196,48,0.15) !important; 
-    border: 0.5vmin solid var(--gold) !important; 
-    font-size: 5vmin; 
+    border: 4px solid var(--gold) !important; 
+    font-size: 48px; 
     font-family: 'Orbitron'; 
     color: var(--gold);
-    border-radius: 2vmin;
+    border-radius: 20px;
 }
 
 /* PROP AREA */
-.prop-area { display: flex; flex-direction: column; gap: 1.5vmin; }
+.prop-area { display: flex; flex-direction: column; gap: 15px; }
 .prop-group { 
     background: rgba(0,0,0,0.3); 
-    border: 0.25vmin solid var(--border); 
-    border-radius: 2vmin; 
-    padding: 1.5vmin; 
+    border: 2px solid var(--border); 
+    border-radius: 20px; 
+    padding: 15px; 
     display: flex; 
     flex-direction: column; 
-    gap: 1vmin; 
+    gap: 10px; 
 }
 .prop-title { 
-    font-size: 1.6vmin; 
+    font-size: 16px; 
     font-weight: 900; 
     color: var(--gold); 
     text-align: center; 
-    border-bottom: 0.15vmin solid var(--border); 
-    padding-bottom: 0.8vmin;
+    border-bottom: 1px solid var(--border); 
+    padding-bottom: 8px;
 }
-.prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8vmin; }
+.prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .prop-cell { 
-    min-height: 8vmin; 
-    font-size: 1.3vmin; 
+    min-height: 70px; 
+    font-size: 13px; 
     font-weight: 900;
     display: flex;
     flex-direction: column;
-    gap: 0.3vmin;
+    gap: 3px;
 }
-.dice-icon { font-size: 3vmin; }
+.dice-icon { font-size: 28px; }
 
 /* CHIPS */
 .chip-stack { 
     position: absolute; 
-    bottom: 1vmin; 
-    right: 1vmin;
+    bottom: 10px; 
+    right: 10px;
     display: flex; 
     flex-direction: column-reverse; 
     align-items: center; 
@@ -262,21 +283,21 @@ body {
     z-index: 20;
 }
 .chip-img { 
-    width: 3.5vmin; 
-    height: 3.5vmin; 
+    width: 35px; 
+    height: 35px; 
     background-size: cover;
-    margin-top: -2.8vmin; 
+    margin-top: -28px; 
     filter: drop-shadow(0 4px 5px rgba(0,0,0,0.8));
 }
 .bet-tag { 
     background: #000; 
     color: var(--green); 
-    font-size: 1.2vmin; 
-    padding: 0.3vmin 0.8vmin; 
-    border-radius: 0.5vmin; 
+    font-size: 11px; 
+    padding: 3px 8px; 
+    border-radius: 5px; 
     font-weight: 900; 
-    margin-bottom: 0.6vmin; 
-    border: 0.15vmin solid var(--green);
+    margin-bottom: 6px; 
+    border: 1px solid var(--green);
     box-shadow: 0 0 15px rgba(0,255,153,0.4);
 }
 
@@ -330,27 +351,28 @@ body {
 /* CONTROLES */
 .controls { 
     background: linear-gradient(to top, #050a0f, #0b1a27); 
-    padding: 2vmin 5vmin; 
+    padding: 20px 40px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    border-top: 0.3vmin solid var(--gold); 
+    border-top: 2px solid var(--gold); 
+    height: 100px;
 }
 
-.chips-tray { display: flex; gap: 2vmin; }
+.chips-tray { display: flex; gap: 20px; }
 .c-btn { 
-    width: 8vmin; 
-    height: 8vmin; 
+    width: 80px; 
+    height: 80px; 
     border-radius: 50%; 
     background-size: cover;
     cursor: pointer; 
     transition: 0.3s; 
     position: relative; 
-    border: 0.25vmin solid transparent;
+    border: 2px solid transparent;
     box-shadow: 0 6px 20px rgba(0,0,0,0.7);
 }
-.c-btn:hover { transform: translateY(-1vmin) scale(1.1); }
-.c-btn.sel { transform: translateY(-1vmin) scale(1.1); border-color: #fff; box-shadow: 0 0 25px #fff; }
+.c-btn:hover { transform: translateY(-8px) scale(1.1); }
+.c-btn.sel { transform: translateY(-8px) scale(1.1); border-color: #fff; box-shadow: 0 0 25px #fff; }
 .c-val { 
     position: absolute; 
     top: 50%; 
@@ -359,19 +381,19 @@ body {
     font-weight: 900; 
     color: #fff; 
     text-shadow: 0 0 10px #000; 
-    font-size: 1.8vmin; 
+    font-size: 18px; 
 }
 
 .roll-btn { 
-    width: 18vmin; 
-    height: 8vmin; 
+    width: 180px; 
+    height: 80px; 
     background: linear-gradient(135deg, #cc0000, #800000); 
-    border: 0.4vmin solid #fff; 
-    border-radius: 2vmin;
+    border: 3px solid #fff; 
+    border-radius: 20px;
     color: #fff; 
     font-family: 'Orbitron'; 
     font-weight: 900; 
-    font-size: 2.8vmin; 
+    font-size: 28px; 
     cursor: pointer; 
     box-shadow: 0 10px 25px rgba(0,0,0,0.7);
 }
@@ -393,155 +415,174 @@ body {
 </head>
 <body>
 
-<div class="header">
-    <div class="title">🎰 VEGAS CRAPS</div>
-    <div class="credits">SALDO: <span id="balance">0</span></div>
-</div>
+<div class="viewport">
+    <div class="game-wrapper">
+        <div class="header">
+            <div class="title">🎰 VEGAS CRAPS</div>
+            <div class="credits">SALDO: <span id="balance">0</span></div>
+        </div>
 
-<div class="game-container">
-    <div class="timer-bar" id="timerBar"></div>
-    <div class="status-msg" id="statusMsg">APUESTA: PASS O DON'T PASS</div>
-    <div id="winDisplay" class="win-display"></div>
+        <div class="game-container">
+            <div class="timer-bar" id="timerBar"></div>
+            <div class="status-msg" id="statusMsg">APUESTA: PASS O DON'T PASS</div>
+            <div id="winDisplay" class="win-display"></div>
 
-    <div class="table-wrapper">
-        <div class="main-area">
-            <!-- LAY -->
-            <div class="num-row-wrapper">
-                <div class="num-row">
-                    <div class="bet-cell num-box" data-bet="lay4" onclick="placeBet('lay4', this)"><div class="num-sub">1 to 2</div></div>
-                    <div class="bet-cell num-box" data-bet="lay5" onclick="placeBet('lay5', this)"><div class="num-sub">2 to 3</div></div>
-                    <div class="bet-cell num-box" data-bet="lay6" onclick="placeBet('lay6', this)"><div class="num-sub">5 to 6</div></div>
-                    <div class="bet-cell num-box" data-bet="lay8" onclick="placeBet('lay8', this)"><div class="num-sub">5 to 6</div></div>
-                    <div class="bet-cell num-box" data-bet="lay9" onclick="placeBet('lay9', this)"><div class="num-sub">2 to 3</div></div>
-                    <div class="bet-cell num-box" data-bet="lay10" onclick="placeBet('lay10', this)"><div class="num-sub">1 to 2</div></div>
+            <div class="table-wrapper">
+                <div class="main-area">
+                    <!-- LAY -->
+                    <div class="num-row-wrapper">
+                        <div class="num-row">
+                            <div class="bet-cell num-box" data-bet="lay4" onclick="placeBet('lay4', this)"><div class="num-sub">1 to 2</div></div>
+                            <div class="bet-cell num-box" data-bet="lay5" onclick="placeBet('lay5', this)"><div class="num-sub">2 to 3</div></div>
+                            <div class="bet-cell num-box" data-bet="lay6" onclick="placeBet('lay6', this)"><div class="num-sub">5 to 6</div></div>
+                            <div class="bet-cell num-box" data-bet="lay8" onclick="placeBet('lay8', this)"><div class="num-sub">5 to 6</div></div>
+                            <div class="bet-cell num-box" data-bet="lay9" onclick="placeBet('lay9', this)"><div class="num-sub">2 to 3</div></div>
+                            <div class="bet-cell num-box" data-bet="lay10" onclick="placeBet('lay10', this)"><div class="num-sub">1 to 2</div></div>
+                        </div>
+                        <div class="side-tab">LAY</div>
+                    </div>
+
+                    <!-- PLACE CON C/E -->
+                    <div class="num-row-wrapper">
+                        <div class="num-row">
+                            <div class="bet-cell num-box" data-bet="num4" onclick="placeBet('num4', this)">
+                                <div class="num-label">4</div>
+                                <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                            </div>
+                            <div class="bet-cell num-box" data-bet="num5" onclick="placeBet('num5', this)">
+                                <div class="num-label">5</div>
+                                <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                            </div>
+                            <div class="bet-cell num-box" data-bet="num6" onclick="placeBet('num6', this)">
+                                <div class="num-label">SIX</div>
+                                <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                            </div>
+                            <div class="bet-cell num-box" data-bet="num8" onclick="placeBet('num8', this)">
+                                <div class="num-label">8</div>
+                                <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                            </div>
+                            <div class="bet-cell num-box" data-bet="num9" onclick="placeBet('num9', this)">
+                                <div class="num-label">NINE</div>
+                                <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                            </div>
+                            <div class="bet-cell num-box" data-bet="num10" onclick="placeBet('num10', this)">
+                                <div class="num-label">10</div>
+                                <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                            </div>
+                        </div>
+                        <div class="side-tab">PLACE</div>
+                    </div>
+
+                    <!-- BUY -->
+                    <div class="num-row-wrapper">
+                        <div class="num-row">
+                            <div class="bet-cell num-box" data-bet="buy4" onclick="placeBet('buy4', this)"><div class="num-sub">2 to 1</div></div>
+                            <div class="bet-cell num-box" data-bet="buy5" onclick="placeBet('buy5', this)"><div class="num-sub">3 to 2</div></div>
+                            <div class="bet-cell num-box" data-bet="buy6" onclick="placeBet('buy6', this)"><div class="num-sub">6 to 5</div></div>
+                            <div class="bet-cell num-box" data-bet="buy8" onclick="placeBet('buy8', this)"><div class="num-sub">6 to 5</div></div>
+                            <div class="bet-cell num-box" data-bet="buy9" onclick="placeBet('buy9', this)"><div class="num-sub">3 to 2</div></div>
+                            <div class="bet-cell num-box" data-bet="buy10" onclick="placeBet('buy10', this)"><div class="num-sub">2 to 1</div></div>
+                        </div>
+                        <div class="side-tab">BUY</div>
+                    </div>
+
+                    <div class="num-row-wrapper">
+                        <div class="bet-cell come-box" data-bet="come" onclick="placeBet('come', this)">COME</div>
+                        <div class="side-tab">COME</div>
+                    </div>
+
+                    <!-- FIELD CON CÍRCULOS -->
+                    <div class="field-wrapper">
+                        <div class="bet-cell field-box" data-bet="field" onclick="placeBet('field', this)">
+                            <div class="field-label">FIELD</div>
+                            <div class="field-nums">
+                                <div class="field-num-circle">2</div>
+                                <div class="field-num-circle">3</div>
+                                <div class="field-num-circle">4</div>
+                                <div class="field-num-circle">9</div>
+                                <div class="field-num-circle">10</div>
+                                <div class="field-num-circle">11</div>
+                                <div class="field-num-circle">12</div>
+                            </div>
+                            <div class="field-info">DOUBLE (2) | TRIPLE (12)</div>
+                        </div>
+                        <div class="side-tab">FIELD</div>
+                    </div>
+
+                    <!-- PASS LINE -->
+                    <div class="pass-wrapper">
+                        <div class="pass-section">
+                            <div class="bet-cell pass-cell" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS</div>
+                            <div class="bet-cell pass-cell pass-line-box" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
+                            <div class="bet-cell pass-cell" data-bet="odds" onclick="placeBet('odds', this)">ODDS</div>
+                        </div>
+                        <div class="side-tab">PASS</div>
+                    </div>
                 </div>
-                <div class="side-tab">LAY</div>
-            </div>
 
-            <!-- PLACE CON C/E -->
-            <div class="num-row-wrapper">
-                <div class="num-row">
-                    <div class="bet-cell num-box" data-bet="num4" onclick="placeBet('num4', this)">
-                        <div class="num-label">4</div>
-                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                <div class="prop-area">
+                    <div class="prop-group">
+                        <div class="prop-title">HARDWAYS</div>
+                        <div class="prop-grid">
+                            <div class="bet-cell prop-cell" data-bet="hard4" onclick="placeBet('hard4', this)"><div class="dice-icon">⚁⚁</div><div>9 A 1</div></div>
+                            <div class="bet-cell prop-cell" data-bet="hard6" onclick="placeBet('hard6', this)"><div class="dice-icon">⚂⚂</div><div>7 A 1</div></div>
+                            <div class="bet-cell prop-cell" data-bet="hard8" onclick="placeBet('hard8', this)"><div class="dice-icon">⚃⚃</div><div>7 A 1</div></div>
+                            <div class="bet-cell prop-cell" data-bet="hard10" onclick="placeBet('hard10', this)"><div class="dice-icon">⚄⚄</div><div>9 A 1</div></div>
+                        </div>
                     </div>
-                    <div class="bet-cell num-box" data-bet="num5" onclick="placeBet('num5', this)">
-                        <div class="num-label">5</div>
-                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                    <div class="prop-group">
+                        <div class="prop-title">ONE ROLL</div>
+                        <div class="prop-grid">
+                            <div class="bet-cell prop-cell" data-bet="any7" onclick="placeBet('any7', this)">ANY 7<br>4 A 1</div>
+                            <div class="bet-cell prop-cell" data-bet="snakeeyes" onclick="placeBet('snakeeyes', this)"><div class="dice-icon">⚀⚀</div>30 A 1</div>
+                            <div class="bet-cell prop-cell" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="dice-icon">⚅⚅</div>30 A 1</div>
+                            <div class="bet-cell prop-cell" data-bet="craps" onclick="placeBet('craps', this)">ANY CRAPS<br>7 A 1</div>
+                            <div class="bet-cell prop-cell" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="dice-icon">⚄⚅</div>15 A 1</div>
+                            <div class="bet-cell prop-cell" data-bet="craps3" onclick="placeBet('craps3', this)"><div class="dice-icon">⚀⚁</div>15 A 1</div>
+                        </div>
                     </div>
-                    <div class="bet-cell num-box" data-bet="num6" onclick="placeBet('num6', this)">
-                        <div class="num-label">6</div>
-                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
-                    </div>
-                    <div class="bet-cell num-box" data-bet="num8" onclick="placeBet('num8', this)">
-                        <div class="num-label">8</div>
-                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
-                    </div>
-                    <div class="bet-cell num-box" data-bet="num9" onclick="placeBet('num9', this)">
-                        <div class="num-label">9</div>
-                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
-                    </div>
-                    <div class="bet-cell num-box" data-bet="num10" onclick="placeBet('num10', this)">
-                        <div class="num-label">10</div>
-                        <div class="num-controls"><div class="c-e-btn">C</div><div class="c-e-btn">E</div></div>
+                    <div class="prop-group">
+                        <div class="bet-cell prop-cell" style="grid-column: span 2; min-height: 60px;" data-bet="horn" onclick="placeBet('horn', this)">HORN BET</div>
                     </div>
                 </div>
-                <div class="side-tab">PLACE</div>
-            </div>
 
-            <!-- BUY -->
-            <div class="num-row-wrapper">
-                <div class="num-row">
-                    <div class="bet-cell num-box" data-bet="buy4" onclick="placeBet('buy4', this)"><div class="num-sub">2 to 1</div></div>
-                    <div class="bet-cell num-box" data-bet="buy5" onclick="placeBet('buy5', this)"><div class="num-sub">3 to 2</div></div>
-                    <div class="bet-cell num-box" data-bet="buy6" onclick="placeBet('buy6', this)"><div class="num-sub">6 to 5</div></div>
-                    <div class="bet-cell num-box" data-bet="buy8" onclick="placeBet('buy8', this)"><div class="num-sub">6 to 5</div></div>
-                    <div class="bet-cell num-box" data-bet="buy9" onclick="placeBet('buy9', this)"><div class="num-sub">3 to 2</div></div>
-                    <div class="bet-cell num-box" data-bet="buy10" onclick="placeBet('buy10', this)"><div class="num-sub">2 to 1</div></div>
-                </div>
-                <div class="side-tab">BUY</div>
-            </div>
-
-            <div class="num-row-wrapper">
-                <div class="bet-cell come-box" data-bet="come" onclick="placeBet('come', this)">COME</div>
-                <div class="side-tab">COME</div>
-            </div>
-
-            <!-- FIELD CON CÍRCULOS -->
-            <div class="field-wrapper">
-                <div class="bet-cell field-box" data-bet="field" onclick="placeBet('field', this)">
-                    <div class="field-label">FIELD</div>
-                    <div class="field-nums">
-                        <div class="field-num-circle">2</div>
-                        <div class="field-num-circle">3</div>
-                        <div class="field-num-circle">4</div>
-                        <div class="field-num-circle">9</div>
-                        <div class="field-num-circle">10</div>
-                        <div class="field-num-circle">11</div>
-                        <div class="field-num-circle">12</div>
+                <div class="dice-pit">
+                    <div class="dice-container" id="diceBox">
+                        <div class="die-3d" id="die1"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
+                        <div class="die-3d" id="die2"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
                     </div>
-                    <div class="field-info">2×2 | 12×3</div>
                 </div>
-                <div class="side-tab">FIELD</div>
-            </div>
-
-            <!-- PASS LINE -->
-            <div class="pass-wrapper">
-                <div class="pass-section">
-                    <div class="bet-cell pass-cell" data-bet="dont_pass" onclick="placeBet('dont_pass', this)">DON'T PASS</div>
-                    <div class="bet-cell pass-cell pass-line-box" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
-                    <div class="bet-cell pass-cell" data-bet="odds" onclick="placeBet('odds', this)">ODDS</div>
-                </div>
-                <div class="side-tab">PASS</div>
             </div>
         </div>
 
-        <div class="prop-area">
-            <div class="prop-group">
-                <div class="prop-title">HARDWAYS</div>
-                <div class="prop-grid">
-                    <div class="bet-cell prop-cell" data-bet="hard4" onclick="placeBet('hard4', this)"><div class="dice-icon">⚁⚁</div><div>9 A 1</div></div>
-                    <div class="bet-cell prop-cell" data-bet="hard6" onclick="placeBet('hard6', this)"><div class="dice-icon">⚂⚂</div><div>7 A 1</div></div>
-                    <div class="bet-cell prop-cell" data-bet="hard8" onclick="placeBet('hard8', this)"><div class="dice-icon">⚃⚃</div><div>7 A 1</div></div>
-                    <div class="bet-cell prop-cell" data-bet="hard10" onclick="placeBet('hard10', this)"><div class="dice-icon">⚄⚄</div><div>9 A 1</div></div>
-                </div>
+        <div class="controls">
+            <div class="chips-tray">
+                <div class="c-btn sel" style="background-image:url('/assets/chips/chip_red.png')" onclick="setC(100, this)"><div class="c-val">100</div></div>
+                <div class="c-btn" style="background-image:url('/assets/chips/chip_blue.png')" onclick="setC(200, this)"><div class="c-val">200</div></div>
+                <div class="c-btn" style="background-image:url('/assets/chips/chip_green.png')" onclick="setC(300, this)"><div class="c-val">300</div></div>
+                <div class="c-btn" style="background-image:url('/assets/chips/chip_black.png')" onclick="setC(500, this)"><div class="c-val">500</div></div>
             </div>
-            <div class="prop-group">
-                <div class="prop-title">ONE ROLL</div>
-                <div class="prop-grid">
-                    <div class="bet-cell prop-cell" data-bet="any7" onclick="placeBet('any7', this)">ANY 7<br>4 A 1</div>
-                    <div class="bet-cell prop-cell" data-bet="snakeeyes" onclick="placeBet('snakeeyes', this)"><div class="dice-icon">⚀⚀</div>30 A 1</div>
-                    <div class="bet-cell prop-cell" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="dice-icon">⚅⚅</div>30 A 1</div>
-                    <div class="bet-cell prop-cell" data-bet="craps" onclick="placeBet('craps', this)">ANY CRAPS<br>7 A 1</div>
-                    <div class="bet-cell prop-cell" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="dice-icon">⚄⚅</div>15 A 1</div>
-                    <div class="bet-cell prop-cell" data-bet="craps3" onclick="placeBet('craps3', this)"><div class="dice-icon">⚀⚁</div>15 A 1</div>
-                </div>
-            </div>
-            <div class="prop-group">
-                <div class="bet-cell prop-cell" style="grid-column: span 2; min-height: 7vmin;" data-bet="horn" onclick="placeBet('horn', this)">HORN BET</div>
-            </div>
-        </div>
-
-        <div class="dice-pit">
-            <div class="dice-container" id="diceBox">
-                <div class="die-3d" id="die1"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
-                <div class="die-3d" id="die2"><div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div><div class="face f4">⚃</div><div class="face f5">⚄</div><div class="face f6">⚅</div></div>
-            </div>
+            <button class="roll-btn" id="rollBtn" onclick="forceRoll()">LANZAR</button>
         </div>
     </div>
-</div>
-
-<div class="controls">
-    <div class="chips-tray">
-        <div class="c-btn sel" style="background-image:url('/assets/chips/chip_red.png')" onclick="setC(100, this)"><div class="c-val">100</div></div>
-        <div class="c-btn" style="background-image:url('/assets/chips/chip_blue.png')" onclick="setC(200, this)"><div class="c-val">200</div></div>
-        <div class="c-btn" style="background-image:url('/assets/chips/chip_green.png')" onclick="setC(300, this)"><div class="c-val">300</div></div>
-        <div class="c-btn" style="background-image:url('/assets/chips/chip_black.png')" onclick="setC(500, this)"><div class="c-val">500</div></div>
-    </div>
-    <button class="roll-btn" id="rollBtn" onclick="forceRoll()">LANZAR</button>
 </div>
 
 <script>
+// ESCALADO AUTOMÁTICO
+function scaleGame() {
+    const wrapper = document.querySelector('.game-wrapper');
+    const viewport = document.querySelector('.viewport');
+    
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    
+    const scale = Math.min(vw / 1920, vh / 1080);
+    wrapper.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('resize', scaleGame);
+window.addEventListener('load', scaleGame);
+
 let balance = 0;
 let currentC = 100;
 let bets = {};
