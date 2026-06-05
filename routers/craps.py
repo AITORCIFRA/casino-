@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import random
-from core.database import get_db
+from core.database import get_db_connection
 from routers.wallet import transaccionar_fichas
 
 router = APIRouter(prefix="/api/games/craps", tags=["craps"])

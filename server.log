@@ -31,3 +31,47 @@ Traceback (most recent call last):
     from core.database import get_db
 ImportError: cannot import name 'get_db' from 'core.database' (/home/ubuntu/casino-/core/database.py)
 Error conectando a MySQL: 2003 (HY000): Can't connect to MySQL server on 'localhost:3306' (111)
+WARNING:  StatReload detected changes in 'routers/craps.py'. Reloading...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 131, in _main
+    prepare(preparation_data)
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 297, in _fixup_main_from_path
+    main_content = runpy.run_path(main_path,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/casino-/server.py", line 6, in <module>
+    from routers import auth, wallet, games, battlepass_leagues, tables, craps
+  File "/home/ubuntu/casino-/routers/craps.py", line 6, in <module>
+    from routers.wallet import transaccionar_fichas
+ImportError: cannot import name 'transaccionar_fichas' from 'routers.wallet' (/home/ubuntu/casino-/routers/wallet.py)
+Error conectando a MySQL: 2003 (HY000): Can't connect to MySQL server on 'localhost:3306' (111)
+WARNING:  StatReload detected changes in 'routers/craps.py'. Reloading...
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 131, in _main
+    prepare(preparation_data)
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 246, in prepare
+    _fixup_main_from_path(data['init_main_from_path'])
+  File "/usr/lib/python3.12/multiprocessing/spawn.py", line 297, in _fixup_main_from_path
+    main_content = runpy.run_path(main_path,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/casino-/server.py", line 6, in <module>
+    from routers import auth, wallet, games, battlepass_leagues, tables, craps
+  File "/home/ubuntu/casino-/routers/craps.py", line 6, in <module>
+    from routers.wallet import transaccionar_fichas
+ImportError: cannot import name 'transaccionar_fichas' from 'routers.wallet' (/home/ubuntu/casino-/routers/wallet.py)
+Error conectando a MySQL: 2003 (HY000): Can't connect to MySQL server on 'localhost:3306' (111)
