@@ -75,3 +75,7 @@ Traceback (most recent call last):
     from routers.wallet import transaccionar_fichas
 ImportError: cannot import name 'transaccionar_fichas' from 'routers.wallet' (/home/ubuntu/casino-/routers/wallet.py)
 Error conectando a MySQL: 2003 (HY000): Can't connect to MySQL server on 'localhost:3306' (111)
+WARNING:  StatReload detected changes in 'routers/craps.py'. Reloading...
+INFO:     Started server process [3265]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import random
 from core.database import get_db_connection
-from routers.wallet import transaccionar_fichas
+from routers.wallet import transaction, WalletTransactionRequest
 
 router = APIRouter(prefix="/api/games/craps", tags=["craps"])
 
@@ -15,9 +15,20 @@ class CrapsPlayRequest(BaseModel):
 @router.post("/roll")
 async def roll_dice(req: CrapsPlayRequest):
     # 1. Cobrar apuesta
-    res_cobro = await transaccionar_fichas(req.username, -req.bet_amount, "craps_bet")
-    if not res_cobro["success"]:
+    # Simulamos la llamada al router de wallet internamente
+    res_cobro = await transaction(WalletTransactionRequest(
+        username=req.username,
+        game="craps",
+        type="gasto_juego",
+        amount=-req.bet_amount
+    ))
+    
+    # Si es un JSONResponse con error 402, lanzamos la excepción
+    if hasattr(res_cobro, "status_code") and res_cobro.status_code == 402:
         raise HTTPException(status_code=402, detail="Créditos insuficientes")
+    
+    if not res_cobro.get("success"):
+        raise HTTPException(status_code=400, detail="Error en la transacción")
 
     # 2. Tirar dados
     die1 = random.randint(1, 6)
@@ -56,7 +67,12 @@ async def roll_dice(req: CrapsPlayRequest):
     # 3. Pagar premio si existe
     new_balance = res_cobro["new_balance"]
     if win > 0:
-        res_pago = await transaccionar_fichas(req.username, win, "craps_win")
+        res_pago = await transaction(WalletTransactionRequest(
+            username=req.username,
+            game="craps",
+            type="premio_juego",
+            amount=win
+        ))
         new_balance = res_pago["new_balance"]
 
     return {
