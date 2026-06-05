@@ -14,15 +14,18 @@ class BattlePassBrawl {
     this.currentXP = 0;
     this.rubies = 0;
     this.claimedRewards = new Set();
-    // No inyectar en el constructor, esperar a que el DOM esté listo
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this._inject());
-    } else {
-      this._inject();
-    }
+    // Inyectar inmediatamente si es posible, o esperar al DOM
+    this._inject();
   }
 
   _inject() {
+    if (!document.body) {
+      console.log("Body no listo, esperando...");
+      setTimeout(() => this._inject(), 50);
+      return;
+    }
+    if (document.getElementById('bp-brawl-overlay')) return;
+
     // Estilos
     const style = document.createElement('style');
     style.innerHTML = `
@@ -773,6 +776,12 @@ class BattlePassBrawl {
 
   async loadBattlePass(username) {
     if (!username) return;
+    
+    // Asegurar que el overlay existe antes de intentar actualizarlo
+    if (!document.getElementById('bp-brawl-overlay')) {
+      this._inject();
+    }
+
     try {
       const res = await fetch(`${this.API_URL}/battlepass/${username}`);
       if (res.ok) {
@@ -784,18 +793,26 @@ class BattlePassBrawl {
         this.rubies = 0;
 
         // Actualizar UI
-        document.getElementById('bpLevelBadge').innerText = `Nivel ${this.currentLevel} / 100`;
-        document.getElementById('bpXPLabel').innerText = `${this.currentXP} / ${this.XP_PER_LEVEL} XP`;
-        document.getElementById('bpXPFill').style.width = `${(this.currentXP / this.XP_PER_LEVEL) * 100}%`;
+        const levelBadge = document.getElementById('bpLevelBadge');
+        if (levelBadge) levelBadge.innerText = `Nivel ${this.currentLevel} / 100`;
+        
+        const xpLabel = document.getElementById('bpXPLabel');
+        if (xpLabel) xpLabel.innerText = `${this.currentXP} / ${this.XP_PER_LEVEL} XP`;
+        
+        const xpFill = document.getElementById('bpXPFill');
+        if (xpFill) xpFill.style.width = `${(this.currentXP / this.XP_PER_LEVEL) * 100}%`;
+        
         this._updateRubiesBadge();
 
         const btn = document.getElementById('bpPremiumBtn');
-        if (this.hasPremium) {
-          btn.textContent = '👑 PREMIUM ACTIVADO';
-          btn.classList.add('active');
-        } else {
-          btn.textContent = '👑 ACTIVAR PREMIUM — 5000 🪙';
-          btn.classList.remove('active');
+        if (btn) {
+          if (this.hasPremium) {
+            btn.textContent = '👑 PREMIUM ACTIVADO';
+            btn.classList.add('active');
+          } else {
+            btn.textContent = '👑 ACTIVAR PREMIUM — 5000 🪙';
+            btn.classList.remove('active');
+          }
         }
 
         this._renderTracks(this.currentLevel);
@@ -805,6 +822,8 @@ class BattlePassBrawl {
       }
     } catch (e) {
       console.error('Error cargando Battle Pass', e);
+      // Fallback: mostrar al menos la UI aunque falle el fetch
+      this.show();
     }
   }
 
@@ -919,11 +938,20 @@ class BattlePassBrawl {
 
 // Instanciar cuando el DOM esté listo
 function _initBattlePassBrawl() {
-  if (window.battlePassBrawl) return;
+  if (window.battlePassBrawl) {
+    console.log("BattlePassBrawl ya existe.");
+    return;
+  }
   console.log("Initializing BattlePassBrawl...");
-  const bp = new BattlePassBrawl();
-  window.battlePassBrawl = bp;
+  try {
+    const bp = new BattlePassBrawl();
+    window.battlePassBrawl = bp;
+    console.log("BattlePassBrawl inicializado correctamente.");
+  } catch (e) {
+    console.error("Error inicializando BattlePassBrawl:", e);
+  }
 }
+window._initBattlePassBrawl = _initBattlePassBrawl;
 
 // Inicialización inmediata para evitar problemas de carga
 _initBattlePassBrawl();
