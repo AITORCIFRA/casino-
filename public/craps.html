@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRAPS ULTIMATE 3D</title>
+<title>CRAPS ULTIMATE 3D — PRO EDITION</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/js/wallet.js"></script>
 <script src="/js/curtain-effect.js"></script>
@@ -23,7 +23,7 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
 .craps-table { 
     width: 95%; 
     max-width: 1100px; 
-    height: 550px; 
+    height: 500px; 
     background: var(--felt-blue); 
     border: 12px solid #4a2e1b; 
     border-radius: 40px; 
@@ -39,47 +39,45 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
 /* AREAS DE APUESTA */
 .bet-area { border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
 .bet-area:hover { background: rgba(255,255,255,0.05); }
-.bet-area.selected { background: rgba(201, 168, 76, 0.3); border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
+.bet-area.has-bet { border-color: #00ff99; background: rgba(0,255,153,0.05); }
+
+/* SISTEMA DE FICHAS AMONTONADAS */
+.chip-stack { position: absolute; bottom: 5px; right: 5px; display: flex; flex-direction: column-reverse; align-items: center; pointer-events: none; }
+.chip-visual { width: 24px; height: 6px; background: radial-gradient(circle, #fff 30%, var(--gold) 70%); border: 1px solid rgba(0,0,0,0.3); border-radius: 50%; margin-top: -4px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+.bet-amount-tag { position: absolute; top: -20px; background: #000; color: #00ff99; font-size: 10px; padding: 2px 4px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+
 .bet-label { font-family: 'Orbitron'; font-size: 10px; font-weight: 900; letter-spacing: 1px; color: rgba(255,255,255,0.8); }
 .bet-payout { font-size: 9px; color: var(--gold); margin-top: 2px; }
 
-/* GRID IZQUIERDA (HARDWAYS) */
+/* GRIDS */
 .left-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-
-/* CENTRO (MAIN BOARD) */
 .center-board { display: grid; grid-template-rows: 1fr 2fr 1fr; gap: 5px; }
 .numbers-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
 .field-area { background: rgba(0,0,0,0.2); border: 2px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .field-nums { font-family: 'Orbitron'; font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 5px; }
-
-/* DERECHA (ONE ROLL BETS) */
 .right-grid { display: grid; grid-template-rows: repeat(4, 1fr); gap: 5px; }
 
-/* DICE 3D SYSTEM */
-.dice-overlay { 
-    position: absolute; 
-    inset: 0; 
-    z-index: 1000; 
-    pointer-events: none; 
-    display: none; 
-    align-items: center; 
-    justify-content: center;
-    background: rgba(0,0,0,0.3);
-    backdrop-filter: blur(2px);
-}
-.dice-overlay.active { display: flex; }
+/* SHOOTER ZONE */
+.shooter-zone { position: absolute; left: 20px; bottom: 20px; width: 250px; height: 180px; background: rgba(0,0,0,0.4); border: 2px solid var(--gold); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 50; }
+.shooter-label { font-family: 'Orbitron'; font-size: 12px; color: var(--gold); font-weight: 900; }
+.btn-shoot { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #cc0000, #800000); border: 5px solid #fff; color: #fff; font-family: 'Orbitron'; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.2s; }
+.btn-shoot:hover:not(:disabled) { transform: scale(1.1); filter: brightness(1.2); }
+.btn-shoot:active { transform: scale(0.95); }
+.btn-shoot:disabled { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
 
+/* ANIMACION DADOS VIBRANDO */
+.vibrating { animation: vibrate 0.1s infinite alternate; }
+@keyframes vibrate { from { transform: translate(-2px, -2px) rotate(-2deg); } to { transform: translate(2px, 2px) rotate(2deg); } }
+
+/* DICE 3D OVERLAY */
+.dice-overlay { position: absolute; inset: 0; z-index: 1000; pointer-events: none; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+.dice-overlay.active { display: flex; }
 .dice-scene { width: 400px; height: 400px; position: relative; perspective: 1000px; transform: scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .dice-overlay.active .dice-scene { transform: scale(1.5); }
-
 .die-3d { width: 100px; height: 100px; position: absolute; transform-style: preserve-3d; transition: transform 2s cubic-bezier(0.2, 0.8, 0.3, 1); }
 #die1 { left: 50px; top: 150px; }
 #die2 { right: 50px; top: 150px; }
-
-.die-face { 
-    position: absolute; width: 100px; height: 100px; background: #fff; border: 2px solid #ddd; border-radius: 15px; 
-    display: flex; align-items: center; justify-content: center; font-size: 60px; color: #cc0000; box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-}
+.die-face { position: absolute; width: 100px; height: 100px; background: #fff; border: 2px solid #ddd; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 60px; color: #cc0000; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
 .face-1 { transform: rotateY(0deg) translateZ(50px); }
 .face-2 { transform: rotateY(90deg) translateZ(50px); }
 .face-3 { transform: rotateX(90deg) translateZ(50px); }
@@ -93,22 +91,15 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
 .chip { width: 45px; height: 45px; border-radius: 50%; border: 3px dashed #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 12px; }
 .chip:hover { transform: translateY(-5px) scale(1.1); }
 .chip.selected { border-style: solid; box-shadow: 0 0 15px #fff; }
+.btn-clear { background: #444; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-family: 'Orbitron'; font-size: 12px; cursor: pointer; }
 
-.btn-roll { 
-    background: linear-gradient(135deg, var(--gold), #ffe080); 
-    color: #000; border: none; padding: 12px 60px; border-radius: 30px; 
-    font-family: 'Orbitron'; font-weight: 900; font-size: 20px; cursor: pointer;
-    box-shadow: 0 5px 20px rgba(201,168,76,0.4);
-}
-.btn-roll:disabled { opacity: 0.5; filter: grayscale(1); }
-
-.log-msg { position: absolute; bottom: 80px; width: 100%; text-align: center; font-family: 'Orbitron'; font-size: 22px; color: #fff; text-shadow: 0 0 10px #000; pointer-events: none; }
+.log-msg { position: absolute; bottom: 100px; width: 100%; text-align: center; font-family: 'Orbitron'; font-size: 24px; color: #fff; text-shadow: 0 0 15px #000; pointer-events: none; z-index: 60; }
 </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="title">🎲 CRAPS ELITE 3D</div>
+    <div class="title">🎲 CRAPS ULTIMATE 3D</div>
     <div class="credits">SALDO: <span id="balance">0</span></div>
 </div>
 
@@ -116,40 +107,36 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
     <div class="craps-table">
         <!-- LEFT: HARDWAYS -->
         <div class="left-grid">
-            <div class="bet-area" onclick="selectBet('hard4', this)">
-                <div class="bet-label">HARD 4</div>
-                <div class="bet-payout">7:1</div>
+            <div class="bet-area" data-bet="hard4" onclick="placeBet('hard4', this)">
+                <div class="bet-label">HARD 4</div><div class="bet-payout">7:1</div>
             </div>
-            <div class="bet-area" onclick="selectBet('hard6', this)">
-                <div class="bet-label">HARD 6</div>
-                <div class="bet-payout">9:1</div>
+            <div class="bet-area" data-bet="hard6" onclick="placeBet('hard6', this)">
+                <div class="bet-label">HARD 6</div><div class="bet-payout">9:1</div>
             </div>
-            <div class="bet-area" onclick="selectBet('hard8', this)">
-                <div class="bet-label">HARD 8</div>
-                <div class="bet-payout">9:1</div>
+            <div class="bet-area" data-bet="hard8" onclick="placeBet('hard8', this)">
+                <div class="bet-label">HARD 8</div><div class="bet-payout">9:1</div>
             </div>
-            <div class="bet-area" onclick="selectBet('hard10', this)">
-                <div class="bet-label">HARD 10</div>
-                <div class="bet-payout">7:1</div>
+            <div class="bet-area" data-bet="hard10" onclick="placeBet('hard10', this)">
+                <div class="bet-label">HARD 10</div><div class="bet-payout">7:1</div>
             </div>
         </div>
 
         <!-- CENTER: MAIN BOARD -->
         <div class="center-board">
             <div class="numbers-row">
-                <div class="bet-area" onclick="selectBet('num4', this)"><div class="bet-label">4</div></div>
-                <div class="bet-area" onclick="selectBet('num5', this)"><div class="bet-label">5</div></div>
-                <div class="bet-area" onclick="selectBet('num6', this)"><div class="bet-label">SIX</div></div>
-                <div class="bet-area" onclick="selectBet('num8', this)"><div class="bet-label">8</div></div>
-                <div class="bet-area" onclick="selectBet('num9', this)"><div class="bet-label">NINE</div></div>
-                <div class="bet-area" onclick="selectBet('num10', this)"><div class="bet-label">10</div></div>
+                <div class="bet-area" data-bet="num4" onclick="placeBet('num4', this)"><div class="bet-label">4</div></div>
+                <div class="bet-area" data-bet="num5" onclick="placeBet('num5', this)"><div class="bet-label">5</div></div>
+                <div class="bet-area" data-bet="num6" onclick="placeBet('num6', this)"><div class="bet-label">SIX</div></div>
+                <div class="bet-area" data-bet="num8" onclick="placeBet('num8', this)"><div class="bet-label">8</div></div>
+                <div class="bet-area" data-bet="num9" onclick="placeBet('num9', this)"><div class="bet-label">NINE</div></div>
+                <div class="bet-area" data-bet="num10" onclick="placeBet('num10', this)"><div class="bet-label">10</div></div>
             </div>
-            <div class="field-area bet-area" onclick="selectBet('field', this)">
+            <div class="field-area bet-area" data-bet="field" onclick="placeBet('field', this)">
                 <div class="bet-label">FIELD</div>
                 <div class="field-nums">2 3 4 9 10 11 12</div>
                 <div class="bet-payout">2:1 (2,12 PAGA 3:1)</div>
             </div>
-            <div class="bet-area" onclick="selectBet('pass', this)" style="border-width: 3px; border-color: var(--gold);">
+            <div class="bet-area" data-bet="pass" onclick="placeBet('pass', this)" style="border-width: 3px; border-color: var(--gold);">
                 <div class="bet-label" style="font-size: 20px; color: var(--gold);">PASS LINE</div>
                 <div class="bet-payout">PAGA 1:1</div>
             </div>
@@ -157,44 +144,37 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
 
         <!-- RIGHT: ONE ROLL BETS -->
         <div class="right-grid">
-            <div class="bet-area" onclick="selectBet('any7', this)">
-                <div class="bet-label">ANY SEVEN</div>
-                <div class="bet-payout">4:1</div>
+            <div class="bet-area" data-bet="any7" onclick="placeBet('any7', this)">
+                <div class="bet-label">ANY SEVEN</div><div class="bet-payout">4:1</div>
             </div>
-            <div class="bet-area" onclick="selectBet('craps', this)">
-                <div class="bet-label">ANY CRAPS</div>
-                <div class="bet-payout">7:1</div>
+            <div class="bet-area" data-bet="craps" onclick="placeBet('craps', this)">
+                <div class="bet-label">ANY CRAPS</div><div class="bet-payout">7:1</div>
             </div>
-            <div class="bet-area" onclick="selectBet('yo11', this)">
-                <div class="bet-label">YO 11</div>
-                <div class="bet-payout">15:1</div>
+            <div class="bet-area" data-bet="yo11" onclick="placeBet('yo11', this)">
+                <div class="bet-label">YO 11</div><div class="bet-payout">15:1</div>
             </div>
-            <div class="bet-area" onclick="selectBet('boxcars', this)">
-                <div class="bet-label">BOXCARS (12)</div>
-                <div class="bet-payout">30:1</div>
+            <div class="bet-area" data-bet="boxcars" onclick="placeBet('boxcars', this)">
+                <div class="bet-label">BOXCARS (12)</div><div class="bet-payout">30:1</div>
             </div>
         </div>
     </div>
 
-    <div class="log-msg" id="log">¡ELIGE TU APUESTA Y LANZA!</div>
+    <div class="shooter-zone">
+        <div class="shooter-label">TIRADOR (TÚ)</div>
+        <button class="btn-shoot vibrating" id="shootBtn" onclick="rollDice()">Lanzar!</button>
+    </div>
+
+    <div class="log-msg" id="log">HAZ TUS APUESTAS Y LANZA!</div>
 
     <div class="dice-overlay" id="diceOverlay">
         <div class="dice-scene">
             <div class="die-3d" id="die1">
-                <div class="die-face face-1">⚀</div>
-                <div class="die-face face-2">⚁</div>
-                <div class="die-face face-3">⚂</div>
-                <div class="die-face face-4">⚃</div>
-                <div class="die-face face-5">⚄</div>
-                <div class="die-face face-6">⚅</div>
+                <div class="die-face face-1">⚀</div><div class="die-face face-2">⚁</div><div class="die-face face-3">⚂</div>
+                <div class="die-face face-4">⚃</div><div class="die-face face-5">⚄</div><div class="die-face face-6">⚅</div>
             </div>
             <div class="die-3d" id="die2">
-                <div class="die-face face-1">⚀</div>
-                <div class="die-face face-2">⚁</div>
-                <div class="die-face face-3">⚂</div>
-                <div class="die-face face-4">⚃</div>
-                <div class="die-face face-5">⚄</div>
-                <div class="die-face face-6">⚅</div>
+                <div class="die-face face-1">⚀</div><div class="die-face face-2">⚁</div><div class="die-face face-3">⚂</div>
+                <div class="die-face face-4">⚃</div><div class="die-face face-5">⚄</div><div class="die-face face-6">⚅</div>
             </div>
         </div>
     </div>
@@ -208,14 +188,15 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
         <div class="chip" style="background:#f59e0b" onclick="setChip(500, this)">500</div>
         <div class="chip" style="background:#8b5cf6" onclick="setChip(1000, this)">1K</div>
     </div>
-    <button class="btn-roll" id="rollBtn" onclick="rollDice()">LANZAR DADOS</button>
+    <button class="btn-clear" onclick="clearBets()">LIMPIAR APUESTAS</button>
 </div>
 
 <script>
 let balance = 0;
 let currentChip = 100;
-let selectedBet = 'pass';
+let bets = {}; // { betType: amount }
 let isRolling = false;
+const MAX_BETS_COUNT = 5;
 const winAnim = new WinAnimation();
 
 async function init() {
@@ -235,88 +216,152 @@ function setChip(val, el) {
     el.classList.add('selected');
 }
 
-function selectBet(type, el) {
+function placeBet(type, el) {
     if (isRolling) return;
-    selectedBet = type;
-    document.querySelectorAll('.bet-area').forEach(a => a.classList.remove('selected'));
-    el.classList.add('selected');
+    
+    // Límite de tipos de apuesta diferentes
+    if (!bets[type] && Object.keys(bets).length >= MAX_BETS_COUNT) {
+        document.getElementById('log').textContent = "MÁXIMO 5 TIPOS DE APUESTA!";
+        return;
+    }
+
+    if (balance < currentChip) { WalletAPI.openShop(); return; }
+
+    bets[type] = (bets[type] || 0) + currentChip;
+    balance -= currentChip;
+    updateUI();
+    updateBetVisuals(type, el);
+    document.getElementById('log').textContent = "APUESTA AÑADIDA!";
+}
+
+function updateBetVisuals(type, el) {
+    el.classList.add('has-bet');
+    let stack = el.querySelector('.chip-stack');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.className = 'chip-stack';
+        el.appendChild(stack);
+    }
+    
+    // Actualizar visualización de pilas (máximo 5 fichas visuales)
+    stack.innerHTML = '';
+    const visualChips = Math.min(5, Math.ceil(bets[type] / 100));
+    for (let i = 0; i < visualChips; i++) {
+        const c = document.createElement('div');
+        c.className = 'chip-visual';
+        stack.appendChild(c);
+    }
+    
+    const tag = document.createElement('div');
+    tag.className = 'bet-amount-tag';
+    tag.textContent = bets[type].toLocaleString();
+    stack.appendChild(tag);
+}
+
+function clearBets() {
+    if (isRolling) return;
+    let totalReturn = 0;
+    for (let type in bets) totalReturn += bets[type];
+    balance += totalReturn;
+    bets = {};
+    document.querySelectorAll('.bet-area').forEach(el => {
+        el.classList.remove('has-bet');
+        const stack = el.querySelector('.chip-stack');
+        if (stack) stack.remove();
+    });
+    updateUI();
+    document.getElementById('log').textContent = "APUESTAS LIMPIADAS";
 }
 
 async function rollDice() {
     if (isRolling) return;
-    if (balance < currentChip) { WalletAPI.openShop(); return; }
+    if (Object.keys(bets).length === 0) {
+        document.getElementById('log').textContent = "¡HAZ UNA APUESTA PRIMERO!";
+        return;
+    }
 
     isRolling = true;
-    document.getElementById('rollBtn').disabled = true;
-    document.getElementById('log').textContent = "¡LANZANDO DADOS!";
+    document.getElementById('shootBtn').disabled = true;
+    document.getElementById('shootBtn').classList.remove('vibrating');
+    document.getElementById('log').textContent = "¡DADOS AL AIRE!";
 
     try {
-        const res = await fetch('/api/games/craps/roll', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: WalletAPI.getUsername(),
-                bet_amount: currentChip,
-                bet_type: selectedBet
-            })
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail);
+        // Procesar cada apuesta (secuencial para simplificar el backend existente)
+        let totalWin = 0;
+        let finalBalance = balance;
+        let lastResult = null;
 
-        // Iniciar animación 3D
+        for (let type in bets) {
+            const res = await fetch('/api/games/craps/roll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: WalletAPI.getUsername(),
+                    bet_amount: bets[type],
+                    bet_type: type
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail);
+            
+            totalWin += data.win_amount;
+            finalBalance = data.new_balance;
+            lastResult = data;
+        }
+
+        // Animación 3D
         const overlay = document.getElementById('diceOverlay');
         overlay.classList.add('active');
         
         const d1 = document.getElementById('die1');
         const d2 = document.getElementById('die2');
-        
-        // Rotaciones aleatorias previas para el efecto de giro
+        const faceRots = { 1: [0, 0], 2: [0, -90], 3: [-90, 0], 4: [90, 0], 5: [0, 90], 6: [0, 180] };
+
         const rotX1 = Math.floor(Math.random() * 5 + 5) * 360;
         const rotY1 = Math.floor(Math.random() * 5 + 5) * 360;
         const rotX2 = Math.floor(Math.random() * 5 + 5) * 360;
         const rotY2 = Math.floor(Math.random() * 5 + 5) * 360;
 
-        // Mapeo de caras a rotaciones
-        const faceRots = {
-            1: [0, 0],
-            2: [0, -90],
-            3: [-90, 0],
-            4: [90, 0],
-            5: [0, 90],
-            6: [0, 180]
-        };
-
-        const f1 = faceRots[data.dice[0]];
-        const f2 = faceRots[data.dice[1]];
-
-        d1.style.transform = `rotateX(${rotX1 + f1[0]}deg) rotateY(${rotY1 + f1[1]}deg)`;
-        d2.style.transform = `rotateX(${rotX2 + f2[0]}deg) rotateY(${rotY2 + f2[1]}deg)`;
+        d1.style.transform = `rotateX(${rotX1 + faceRots[lastResult.dice[0]][0]}deg) rotateY(${rotY1 + faceRots[lastResult.dice[0]][1]}deg)`;
+        d2.style.transform = `rotateX(${rotX2 + faceRots[lastResult.dice[1]][0]}deg) rotateY(${rotY2 + faceRots[lastResult.dice[1]][1]}deg)`;
 
         setTimeout(() => {
-            document.getElementById('log').textContent = data.message;
-            balance = data.new_balance;
+            document.getElementById('log').textContent = `TIRADA: ${lastResult.dice[0]} + ${lastResult.dice[1]} = ${lastResult.total}`;
+            balance = finalBalance;
             updateUI();
             
-            if (data.win_amount > currentChip) {
-                winAnim.fountainEffect(data.win_amount);
+            if (totalWin > 0) {
+                setTimeout(() => {
+                    document.getElementById('log').textContent = `¡HAS GANADO ${totalWin.toLocaleString()}!`;
+                    winAnim.fountainEffect(totalWin);
+                }, 1000);
             }
 
             setTimeout(() => {
                 overlay.classList.remove('active');
-                d1.style.transform = '';
-                d2.style.transform = '';
+                d1.style.transform = ''; d2.style.transform = '';
                 isRolling = false;
-                document.getElementById('rollBtn').disabled = false;
-            }, 2000);
+                document.getElementById('shootBtn').disabled = false;
+                document.getElementById('shootBtn').classList.add('vibrating');
+                clearBetsAfterRoll();
+            }, 3000);
         }, 2200);
 
     } catch (e) {
         console.error(e);
         isRolling = false;
-        document.getElementById('rollBtn').disabled = false;
+        document.getElementById('shootBtn').disabled = false;
         document.getElementById('log').textContent = "ERROR EN EL SERVIDOR";
     }
+}
+
+function clearBetsAfterRoll() {
+    bets = {};
+    document.querySelectorAll('.bet-area').forEach(el => {
+        el.classList.remove('has-bet');
+        const stack = el.querySelector('.chip-stack');
+        if (stack) stack.remove();
+    });
 }
 
 init();
