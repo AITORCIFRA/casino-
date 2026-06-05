@@ -664,7 +664,6 @@ body {
   .nav-arrow { width: 45px; height: 45px; font-size: 18px; }
 }
 </style>
-  <script src="/battlepass-brawl.js" defer></script>
 </head>
 <body>
 
@@ -1296,6 +1295,7 @@ function doLogout() { localStorage.clear(); window.location.reload(); }
 
 window.onload = () => { if(currentUser) { document.getElementById("authScreen").classList.add("hidden"); document.getElementById("lobbyScreen").classList.remove("hidden"); initLobby(); } };
 </script>
+<script src="/battlepass-brawl.js"></script>
 <script src="/table-lobby.js"></script>
 </body>
 </html>

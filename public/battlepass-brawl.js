@@ -908,12 +908,16 @@ class BattlePassBrawl {
 
 // Instanciar cuando el DOM esté listo
 function _initBattlePassBrawl() {
+  if (window.battlePassBrawl) return;
+  console.log("Initializing BattlePassBrawl...");
   const bp = new BattlePassBrawl();
   window.battlePassBrawl = bp;
 }
 
+// Inicialización inmediata para evitar problemas de carga
+_initBattlePassBrawl();
+
+// Backup por si el DOM no estaba listo
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _initBattlePassBrawl);
-} else {
-  _initBattlePassBrawl();
 }
