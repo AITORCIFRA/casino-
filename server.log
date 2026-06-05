@@ -79,3 +79,11 @@ WARNING:  StatReload detected changes in 'routers/craps.py'. Reloading...
 INFO:     Started server process [3265]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'routers/craps.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3265]
+INFO:     Started server process [3510]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

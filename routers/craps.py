@@ -38,31 +38,79 @@ async def roll_dice(req: CrapsPlayRequest):
     win = 0
     message = f"Tirada: {die1} + {die2} = {total}"
     
-    # Lógica simplificada de Craps para la primera tirada (Come Out Roll)
+    # Lógica completa de Craps (Versión Arcade One-Roll)
     if req.bet_type == "pass":
         if total in [7, 11]:
             win = req.bet_amount * 2
-            message += " - ¡Ganaste! (Natural)"
+            message += " - ¡GANASTE! (NATURAL)"
         elif total in [2, 3, 12]:
             win = 0
-            message += " - Craps. Perdiste."
+            message += " - CRAPS. PERDISTE."
         else:
-            # En una versión completa aquí se establecería el punto
-            # Para esta versión arcade, devolvemos la apuesta si no es decisión inmediata
-            win = req.bet_amount 
-            message += " - Punto establecido (Empate en arcade)"
+            win = req.bet_amount # Devolvemos apuesta si es punto para no frustrar al jugador
+            message += " - PUNTO ESTABLECIDO (EMPATE)"
             
     elif req.bet_type == "field":
-        # Apuesta de campo: gana en 2, 3, 4, 9, 10, 11, 12
         if total in [2, 12]:
             win = req.bet_amount * 3
-            message += " - ¡Campo Ganador (x3)!"
+            message += " - ¡CAMPO GANADOR (x3)!"
         elif total in [3, 4, 9, 10, 11]:
             win = req.bet_amount * 2
-            message += " - ¡Campo Ganador (x2)!"
+            message += " - ¡CAMPO GANADOR (x2)!"
         else:
             win = 0
-            message += " - Campo Perdedor."
+            message += " - CAMPO PERDEDOR."
+
+    elif req.bet_type == "any7":
+        if total == 7:
+            win = req.bet_amount * 5
+            message += " - ¡ANY SEVEN! (x5)"
+        else:
+            win = 0
+            message += " - PERDISTE."
+
+    elif req.bet_type == "craps":
+        if total in [2, 3, 12]:
+            win = req.bet_amount * 8
+            message += " - ¡ANY CRAPS! (x8)"
+        else:
+            win = 0
+            message += " - PERDISTE."
+
+    elif req.bet_type == "yo11":
+        if total == 11:
+            win = req.bet_amount * 16
+            message += " - ¡YO-LEVEN! (x16)"
+        else:
+            win = 0
+            message += " - PERDISTE."
+
+    elif req.bet_type == "boxcars":
+        if total == 12:
+            win = req.bet_amount * 31
+            message += " - ¡BOXCARS! (x31)"
+        else:
+            win = 0
+            message += " - PERDISTE."
+
+    elif req.bet_type.startswith("hard"):
+        val = int(req.bet_type.replace("hard", ""))
+        if total == val and die1 == die2:
+            mult = 8 if val in [4, 10] else 10
+            win = req.bet_amount * mult
+            message += f" - ¡HARDWAY {val}! (x{mult})"
+        else:
+            win = 0
+            message += " - PERDISTE."
+
+    elif req.bet_type.startswith("num"):
+        val = int(req.bet_type.replace("num", ""))
+        if total == val:
+            win = req.bet_amount * 2
+            message += f" - ¡NÚMERO {val}! (x2)"
+        else:
+            win = 0
+            message += " - PERDISTE."
 
     # 3. Pagar premio si existe
     new_balance = res_cobro["new_balance"]
