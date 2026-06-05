@@ -11,24 +11,29 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; padding: 20px; overflow: hidden; }
 
-.header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; }
-.title { font-family: 'Orbitron'; font-size: 24px; color: #FF9F43; font-weight: 900; letter-spacing: 2px; }
+.header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+.title { font-family: 'Orbitron'; font-size: 24px; color: #FF9F43; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 15px rgba(255,159,67,0.5); }
 .credits-display { font-family: 'Orbitron'; font-size: 18px; color: #00FF99; }
 
-.game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+.game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; width: 100%; }
 
-.plinko-board { width: 400px; height: 500px; background: radial-gradient(circle, #1a1a2e 0%, #09090e 100%); border: 3px solid #FF9F43; border-radius: 15px; position: relative; overflow: hidden; }
-.peg { position: absolute; width: 12px; height: 12px; background: #FF9F43; border-radius: 50%; box-shadow: 0 0 10px #FF9F43; }
-.ball { position: absolute; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #FFD700, #FF9F43); border-radius: 50%; box-shadow: 0 0 15px #FFD700; }
-.bucket { position: absolute; bottom: 10px; width: 50px; height: 30px; background: rgba(0,255,153,0.2); border: 2px solid #00FF99; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #00FF99; }
+.plinko-board { width: 500px; height: 600px; background: rgba(20, 20, 35, 0.8); border: 3px solid #FF9F43; border-radius: 20px; position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,159,67,0.1); }
+.peg { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 8px #fff; transform: translate(-50%, -50%); }
+.ball { position: absolute; width: 14px; height: 14px; background: radial-gradient(circle at 30% 30%, #FFD700, #FF9F43); border-radius: 50%; box-shadow: 0 0 15px #FFD700; transform: translate(-50%, -50%); z-index: 10; }
 
-.controls { display: flex; gap: 15px; }
-.btn { font-family: 'Orbitron'; font-weight: 900; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; letter-spacing: 1px; transition: all 0.3s; }
+.buckets-container { position: absolute; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 0 10px 10px 10px; }
+.bucket { width: 45px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 10px; font-weight: 900; color: #fff; transition: transform 0.2s, filter 0.2s; border: 2px solid rgba(255,255,255,0.2); }
+.bucket.active { transform: scale(1.2); filter: brightness(1.5); }
+
+.controls { display: flex; gap: 15px; align-items: center; background: rgba(255,255,255,0.03); padding: 15px 30px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.05); }
+.bet-info { font-family: 'Orbitron'; font-size: 14px; color: rgba(255,255,255,0.5); }
+.btn { font-family: 'Orbitron'; font-weight: 900; padding: 12px 40px; border: none; border-radius: 30px; cursor: pointer; font-size: 16px; letter-spacing: 1px; transition: all 0.3s; text-transform: uppercase; }
 .btn-drop { background: linear-gradient(135deg, #FF9F43, #FFD700); color: #000; box-shadow: 0 4px 15px rgba(255,159,67,0.3); }
-.btn-drop:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,159,67,0.5); }
-.btn-drop:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-drop:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,159,67,0.5); filter: brightness(1.1); }
+.btn-drop:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
-.result { font-family: 'Bebas Neue'; font-size: 32px; color: #00FF99; text-align: center; min-height: 40px; }
+.result-popup { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-family: 'Bebas Neue'; font-size: 80px; color: #00FF99; text-shadow: 0 0 30px #00FF99; pointer-events: none; opacity: 0; z-index: 20; }
+@keyframes popupAnim { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(1); } }
 </style>
 </head>
 <body>
@@ -40,9 +45,11 @@ body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; di
 
 <div class="game-area">
   <div class="plinko-board" id="board">
-    <div class="result" id="result"></div>
+    <div class="result-popup" id="resultPopup">×0</div>
+    <div class="buckets-container" id="buckets"></div>
   </div>
   <div class="controls">
+    <div class="bet-info">APUESTA: <span id="betVal">0</span></div>
     <button class="btn btn-drop" id="dropBtn" onclick="dropBall()">SOLTAR BOLA</button>
   </div>
 </div>
@@ -51,11 +58,66 @@ body { background: #09090e; color: #fff; font-family: 'Rajdhani', sans-serif; di
 let credits = 0;
 let isDropping = false;
 const params = new URLSearchParams(window.location.search);
-const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 1);
+const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 10);
 let MAX_BET = parseInt(params.get('max_bet'));
 if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
 const BET = Math.min(MAX_BET, Math.max(MIN_BET, 50));
+
+const ROWS = 12;
+const PEGS = [];
+const BUCKETS = [
+  { mult: 5.0, color: '#ff3b30' },
+  { mult: 2.0, color: '#ff9500' },
+  { mult: 1.5, color: '#ffcc00' },
+  { mult: 1.0, color: '#4cd964' },
+  { mult: 0.5, color: '#5ac8fa' },
+  { mult: 0.2, color: '#007aff' },
+  { mult: 0.5, color: '#5ac8fa' },
+  { mult: 1.0, color: '#4cd964' },
+  { mult: 1.5, color: '#ffcc00' },
+  { mult: 2.0, color: '#ff9500' },
+  { mult: 5.0, color: '#ff3b30' }
+];
+
+const board = document.getElementById('board');
+const bucketsCont = document.getElementById('buckets');
 const winAnim = new WinAnimation();
+
+function initBoard() {
+  document.getElementById('betVal').textContent = BET.toLocaleString();
+  
+  // Crear clavos (pegs)
+  const boardWidth = 500;
+  const boardHeight = 600;
+  const startY = 80;
+  const spacingY = 40;
+  
+  for (let r = 0; r < ROWS; r++) {
+    const cols = r + 3;
+    const spacingX = boardWidth / (cols + 1);
+    for (let c = 0; c < cols; c++) {
+      const x = spacingX * (c + 1);
+      const y = startY + (r * spacingY);
+      const peg = document.createElement('div');
+      peg.className = 'peg';
+      peg.style.left = x + 'px';
+      peg.style.top = y + 'px';
+      board.appendChild(peg);
+      PEGS.push({ x, y });
+    }
+  }
+
+  // Crear cubos (buckets)
+  BUCKETS.forEach((b, i) => {
+    const div = document.createElement('div');
+    div.className = 'bucket';
+    div.id = 'bucket-' + i;
+    div.style.backgroundColor = b.color + '33';
+    div.style.borderColor = b.color;
+    div.innerHTML = `×${b.mult}`;
+    bucketsCont.appendChild(div);
+  });
+}
 
 async function initCredits() {
   credits = await WalletAPI.getBalance();
@@ -69,19 +131,11 @@ function updateUI() {
 
 async function dropBall() {
   if (isDropping) return;
-  if (BET < MIN_BET || BET > MAX_BET) {
-    document.getElementById('result').textContent = `Apuesta válida: ${MIN_BET}-${MAX_BET}`;
-    return;
-  }
-  if (credits < BET) {
-    WalletAPI.openShop();
-    return;
-  }
-  
+  if (credits < BET) { WalletAPI.openShop(); return; }
+
   isDropping = true;
   document.getElementById('dropBtn').disabled = true;
-  
-  // Deducir apuesta
+
   const res = await WalletAPI.transaccionar('plinko', -BET);
   if (!res.success) {
     isDropping = false;
@@ -91,36 +145,99 @@ async function dropBall() {
   
   credits = res.new_balance;
   updateUI();
-  
-  // Simular caída y premio
-  const multipliers = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5];
-  const winMultiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
-  const winAmount = Math.floor(BET * winMultiplier);
-  
-  // Animación de caída
-  setTimeout(async () => {
-    document.getElementById('result').textContent = `×${winMultiplier}`;
-    
-    if (winAmount > 0) {
-      const resWin = await WalletAPI.transaccionar('plinko', winAmount);
-      if (resWin.success) {
-        credits = resWin.new_balance;
-        updateUI();
-        winAnim.fountainEffect(winAmount);
+
+  const ball = document.createElement('div');
+  ball.className = 'ball';
+  board.appendChild(ball);
+
+  let x = 250 + (Math.random() * 10 - 5);
+  let y = 30;
+  let vx = 0;
+  let vy = 0;
+  const gravity = 0.25;
+  const friction = 0.98;
+  const bounce = 0.6;
+
+  function animate() {
+    vy += gravity;
+    vx *= friction;
+    vy *= friction;
+    x += vx;
+    y += vy;
+
+    // Colisión con clavos
+    PEGS.forEach(peg => {
+      const dx = x - peg.x;
+      const dy = y - peg.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 12) { // Radio bola(7) + Radio clavo(4) + margen
+        const angle = Math.atan2(dy, dx);
+        const force = 4;
+        vx = Math.cos(angle) * force + (Math.random() * 2 - 1);
+        vy = Math.sin(angle) * force;
+        // Mover fuera del clavo
+        x = peg.x + Math.cos(angle) * 12;
+        y = peg.y + Math.sin(angle) * 12;
       }
+    });
+
+    // Límites laterales
+    if (x < 15) { x = 15; vx *= -bounce; }
+    if (x > 485) { x = 485; vx *= -bounce; }
+
+    ball.style.left = x + 'px';
+    ball.style.top = y + 'px';
+
+    if (y < 560) {
+      requestAnimationFrame(animate);
+    } else {
+      finishDrop(ball, x);
     }
-    
-    setTimeout(() => {
-      document.getElementById('result').textContent = '';
-      isDropping = false;
-      document.getElementById('dropBtn').disabled = false;
-    }, 1500);
-  }, 1000);
+  }
+
+  animate();
 }
 
+async function finishDrop(ball, finalX) {
+  // Determinar bucket
+  const bucketWidth = 500 / BUCKETS.length;
+  const bucketIdx = Math.floor(finalX / bucketWidth);
+  const clampedIdx = Math.max(0, Math.min(BUCKETS.length - 1, bucketIdx));
+  const bucket = BUCKETS[clampedIdx];
+  
+  const bucketEl = document.getElementById('bucket-' + clampedIdx);
+  bucketEl.classList.add('active');
+  setTimeout(() => bucketEl.classList.remove('active'), 300);
+
+  const winAmount = Math.floor(BET * bucket.mult);
+  
+  // Mostrar resultado
+  const popup = document.getElementById('resultPopup');
+  popup.textContent = `×${bucket.mult}`;
+  popup.style.color = bucket.mult >= 1 ? '#00FF99' : '#FF3B30';
+  popup.style.animation = 'none';
+  void popup.offsetWidth;
+  popup.style.animation = 'popupAnim 1.5s ease forwards';
+
+  if (winAmount > 0) {
+    const res = await WalletAPI.transaccionar('plinko', winAmount);
+    if (res.success) {
+      credits = res.new_balance;
+      updateUI();
+      if (bucket.mult >= 2) winAnim.fountainEffect(winAmount);
+    }
+  }
+
+  setTimeout(() => {
+    ball.remove();
+    isDropping = false;
+    document.getElementById('dropBtn').disabled = false;
+  }, 500);
+}
+
+initBoard();
 initCredits();
 
-// Escuchar actualizaciones de créditos desde el lobby
 window.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'credits_updated') {
     credits = Math.floor(event.data.balance);

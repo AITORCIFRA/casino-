@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRAPS ELITE — DADOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/js/wallet.js"></script>
+<script src="/js/curtain-effect.js"></script>
+<script src="/animations.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #051a10; color: #fff; font-family: 'Rajdhani', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; padding: 20px; overflow: hidden; }
+
+.header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid #C9A84C; }
+.title { font-family: 'Orbitron'; font-size: 24px; color: #C9A84C; font-weight: 900; letter-spacing: 2px; }
+.credits-display { font-family: 'Orbitron'; font-size: 18px; color: #00FF99; }
+
+.table-area { flex: 1; width: 100%; max-width: 900px; background: #0d3b25; border: 15px solid #4a2e1b; border-radius: 100px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: inset 0 0 100px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.5); }
+.felt-line { position: absolute; inset: 20px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 80px; pointer-events: none; }
+
+.dice-container { display: flex; gap: 30px; margin-bottom: 40px; perspective: 1000px; z-index: 10; }
+.die { width: 80px; height: 80px; background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.die-face { font-size: 50px; color: #000; }
+
+.rolling { animation: rollAnim 0.5s infinite linear; }
+@keyframes rollAnim { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+
+.betting-layout { display: flex; gap: 15px; z-index: 10; margin-top: 20px; }
+.bet-box { background: rgba(0,0,0,0.4); border: 2px solid #C9A84C; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; min-width: 120px; }
+.bet-box:hover { background: rgba(201, 168, 76, 0.2); transform: translateY(-5px); }
+.bet-box.selected { background: #C9A84C; color: #000; box-shadow: 0 0 20px #C9A84C; }
+.bet-name { font-family: 'Orbitron'; font-size: 14px; font-weight: 900; }
+.bet-payout { font-size: 11px; opacity: 0.8; margin-top: 5px; }
+
+.controls { margin-top: 40px; display: flex; align-items: center; gap: 20px; }
+.btn-roll { font-family: 'Orbitron'; font-weight: 900; padding: 15px 50px; background: linear-gradient(135deg, #C9A84C, #FFE080); color: #000; border: none; border-radius: 50px; cursor: pointer; font-size: 20px; box-shadow: 0 5px 15px rgba(201,168,76,0.4); text-transform: uppercase; }
+.btn-roll:hover:not(:disabled) { transform: scale(1.05); filter: brightness(1.1); }
+.btn-roll:disabled { opacity: 0.5; filter: grayscale(1); }
+
+.message-log { position: absolute; bottom: 60px; font-family: 'Orbitron'; font-size: 18px; color: #fff; text-align: center; width: 100%; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">🎲 CRAPS ELITE</div>
+  <div class="credits-display">CRÉDITOS: <span id="credits">0</span></div>
+</div>
+
+<div class="table-area">
+  <div class="felt-line"></div>
+  
+  <div class="dice-container">
+    <div class="die" id="die1"><span class="die-face">⚀</span></div>
+    <div class="die" id="die2"><span class="die-face">⚅</span></div>
+  </div>
+
+  <div class="message-log" id="log">ELIGE TU APUESTA Y LANZA LOS DADOS</div>
+
+  <div class="betting-layout">
+    <div class="bet-box selected" onclick="selectBet('pass', this)">
+      <div class="bet-name">PASS LINE</div>
+      <div class="bet-payout">PAGA 1:1</div>
+    </div>
+    <div class="bet-box" onclick="selectBet('field', this)">
+      <div class="bet-name">FIELD</div>
+      <div class="bet-payout">PAGA HASTA 3:1</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div style="font-family:'Orbitron'; color:#00FF99">APUESTA: <span id="betVal">0</span></div>
+    <button class="btn-roll" id="rollBtn" onclick="rollDice()">LANZAR DADOS</button>
+  </div>
+</div>
+
+<script>
+let credits = 0;
+let isRolling = false;
+let selectedBet = 'pass';
+const params = new URLSearchParams(window.location.search);
+const MIN_BET = Math.max(1, parseInt(params.get('min_bet')) || 10);
+let MAX_BET = parseInt(params.get('max_bet'));
+if (isNaN(MAX_BET) || MAX_BET < MIN_BET) MAX_BET = MIN_BET * 1000;
+const BET = Math.min(MAX_BET, Math.max(MIN_BET, 100));
+
+const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+const winAnim = new WinAnimation();
+
+async function initCredits() {
+  credits = await WalletAPI.getBalance();
+  updateUI();
+  document.getElementById('betVal').textContent = BET.toLocaleString();
+}
+
+function updateUI() {
+  document.getElementById('credits').textContent = credits.toLocaleString();
+  window.parent.postMessage({ type: 'credits', value: credits }, '*');
+}
+
+function selectBet(type, el) {
+  if (isRolling) return;
+  selectedBet = type;
+  document.querySelectorAll('.bet-box').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function rollDice() {
+  if (isRolling) return;
+  if (credits < BET) { WalletAPI.openShop(); return; }
+
+  isRolling = true;
+  document.getElementById('rollBtn').disabled = true;
+  document.getElementById('log').textContent = "¡LANZANDO...";
+
+  // Animación visual
+  const d1 = document.getElementById('die1');
+  const d2 = document.getElementById('die2');
+  d1.classList.add('rolling');
+  d2.classList.add('rolling');
+
+  try {
+    const res = await fetch('/api/games/craps/roll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: WalletAPI.getUsername(),
+        bet_amount: BET,
+        bet_type: selectedBet
+      })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+
+    // Esperar un poco para la animación
+    setTimeout(() => {
+      d1.classList.remove('rolling');
+      d2.classList.remove('rolling');
+      
+      d1.querySelector('.die-face').textContent = diceFaces[data.dice[0] - 1];
+      d2.querySelector('.die-face').textContent = diceFaces[data.dice[1] - 1];
+      
+      document.getElementById('log').textContent = data.message;
+      
+      credits = data.new_balance;
+      updateUI();
+
+      if (data.win_amount > BET) {
+        winAnim.fountainEffect(data.win_amount);
+      }
+
+      isRolling = false;
+      document.getElementById('rollBtn').disabled = false;
+    }, 1000);
+
+  } catch (e) {
+    console.error(e);
+    d1.classList.remove('rolling');
+    d2.classList.remove('rolling');
+    isRolling = false;
+    document.getElementById('rollBtn').disabled = false;
+    document.getElementById('log').textContent = "ERROR EN EL SERVIDOR";
+  }
+}
+
+initCredits();
+
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'credits_updated') {
+    credits = Math.floor(event.data.balance);
+    updateUI();
+  }
+});
+</script>
+</body>
+</html>

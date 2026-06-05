@@ -861,7 +861,8 @@ const GAMES = [
   { id: 'plinko',   title: 'PLINKO EXTREME', file: 'plinko.html',   cat: 'arcade', color: '#FF9F43', img: '/assets/games/LzigdfqGJqBH.jpg' },
   { id: 'roulette', title: 'ROULETTE ELITE',  file: 'roulette.html', cat: 'mesa',   color: '#FF1744', img: '/assets/games/ueFafQNyPKsD.jpg' },
   { id: 'poker',    title: 'POKER TEXAS',    file: 'poker.html',    cat: 'mesa',   color: '#FF6B35', img: '/assets/games/ctMqgVaaG9Cs.jpg', minPlayers: 2 },
-  { id: 'magic_trakka', title: 'MAGIC TRAKKA', file: 'magic_trakka.html', cat: 'arcade', color: '#A855F7', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=magic' }
+  { id: 'magic_trakka', title: 'MAGIC TRAKKA', file: 'magic_trakka.html', cat: 'arcade', color: '#A855F7', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=magic' },
+  { id: 'craps', title: 'CRAPS ELITE', file: 'craps.html', cat: 'mesa', color: '#C9A84C', img: 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=300' }
 ];
 
 const GAME_DEFAULT_LIMITS = {
@@ -874,7 +875,8 @@ const GAME_DEFAULT_LIMITS = {
   'plinko.html': { min: 1, max: 100 },
   'slots.html': { min: 1, max: 100 },
   '3_en_1.html': { min: 1, max: 100 },
-  'magic_trakka.html': { min: 5, max: 1000 }
+  'magic_trakka.html': { min: 5, max: 1000 },
+  'craps.html': { min: 10, max: 1000 }
 };
 
 function getGameBetLimits(file, balance) {

@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from routers import auth, wallet, games, battlepass_leagues, tables
+from routers import auth, wallet, games, battlepass_leagues, tables, craps
 
 app = FastAPI(
     title="Arcade Premium Ultimate API",
@@ -25,6 +25,7 @@ app.include_router(wallet.router)
 app.include_router(games.router)
 app.include_router(battlepass_leagues.router)
 app.include_router(tables.router)
+app.include_router(craps.router)
 
 # Servir archivos estáticos desde public/
 app.mount("/css", StaticFiles(directory="public/css"), name="css")
