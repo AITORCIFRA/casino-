@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRAPS POKERIST CLONE</title>
+<title>CRAPS POKERIST ULTIMATE</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/js/wallet.js"></script>
 <script src="/js/curtain-effect.js"></script>
@@ -46,7 +46,7 @@ body {
     justify-content: center;
     background: var(--felt); 
     overflow: hidden;
-    padding: 10px;
+    padding: 0.6vmin;
 }
 
 .timer-bar { 
@@ -54,22 +54,45 @@ body {
     top: 0; 
     left: 0; 
     width: 100%; 
-    height: 3px; 
+    height: 0.2vmin; 
     background: var(--green); 
     z-index: 150; 
 }
 
 .status-msg { 
     position: absolute; 
-    top: 15px; 
+    top: 1.2vmin; 
     left: 50%; 
     transform: translateX(-50%); 
     font-family: 'Orbitron'; 
-    font-size: 18px; 
+    font-size: 1.3vmin; 
     color: var(--gold); 
     font-weight: 900; 
     z-index: 100; 
     text-transform: uppercase;
+}
+
+/* GANANCIA FLOTANTE */
+.win-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue';
+    font-size: 8vmin;
+    color: var(--green);
+    font-weight: 900;
+    text-shadow: 0 0 30px var(--green), 0 0 60px rgba(0,255,153,0.5);
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    animation: winPulse 2.5s ease-out forwards;
+}
+
+@keyframes winPulse {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -150%) scale(1.5); }
 }
 
 /* MESA PRINCIPAL */
@@ -87,18 +110,16 @@ body {
     padding: 1.5vmin;
     position: relative;
     box-shadow: inset 0 0 150px rgba(0,0,0,0.6), 0 40px 80px rgba(0,0,0,0.9);
-    transform-origin: center;
-    transform: scale(1);
 }
 
-/* MAIN AREA - NÚMEROS Y PASS */
+/* MAIN AREA */
 .main-area {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0.9vmin;
 }
 
-/* FILAS DE NÚMEROS CON PESTAÑAS */
+/* FILA DE NÚMEROS CON CONTROLES */
 .num-row-wrapper {
     display: grid;
     grid-template-columns: 1fr 3.5vmin;
@@ -117,6 +138,7 @@ body {
     border: 0.15vmin solid var(--border);
     border-radius: 0.7vmin;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -126,10 +148,16 @@ body {
     transition: 0.2s;
     position: relative;
     min-height: 5vmin;
+    gap: 0.3vmin;
 }
 .num-cell:hover { background: rgba(255,255,255,0.12); }
 .num-cell.active { background: rgba(0,255,153,0.15); border-color: var(--green); box-shadow: 0 0 12px rgba(0,255,153,0.4); }
 .num-cell.winning { background: rgba(255,255,255,0.35) !important; box-shadow: 0 0 25px #fff; }
+
+.num-label { font-size: 1.8vmin; }
+.num-controls { font-size: 0.7vmin; display: flex; gap: 0.2vmin; }
+.ctrl-btn { width: 1.2vmin; height: 1.2vmin; border-radius: 50%; background: rgba(0,0,0,0.3); border: 0.1vmin solid var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6vmin; font-weight: 900; color: var(--gold); }
+.ctrl-btn:hover { background: rgba(0,0,0,0.5); }
 
 .side-tab {
     background: rgba(0,0,0,0.2);
@@ -169,8 +197,8 @@ body {
 /* FIELD */
 .field-wrapper {
     display: grid;
-    grid-template-columns: 1fr 50px;
-    gap: 8px;
+    grid-template-columns: 1fr 3.5vmin;
+    gap: 0.6vmin;
     align-items: stretch;
 }
 
@@ -198,15 +226,15 @@ body {
 /* PASS LINE */
 .pass-wrapper {
     display: grid;
-    grid-template-columns: 1fr 50px;
-    gap: 8px;
+    grid-template-columns: 1fr 3.5vmin;
+    gap: 0.6vmin;
     align-items: stretch;
 }
 
 .pass-section {
     display: grid;
     grid-template-columns: 1fr 2.5fr 1fr;
-    gap: 8px;
+    gap: 0.6vmin;
 }
 
 .pass-cell {
@@ -234,11 +262,11 @@ body {
     font-family: 'Orbitron';
 }
 
-/* CHIPS POSITIONING */
+/* CHIPS */
 .chip-stack { 
     position: absolute; 
-    bottom: 8px; 
-    right: 8px;
+    bottom: 0.4vmin; 
+    right: 0.4vmin;
     display: flex; 
     flex-direction: column-reverse; 
     align-items: center; 
@@ -264,11 +292,23 @@ body {
     white-space: nowrap;
 }
 
-/* PROP AREA - DERECHA */
+/* ANIMACIÓN DE FICHA VOLANDO */
+.chip-flying {
+    position: fixed !important;
+    animation: chipFly 1.5s ease-in forwards !important;
+    z-index: 1000 !important;
+}
+
+@keyframes chipFly {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0.3); opacity: 0; }
+}
+
+/* PROP AREA */
 .prop-area {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0.9vmin;
 }
 
 .prop-box {
@@ -322,7 +362,7 @@ body {
 
 .horn-cell {
     grid-column: span 2;
-    min-height: 50px;
+    min-height: 4vmin;
 }
 
 /* DICE PIT */
@@ -426,6 +466,7 @@ body {
 <div class="game-container">
     <div class="timer-bar" id="timerBar"></div>
     <div class="status-msg" id="statusMsg">APUESTA: PASS O DON'T PASS</div>
+    <div class="win-display" id="winDisplay"></div>
 
     <div class="table-wrapper">
         <!-- LADO IZQUIERDO -->
@@ -433,25 +474,43 @@ body {
             <!-- LAY ROW -->
             <div class="num-row-wrapper">
                 <div class="num-row">
-                    <div class="num-cell" data-bet="lay4" onclick="placeBet('lay4', this)">1 to 2</div>
-                    <div class="num-cell" data-bet="lay5" onclick="placeBet('lay5', this)">2 to 3</div>
-                    <div class="num-cell" data-bet="lay6" onclick="placeBet('lay6', this)">5 to 6</div>
-                    <div class="num-cell" data-bet="lay8" onclick="placeBet('lay8', this)">5 to 6</div>
-                    <div class="num-cell" data-bet="lay9" onclick="placeBet('lay9', this)">2 to 3</div>
-                    <div class="num-cell" data-bet="lay10" onclick="placeBet('lay10', this)">1 to 2</div>
+                    <div class="num-cell" data-bet="lay4" onclick="placeBet('lay4', this)"><div class="num-label">1 to 2</div></div>
+                    <div class="num-cell" data-bet="lay5" onclick="placeBet('lay5', this)"><div class="num-label">2 to 3</div></div>
+                    <div class="num-cell" data-bet="lay6" onclick="placeBet('lay6', this)"><div class="num-label">5 to 6</div></div>
+                    <div class="num-cell" data-bet="lay8" onclick="placeBet('lay8', this)"><div class="num-label">5 to 6</div></div>
+                    <div class="num-cell" data-bet="lay9" onclick="placeBet('lay9', this)"><div class="num-label">2 to 3</div></div>
+                    <div class="num-cell" data-bet="lay10" onclick="placeBet('lay10', this)"><div class="num-label">1 to 2</div></div>
                 </div>
                 <div class="side-tab">LAY</div>
             </div>
 
-            <!-- PLACE ROW -->
+            <!-- PLACE ROW CON CONTROLES C/E -->
             <div class="num-row-wrapper">
                 <div class="num-row">
-                    <div class="num-cell" data-bet="num4" onclick="placeBet('num4', this)">4</div>
-                    <div class="num-cell" data-bet="num5" onclick="placeBet('num5', this)">5</div>
-                    <div class="num-cell" data-bet="num6" onclick="placeBet('num6', this)">6</div>
-                    <div class="num-cell" data-bet="num8" onclick="placeBet('num8', this)">8</div>
-                    <div class="num-cell" data-bet="num9" onclick="placeBet('num9', this)">9</div>
-                    <div class="num-cell" data-bet="num10" onclick="placeBet('num10', this)">10</div>
+                    <div class="num-cell" data-bet="num4" onclick="placeBet('num4', this)">
+                        <div class="num-label">4</div>
+                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                    </div>
+                    <div class="num-cell" data-bet="num5" onclick="placeBet('num5', this)">
+                        <div class="num-label">5</div>
+                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                    </div>
+                    <div class="num-cell" data-bet="num6" onclick="placeBet('num6', this)">
+                        <div class="num-label">6</div>
+                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                    </div>
+                    <div class="num-cell" data-bet="num8" onclick="placeBet('num8', this)">
+                        <div class="num-label">8</div>
+                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                    </div>
+                    <div class="num-cell" data-bet="num9" onclick="placeBet('num9', this)">
+                        <div class="num-label">9</div>
+                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                    </div>
+                    <div class="num-cell" data-bet="num10" onclick="placeBet('num10', this)">
+                        <div class="num-label">10</div>
+                        <div class="num-controls"><div class="ctrl-btn">C</div><div class="ctrl-btn">E</div></div>
+                    </div>
                 </div>
                 <div class="side-tab">PLACE</div>
             </div>
@@ -459,12 +518,12 @@ body {
             <!-- BUY ROW -->
             <div class="num-row-wrapper">
                 <div class="num-row">
-                    <div class="num-cell" data-bet="buy4" onclick="placeBet('buy4', this)">2 to 1</div>
-                    <div class="num-cell" data-bet="buy5" onclick="placeBet('buy5', this)">3 to 2</div>
-                    <div class="num-cell" data-bet="buy6" onclick="placeBet('buy6', this)">6 to 5</div>
-                    <div class="num-cell" data-bet="buy8" onclick="placeBet('buy8', this)">6 to 5</div>
-                    <div class="num-cell" data-bet="buy9" onclick="placeBet('buy9', this)">3 to 2</div>
-                    <div class="num-cell" data-bet="buy10" onclick="placeBet('buy10', this)">2 to 1</div>
+                    <div class="num-cell" data-bet="buy4" onclick="placeBet('buy4', this)"><div class="num-label">2 to 1</div></div>
+                    <div class="num-cell" data-bet="buy5" onclick="placeBet('buy5', this)"><div class="num-label">3 to 2</div></div>
+                    <div class="num-cell" data-bet="buy6" onclick="placeBet('buy6', this)"><div class="num-label">6 to 5</div></div>
+                    <div class="num-cell" data-bet="buy8" onclick="placeBet('buy8', this)"><div class="num-label">6 to 5</div></div>
+                    <div class="num-cell" data-bet="buy9" onclick="placeBet('buy9', this)"><div class="num-label">3 to 2</div></div>
+                    <div class="num-cell" data-bet="buy10" onclick="placeBet('buy10', this)"><div class="num-label">2 to 1</div></div>
                 </div>
                 <div class="side-tab">BUY</div>
             </div>
@@ -654,6 +713,7 @@ async function doRoll() {
         let results = [];
         let finalBal = balance;
         let lastDice = [1, 1];
+        let totalWin = 0;
 
         for (let type in bets) {
             const res = await fetch('/api/games/craps/roll', {
@@ -662,9 +722,10 @@ async function doRoll() {
                 body: JSON.stringify({ username: WalletAPI.getUsername(), bet_amount: bets[type], bet_type: type })
             });
             const data = await res.json();
-            results.push({ type, win: data.win_amount });
+            results.push({ type, win: data.win_amount, amount: bets[type] });
             finalBal = data.new_balance;
             lastDice = data.dice;
+            if (data.win_amount > 0) totalWin += data.win_amount;
         }
 
         const box = document.getElementById('diceBox');
@@ -687,18 +748,51 @@ async function doRoll() {
 
         setTimeout(() => {
             document.getElementById('statusMsg').textContent = "PAGANDO...";
+            
+            // MARCAR GANADORES
             results.forEach(r => {
                 if (r.win > 0) {
-                    document.querySelector(`[data-bet="${r.type}"]`).classList.add('winning');
+                    const el = document.querySelector(`[data-bet="${r.type}"]`);
+                    el.classList.add('winning');
+                    
+                    // ANIMACIÓN DE FICHAS VOLANDO AL SALDO
+                    const stack = el.querySelector('.chip-stack');
+                    if (stack) {
+                        const rect = stack.getBoundingClientRect();
+                        const balanceRect = document.getElementById('balance').getBoundingClientRect();
+                        
+                        const chip = stack.querySelector('.chip-img');
+                        if (chip) {
+                            const flyChip = chip.cloneNode(true);
+                            flyChip.classList.add('chip-flying');
+                            flyChip.style.left = rect.left + 'px';
+                            flyChip.style.top = rect.top + 'px';
+                            flyChip.style.setProperty('--tx', (balanceRect.left - rect.left) + 'px');
+                            flyChip.style.setProperty('--ty', (balanceRect.top - rect.top) + 'px');
+                            document.body.appendChild(flyChip);
+                            
+                            setTimeout(() => flyChip.remove(), 1500);
+                        }
+                    }
                 }
             });
+
+            // MOSTRAR GANANCIA TOTAL
+            if (totalWin > 0) {
+                const winDisplay = document.getElementById('winDisplay');
+                winDisplay.textContent = `+${totalWin}`;
+                winDisplay.style.animation = 'none';
+                setTimeout(() => {
+                    winDisplay.style.animation = 'winPulse 2.5s ease-out forwards';
+                }, 10);
+            }
 
             balance = finalBal;
             updateUI();
 
             setTimeout(() => {
                 startNewRound();
-            }, 2000);
+            }, 2500);
         }, 2200);
 
     } catch (e) {
