@@ -1068,23 +1068,13 @@ function openBattlePass() {
     alert('❌ Inicia sesión primero para abrir el pase.');
     return;
   }
-  // Si ya está listo, abrir directo
+  
   if (window.battlePassBrawl && typeof window.battlePassBrawl.loadBattlePass === 'function') {
     window.battlePassBrawl.loadBattlePass(user);
-    return;
+  } else {
+    console.error("BattlePassBrawl no inicializado.");
+    alert('❌ Error: El sistema del pase no está listo. Por favor, recarga la página.');
   }
-  // Script defer aún no ejecutado - esperar hasta 3s
-  let attempts = 0;
-  const wait = setInterval(() => {
-    attempts++;
-    if (window.battlePassBrawl && typeof window.battlePassBrawl.loadBattlePass === 'function') {
-      clearInterval(wait);
-      window.battlePassBrawl.loadBattlePass(user);
-    } else if (attempts >= 30) {
-      clearInterval(wait);
-      alert('❌ Error cargando el pase. Recarga la página.');
-    }
-  }, 100);
 }
 
 window.openBattlePass = openBattlePass;

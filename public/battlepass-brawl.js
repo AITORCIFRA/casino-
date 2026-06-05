@@ -14,7 +14,12 @@ class BattlePassBrawl {
     this.currentXP = 0;
     this.rubies = 0;
     this.claimedRewards = new Set();
-    this._inject();
+    // No inyectar en el constructor, esperar a que el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this._inject());
+    } else {
+      this._inject();
+    }
   }
 
   _inject() {
@@ -444,13 +449,19 @@ class BattlePassBrawl {
   }
 
   show() {
-    const overlay = document.getElementById('bp-brawl-overlay');
+    let overlay = document.getElementById('bp-brawl-overlay');
     if (!overlay) {
-      requestAnimationFrame(() => this.show());
-      return;
+      console.log("Overlay no encontrado, re-inyectando...");
+      this._inject();
+      overlay = document.getElementById('bp-brawl-overlay');
     }
-    overlay.classList.add('open');
-    this.isVisible = true;
+    
+    if (overlay) {
+      overlay.classList.add('open');
+      this.isVisible = true;
+    } else {
+      console.error("No se pudo mostrar el Pase de Batalla: Overlay ausente.");
+    }
   }
 
   hide() {

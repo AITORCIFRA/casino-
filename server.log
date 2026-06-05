@@ -1,0 +1,7 @@
+INFO:     Will watch for changes in these directories: ['/home/ubuntu/casino-']
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:     Started reloader process [1914] using StatReload
+Error conectando a MySQL: 2003 (HY000): Can't connect to MySQL server on 'localhost:3306' (111)
+INFO:     Started server process [1916]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
