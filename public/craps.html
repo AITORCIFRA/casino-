@@ -2,90 +2,159 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRAPS PRO — POKERIST STYLE</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/js/wallet.js"></script>
 <script src="/js/curtain-effect.js"></script>
 <script src="/animations.js"></script>
 <style>
-:root { --felt-blue: #143d59; --gold: #c9a84c; --border: rgba(255,255,255,0.2); --text-dim: rgba(255,255,255,0.6); }
+:root { 
+    --felt-blue: #143d59; 
+    --gold: #c9a84c; 
+    --border: rgba(255,255,255,0.2); 
+    --text-dim: rgba(255,255,255,0.6); 
+    --neon-green: #00ff99;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+body { 
+    background: #050a0f; 
+    color: #fff; 
+    font-family: 'Rajdhani', sans-serif; 
+    height: 100vh; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+}
 
 /* HEADER */
-.header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0b1a27; border-bottom: 2px solid var(--gold); z-index: 100; }
+.header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px 20px; 
+    background: #0b1a27; 
+    border-bottom: 2px solid var(--gold); 
+    z-index: 100; 
+}
 .title { font-family: 'Orbitron'; font-size: 18px; color: var(--gold); font-weight: 900; }
-.credits { font-family: 'Orbitron'; color: #00ff99; font-size: 16px; }
+.credits { font-family: 'Orbitron'; color: var(--neon-green); font-size: 16px; }
 
-/* TABLE LAYOUT */
-.game-container { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; background: radial-gradient(circle, #1a4d6e 0%, #050a0f 100%); overflow: hidden; }
+/* GAME CONTAINER */
+.game-container { 
+    flex: 1; 
+    position: relative; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    background: radial-gradient(circle, #1a4d6e 0%, #050a0f 100%); 
+    overflow: hidden;
+    perspective: 1000px;
+}
 
 /* MESA PROFESIONAL */
 .craps-table { 
-    width: 98%; 
-    max-width: 1200px; 
-    height: 480px; 
+    width: 95%; 
+    max-width: 1400px; 
+    height: 550px; 
     background: var(--felt-blue); 
-    border: 15px solid #3d2b1f; 
-    border-radius: 60px; 
+    border: 20px solid #3d2b1f; 
+    border-radius: 100px; 
     position: relative; 
     box-shadow: inset 0 0 150px rgba(0,0,0,0.8), 0 50px 100px rgba(0,0,0,0.9);
     margin-top: 20px;
     display: flex;
-    padding: 20px;
-    gap: 15px;
-    transform: rotateX(15deg);
+    padding: 30px;
+    gap: 20px;
+    transform: rotateX(10deg);
 }
 
-/* SECCIONES DE LA MESA */
-.main-layout { flex: 2; display: grid; grid-template-rows: 1.2fr 2fr 1.5fr 1fr; gap: 8px; }
-.prop-bets { flex: 0.8; display: grid; grid-template-rows: repeat(5, 1fr); gap: 5px; border-left: 2px solid var(--border); padding-left: 15px; }
+/* SECCIONES */
+.left-layout { flex: 2.5; display: grid; grid-template-rows: 1fr 1.5fr 1.2fr 0.8fr; gap: 5px; }
+.right-layout { flex: 1.2; display: grid; grid-template-rows: 1.5fr 1.5fr 1fr; gap: 5px; border-left: 2px solid var(--border); padding-left: 15px; }
 
 /* CASILLAS */
-.bet-area { border: 1px solid var(--border); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: 0.1s; position: relative; min-height: 40px; }
+.bet-area { 
+    border: 1px solid var(--border); 
+    border-radius: 4px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    cursor: pointer; 
+    transition: 0.1s; 
+    position: relative; 
+}
 .bet-area:hover { background: rgba(255,255,255,0.05); }
-.bet-area.active { background: rgba(0,255,153,0.1); border-color: #00ff99; }
+.bet-area.active { background: rgba(0,255,153,0.1); border-color: var(--neon-green); }
 
-.bet-label { font-family: 'Orbitron'; font-size: 10px; font-weight: 900; color: #fff; text-transform: uppercase; }
-.bet-sub { font-size: 8px; color: var(--gold); }
+.bet-label { font-family: 'Orbitron'; font-size: 11px; font-weight: 900; color: #fff; text-transform: uppercase; }
+.bet-sub { font-size: 9px; color: var(--gold); font-weight: bold; }
 
-/* GRID DE NÚMEROS */
+/* GRID NÚMEROS */
 .numbers-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; }
-.num-box { height: 70px; }
-.num-val { font-size: 24px; font-weight: 900; }
+.num-box { height: 80px; }
+.num-val { font-size: 32px; font-weight: 900; font-family: 'Orbitron'; }
 
 /* COME & FIELD */
-.come-area { background: rgba(255,255,255,0.03); font-size: 28px; font-weight: 900; letter-spacing: 10px; }
-.field-area { display: flex; flex-direction: column; gap: 5px; }
-.field-nums { font-size: 20px; font-weight: 900; letter-spacing: 5px; }
+.come-area { background: rgba(255,255,255,0.03); font-size: 36px; font-weight: 900; letter-spacing: 15px; font-family: 'Orbitron'; }
+.field-area { display: flex; flex-direction: column; gap: 2px; }
+.field-nums { font-size: 24px; font-weight: 900; letter-spacing: 8px; font-family: 'Orbitron'; }
 
-/* PASS LINE CURVA */
-.pass-line { border: 3px solid var(--gold); border-radius: 0 0 40px 40px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: var(--gold); }
+/* PASS LINE */
+.pass-line { border: 4px solid var(--gold); border-radius: 0 0 50px 50px; height: 60px; font-size: 22px; font-weight: 900; color: var(--gold); font-family: 'Orbitron'; }
 
-/* SISTEMA DE FICHAS */
-.chip-stack { position: absolute; bottom: 2px; right: 2px; display: flex; flex-direction: column-reverse; align-items: center; pointer-events: none; }
-.chip-v { width: 18px; height: 4px; background: radial-gradient(circle, #fff 30%, #cc0000 70%); border-radius: 50%; margin-top: -3px; border: 1px solid rgba(0,0,0,0.2); }
-.bet-tag { background: #000; color: #00ff99; font-size: 8px; padding: 1px 3px; border-radius: 3px; font-weight: bold; margin-bottom: 2px; }
+/* PROP BETS (RIGHT SIDE) */
+.prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.hardway-box { height: 60px; }
+.one-roll-box { height: 50px; }
 
-/* PIT CENTRAL (DONDE CAEN LOS DADOS) */
-.pit-area { 
+/* DICE AREA (PIT) */
+.dice-pit { 
     position: absolute; 
-    top: 50%; left: 50%; 
+    top: 50%; 
+    left: 50%; 
     transform: translate(-50%, -50%); 
-    width: 400px; height: 200px; 
+    width: 450px; 
+    height: 250px; 
     pointer-events: none; 
-    z-index: 10; 
+    z-index: 50; 
 }
 
-/* DADOS 3D REALISTAS */
-.dice-container { position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; perspective: 1000px; }
+/* DADOS 3D */
+.dice-container { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    display: none; 
+    align-items: center; 
+    justify-content: center; 
+    perspective: 1000px; 
+}
 .dice-container.active { display: flex; }
 
-.die-3d { width: 60px; height: 60px; position: absolute; transform-style: preserve-3d; transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.3, 1.1); }
-#die1 { left: 100px; }
-#die2 { right: 100px; }
-
-.face { position: absolute; width: 60px; height: 60px; background: #cc0000; border: 1px solid #900; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); }
+.die-3d { 
+    width: 60px; 
+    height: 60px; 
+    position: absolute; 
+    transform-style: preserve-3d; 
+    transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+.face { 
+    position: absolute; 
+    width: 60px; 
+    height: 60px; 
+    background: #cc0000; 
+    border: 1px solid #900; 
+    border-radius: 10px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 40px; 
+    color: #fff; 
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5); 
+}
 .f1 { transform: rotateY(0deg) translateZ(30px); }
 .f2 { transform: rotateY(90deg) translateZ(30px); }
 .f3 { transform: rotateX(90deg) translateZ(30px); }
@@ -94,22 +163,111 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
 .f6 { transform: rotateY(180deg) translateZ(30px); }
 
 /* CONTROLES */
-.controls-bar { background: #0b1a27; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--gold); }
-.chips-tray { display: flex; gap: 12px; }
-.c-btn { width: 50px; height: 50px; border-radius: 50%; border: 4px dashed #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 14px; color: #fff; }
-.c-btn.sel { border-style: solid; transform: scale(1.15); box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+.controls-bar { 
+    background: #0b1a27; 
+    padding: 15px 40px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-top: 2px solid var(--gold); 
+}
+.chips-tray { display: flex; gap: 15px; }
+.c-btn { 
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; 
+    border: 5px dashed rgba(255,255,255,0.5); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 900; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    font-size: 16px; 
+    color: #fff; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.c-btn:hover { transform: translateY(-5px); }
+.c-btn.sel { border-style: solid; border-color: #fff; transform: scale(1.2) translateY(-5px); box-shadow: 0 0 25px rgba(255,255,255,0.6); }
 
 .action-btns { display: flex; gap: 20px; align-items: center; }
 .roll-btn { 
-    width: 140px; height: 60px; background: linear-gradient(135deg, #cc0000, #800000); border: 3px solid #fff; border-radius: 12px;
-    color: #fff; font-family: 'Orbitron'; font-weight: 900; font-size: 20px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    width: 160px; 
+    height: 65px; 
+    background: linear-gradient(135deg, #cc0000, #800000); 
+    border: 3px solid #fff; 
+    border-radius: 15px;
+    color: #fff; 
+    font-family: 'Orbitron'; 
+    font-weight: 900; 
+    font-size: 24px; 
+    cursor: pointer; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    transition: 0.2s;
 }
-.roll-btn:disabled { opacity: 0.5; filter: grayscale(1); }
-.clear-btn { background: #333; color: #ccc; border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron'; font-size: 12px; cursor: pointer; }
+.roll-btn:active { transform: scale(0.95); }
+.roll-btn:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
 
-/* RESULTADO FLOTANTE */
-.result-popup { position: absolute; top: 30%; left: 50%; transform: translateX(-50%); font-family: 'Bebas Neue'; font-size: 60px; color: #00ff99; text-shadow: 0 0 20px #000; z-index: 200; opacity: 0; pointer-events: none; }
-@keyframes showResult { 0% { opacity: 0; transform: translateX(-50%) scale(0.5); } 20% { opacity: 1; transform: translateX(-50%) scale(1.2); } 80% { opacity: 1; transform: translateX(-50%) scale(1); } 100% { opacity: 0; transform: translateX(-50%) translateY(-50px); } }
+.clear-btn { 
+    background: #222; 
+    color: #fff; 
+    border: 1px solid #444; 
+    padding: 12px 25px; 
+    border-radius: 10px; 
+    font-family: 'Orbitron'; 
+    font-size: 14px; 
+    cursor: pointer; 
+}
+
+/* CHIP STACK ON TABLE */
+.chip-stack { 
+    position: absolute; 
+    bottom: 5px; 
+    right: 5px; 
+    display: flex; 
+    flex-direction: column-reverse; 
+    align-items: center; 
+    pointer-events: none; 
+}
+.chip-v { 
+    width: 22px; 
+    height: 5px; 
+    background: radial-gradient(circle, #fff 20%, #cc0000 80%); 
+    border-radius: 50%; 
+    margin-top: -3px; 
+    border: 1px solid rgba(0,0,0,0.3); 
+}
+.bet-tag { 
+    background: rgba(0,0,0,0.8); 
+    color: var(--neon-green); 
+    font-size: 10px; 
+    padding: 2px 5px; 
+    border-radius: 4px; 
+    font-weight: bold; 
+    margin-bottom: 3px; 
+    border: 1px solid var(--neon-green);
+}
+
+/* POPUPS */
+.result-popup { 
+    position: absolute; 
+    top: 25%; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    font-family: 'Bebas Neue'; 
+    font-size: 80px; 
+    color: var(--neon-green); 
+    text-shadow: 0 0 30px #000; 
+    z-index: 200; 
+    opacity: 0; 
+    pointer-events: none; 
+}
+@keyframes showResult { 
+    0% { opacity: 0; transform: translateX(-50%) scale(0.5); } 
+    20% { opacity: 1; transform: translateX(-50%) scale(1.2); } 
+    80% { opacity: 1; transform: translateX(-50%) scale(1); } 
+    100% { opacity: 0; transform: translateX(-50%) translateY(-100px); } 
+}
 
 </style>
 </head>
@@ -122,16 +280,16 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
 
 <div class="game-container">
     <div class="craps-table">
-        <!-- LAYOUT PRINCIPAL -->
-        <div class="main-layout">
+        <!-- LADO IZQUIERDO (MAIN LAYOUT) -->
+        <div class="left-layout">
             <!-- NÚMEROS DE PUNTO -->
             <div class="numbers-grid">
-                <div class="bet-area num-box" data-bet="num4" onclick="placeBet('num4', this)"><div class="num-val">4</div><div class="bet-sub">PAGA 2:1</div></div>
-                <div class="bet-area num-box" data-bet="num5" onclick="placeBet('num5', this)"><div class="num-val">5</div><div class="bet-sub">PAGA 2:1</div></div>
-                <div class="bet-area num-box" data-bet="num6" onclick="placeBet('num6', this)"><div class="num-val">SIX</div><div class="bet-sub">PAGA 2:1</div></div>
-                <div class="bet-area num-box" data-bet="num8" onclick="placeBet('num8', this)"><div class="num-val">8</div><div class="bet-sub">PAGA 2:1</div></div>
-                <div class="bet-area num-box" data-bet="num9" onclick="placeBet('num9', this)"><div class="num-val">NINE</div><div class="bet-sub">PAGA 2:1</div></div>
-                <div class="bet-area num-box" data-bet="num10" onclick="placeBet('num10', this)"><div class="num-val">10</div><div class="bet-sub">PAGA 2:1</div></div>
+                <div class="bet-area num-box" data-bet="num4" onclick="placeBet('num4', this)"><div class="num-val">4</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area num-box" data-bet="num5" onclick="placeBet('num5', this)"><div class="num-val">5</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area num-box" data-bet="num6" onclick="placeBet('num6', this)"><div class="num-val">SIX</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area num-box" data-bet="num8" onclick="placeBet('num8', this)"><div class="num-val">8</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area num-box" data-bet="num9" onclick="placeBet('num9', this)"><div class="num-val">NINE</div><div class="bet-sub">2 A 1</div></div>
+                <div class="bet-area num-box" data-bet="num10" onclick="placeBet('num10', this)"><div class="num-val">10</div><div class="bet-sub">2 A 1</div></div>
             </div>
 
             <!-- COME AREA -->
@@ -148,17 +306,34 @@ body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; he
             <div class="bet-area pass-line" data-bet="pass" onclick="placeBet('pass', this)">PASS LINE</div>
         </div>
 
-        <!-- PROPOSITION BETS (HARDWAYS & ONE ROLL) -->
-        <div class="prop-bets">
-            <div class="bet-area" data-bet="any7" onclick="placeBet('any7', this)"><div class="bet-label">ANY SEVEN</div><div class="bet-sub">5 A 1</div></div>
-            <div class="bet-area" data-bet="hardways" onclick="placeBet('hardways', this)"><div class="bet-label">HARDWAYS</div><div class="bet-sub">HASTA 10 A 1</div></div>
-            <div class="bet-area" data-bet="horn" onclick="placeBet('horn', this)"><div class="bet-label">HORN BET</div><div class="bet-sub">HASTA 30 A 1</div></div>
-            <div class="bet-area" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="bet-label">YO 11</div><div class="bet-sub">15 A 1</div></div>
-            <div class="bet-area" data-bet="craps" onclick="placeBet('craps', this)"><div class="bet-label">ANY CRAPS</div><div class="bet-sub">8 A 1</div></div>
+        <!-- LADO DERECHO (PROP BETS) -->
+        <div class="right-layout">
+            <!-- HARDWAYS -->
+            <div class="prop-grid">
+                <div class="bet-area hardway-box" data-bet="hard4" onclick="placeBet('hard4', this)"><div class="bet-label">HARD 4</div><div class="bet-sub">8 A 1</div></div>
+                <div class="bet-area hardway-box" data-bet="hard6" onclick="placeBet('hard6', this)"><div class="bet-label">HARD 6</div><div class="bet-sub">10 A 1</div></div>
+                <div class="bet-area hardway-box" data-bet="hard8" onclick="placeBet('hard8', this)"><div class="bet-label">HARD 8</div><div class="bet-sub">10 A 1</div></div>
+                <div class="bet-area hardway-box" data-bet="hard10" onclick="placeBet('hard10', this)"><div class="bet-label">HARD 10</div><div class="bet-sub">8 A 1</div></div>
+            </div>
+
+            <!-- ONE ROLL BETS -->
+            <div class="prop-grid">
+                <div class="bet-area one-roll-box" data-bet="any7" onclick="placeBet('any7', this)"><div class="bet-label">ANY 7</div><div class="bet-sub">5 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="craps" onclick="placeBet('craps', this)"><div class="bet-label">ANY CRAPS</div><div class="bet-sub">8 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="yo11" onclick="placeBet('yo11', this)"><div class="bet-label">YO 11</div><div class="bet-sub">16 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="boxcars" onclick="placeBet('boxcars', this)"><div class="bet-label">12</div><div class="bet-sub">31 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="snakeeyes" onclick="placeBet('snakeeyes', this)"><div class="bet-label">2</div><div class="bet-sub">31 A 1</div></div>
+                <div class="bet-area one-roll-box" data-bet="horn" onclick="placeBet('horn', this)"><div class="bet-label">HORN</div><div class="bet-sub">VARIES</div></div>
+            </div>
+            
+            <div class="bet-area" data-bet="big68" onclick="placeBet('big68', this)">
+                <div class="bet-label">BIG 6 & 8</div>
+                <div class="bet-sub">1 A 1</div>
+            </div>
         </div>
 
         <!-- PIT CENTRAL PARA DADOS -->
-        <div class="pit-area">
+        <div class="dice-pit">
             <div class="dice-container" id="diceBox">
                 <div class="die-3d" id="die1">
                     <div class="face f1">⚀</div><div class="face f2">⚁</div><div class="face f3">⚂</div>
@@ -195,7 +370,6 @@ let balance = 0;
 let currentC = 100;
 let bets = {};
 let isRolling = false;
-const winAnim = new WinAnimation();
 
 async function init() {
     balance = await WalletAPI.getBalance();
@@ -222,7 +396,6 @@ function placeBet(type, el) {
     balance -= currentC;
     updateUI();
     
-    // Efecto visual de fichas
     el.classList.add('active');
     let stack = el.querySelector('.chip-stack');
     if (!stack) {
@@ -231,7 +404,8 @@ function placeBet(type, el) {
         el.appendChild(stack);
     }
     stack.innerHTML = `<div class="bet-tag">${bets[type].toLocaleString()}</div>`;
-    const numChips = Math.min(6, Math.ceil(bets[type] / 100));
+    const numChips = Math.min(8, Math.ceil(bets[type] / 100));
+    stack.querySelectorAll('.chip-v').forEach(c => c.remove());
     for (let i = 0; i < numChips; i++) {
         const c = document.createElement('div');
         c.className = 'chip-v';
@@ -263,6 +437,7 @@ async function doRoll() {
         let finalBal = balance;
         let lastRes = null;
 
+        // Ejecutar todas las apuestas activas
         for (let type in bets) {
             const res = await fetch('/api/games/craps/roll', {
                 method: 'POST',
@@ -279,9 +454,10 @@ async function doRoll() {
             lastRes = data;
         }
 
-        // Animación de dados en el centro
+        // Animación de dados
         const box = document.getElementById('diceBox');
         box.style.display = 'flex';
+        box.classList.add('active');
         
         const d1 = document.getElementById('die1');
         const d2 = document.getElementById('die2');
@@ -289,45 +465,50 @@ async function doRoll() {
 
         // Lanzamiento cinemático
         d1.style.transition = 'none'; d2.style.transition = 'none';
-        d1.style.transform = 'translate(-500px, -200px) rotate(0deg)';
-        d2.style.transform = 'translate(500px, -200px) rotate(0deg)';
+        d1.style.transform = 'translate(-400px, -300px) rotate(0deg)';
+        d2.style.transform = 'translate(400px, -300px) rotate(0deg)';
         
         setTimeout(() => {
-            d1.style.transition = 'transform 1.5s cubic-bezier(0.2, 0.8, 0.3, 1.1)';
-            d2.style.transition = 'transform 1.5s cubic-bezier(0.2, 0.8, 0.3, 1.1)';
+            d1.style.transition = 'transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            d2.style.transition = 'transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             
             const r1 = faceRots[lastRes.dice[0]];
             const r2 = faceRots[lastRes.dice[1]];
             
-            d1.style.transform = `translate(-40px, 0) rotateX(${720 + r1[0]}deg) rotateY(${720 + r1[1]}deg)`;
-            d2.style.transform = `translate(40px, 0) rotateX(${720 + r2[0]}deg) rotateY(${720 + r2[1]}deg)`;
+            // Rotaciones extra para realismo
+            d1.style.transform = `translate(-50px, 0) rotateX(${1080 + r1[0]}deg) rotateY(${1080 + r1[1]}deg)`;
+            d2.style.transform = `translate(50px, 0) rotateX(${1080 + r2[0]}deg) rotateY(${1080 + r2[1]}deg)`;
         }, 50);
 
         setTimeout(() => {
             // Mostrar resultado
             const pop = document.getElementById('resPopup');
-            pop.textContent = lastRes.message.split(' - ')[0];
+            pop.textContent = lastRes.message.split(' - ')[0].replace('Tirada: ', '');
+            if (totalWin > 0) {
+                pop.textContent += " - WIN!";
+                pop.style.color = '#00ff99';
+                if (typeof WinAnimation !== 'undefined') new WinAnimation().start();
+            } else {
+                pop.style.color = '#ff4d4d';
+            }
+            pop.style.animation = 'none';
+            void pop.offsetWidth; // Trigger reflow
             pop.style.animation = 'showResult 2s forwards';
             
             balance = finalBal;
             updateUI();
             
-            if (totalWin > 0) {
-                winAnim.fountainEffect(totalWin);
-            }
+            // Limpiar mesa después del roll
+            bets = {};
+            document.querySelectorAll('.bet-area').forEach(a => {
+                a.classList.remove('active');
+                const s = a.querySelector('.chip-stack');
+                if (s) s.remove();
+            });
 
-            setTimeout(() => {
-                box.style.display = 'none';
-                isRolling = false;
-                document.getElementById('rollBtn').disabled = false;
-                bets = {};
-                document.querySelectorAll('.bet-area').forEach(a => {
-                    a.classList.remove('active');
-                    const s = a.querySelector('.chip-stack');
-                    if (s) s.remove();
-                });
-            }, 2500);
-        }, 1800);
+            isRolling = false;
+            document.getElementById('rollBtn').disabled = false;
+        }, 1500);
 
     } catch (e) {
         console.error(e);
@@ -336,7 +517,7 @@ async function doRoll() {
     }
 }
 
-init();
+window.onload = init;
 </script>
 </body>
 </html>

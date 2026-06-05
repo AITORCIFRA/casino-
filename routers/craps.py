@@ -10,12 +10,11 @@ router = APIRouter(prefix="/api/games/craps", tags=["craps"])
 class CrapsPlayRequest(BaseModel):
     username: str
     bet_amount: int
-    bet_type: str  # "pass", "dont_pass", "field", etc.
+    bet_type: str  # "pass", "field", "any7", "craps", "yo11", "hard4", "num4", etc.
 
 @router.post("/roll")
 async def roll_dice(req: CrapsPlayRequest):
     # 1. Cobrar apuesta
-    # Simulamos la llamada al router de wallet internamente
     res_cobro = await transaction(WalletTransactionRequest(
         username=req.username,
         game="craps",
@@ -23,7 +22,6 @@ async def roll_dice(req: CrapsPlayRequest):
         amount=-req.bet_amount
     ))
     
-    # Si es un JSONResponse con error 402, lanzamos la excepción
     if hasattr(res_cobro, "status_code") and res_cobro.status_code == 402:
         raise HTTPException(status_code=402, detail="Créditos insuficientes")
     
@@ -38,7 +36,7 @@ async def roll_dice(req: CrapsPlayRequest):
     win = 0
     message = f"Tirada: {die1} + {die2} = {total}"
     
-    # Lógica completa de Craps (Versión Arcade One-Roll)
+    # Lógica de Pagos (Basada en Pokerist/Casino real)
     if req.bet_type == "pass":
         if total in [7, 11]:
             win = req.bet_amount * 2
@@ -47,70 +45,76 @@ async def roll_dice(req: CrapsPlayRequest):
             win = 0
             message += " - CRAPS. PERDISTE."
         else:
-            win = req.bet_amount # Devolvemos apuesta si es punto para no frustrar al jugador
-            message += " - PUNTO ESTABLECIDO (EMPATE)"
+            win = req.bet_amount # Devolvemos apuesta si es punto (Simulación simplificada)
+            message += " - PUNTO ESTABLECIDO"
             
     elif req.bet_type == "field":
-        if total in [2, 12]:
-            win = req.bet_amount * 3
-            message += " - ¡CAMPO GANADOR (x3)!"
+        # Field: 2 (x2), 12 (x3), 3, 4, 9, 10, 11 (x1)
+        if total == 12:
+            win = req.bet_amount * 4 # Triple (Paga 3 a 1 + original)
+            message += " - ¡FIELD (TRIPLE)!"
+        elif total == 2:
+            win = req.bet_amount * 3 # Doble (Paga 2 a 1 + original)
+            message += " - ¡FIELD (DOBLE)!"
         elif total in [3, 4, 9, 10, 11]:
-            win = req.bet_amount * 2
-            message += " - ¡CAMPO GANADOR (x2)!"
+            win = req.bet_amount * 2 # 1 a 1 + original
+            message += " - ¡FIELD!"
         else:
             win = 0
-            message += " - CAMPO PERDEDOR."
+            message += " - FIELD PERDEDOR."
 
     elif req.bet_type == "any7":
         if total == 7:
-            win = req.bet_amount * 5
-            message += " - ¡ANY SEVEN! (x5)"
+            win = req.bet_amount * 5 # 4 a 1
+            message += " - ¡ANY SEVEN!"
         else:
             win = 0
-            message += " - PERDISTE."
 
     elif req.bet_type == "craps":
         if total in [2, 3, 12]:
-            win = req.bet_amount * 8
-            message += " - ¡ANY CRAPS! (x8)"
+            win = req.bet_amount * 8 # 7 a 1
+            message += " - ¡ANY CRAPS!"
         else:
             win = 0
-            message += " - PERDISTE."
 
     elif req.bet_type == "yo11":
         if total == 11:
-            win = req.bet_amount * 16
-            message += " - ¡YO-LEVEN! (x16)"
+            win = req.bet_amount * 16 # 15 a 1
+            message += " - ¡YO-LEVEN!"
         else:
             win = 0
-            message += " - PERDISTE."
 
-    elif req.bet_type == "boxcars":
+    elif req.bet_type == "boxcars": # 12 específico
         if total == 12:
-            win = req.bet_amount * 31
-            message += " - ¡BOXCARS! (x31)"
+            win = req.bet_amount * 31 # 30 a 1
+            message += " - ¡BOXCARS!"
         else:
             win = 0
-            message += " - PERDISTE."
+            
+    elif req.bet_type == "snakeeyes": # 2 específico
+        if total == 2:
+            win = req.bet_amount * 31 # 30 a 1
+            message += " - ¡SNAKE EYES!"
+        else:
+            win = 0
 
     elif req.bet_type.startswith("hard"):
         val = int(req.bet_type.replace("hard", ""))
+        # Hardways: 4, 6, 8, 10 (Pares)
         if total == val and die1 == die2:
-            mult = 8 if val in [4, 10] else 10
+            mult = 8 if val in [4, 10] else 10 # 7 a 1 o 9 a 1
             win = req.bet_amount * mult
-            message += f" - ¡HARDWAY {val}! (x{mult})"
+            message += f" - ¡HARDWAY {val}!"
         else:
             win = 0
-            message += " - PERDISTE."
 
     elif req.bet_type.startswith("num"):
         val = int(req.bet_type.replace("num", ""))
         if total == val:
             win = req.bet_amount * 2
-            message += f" - ¡NÚMERO {val}! (x2)"
+            message += f" - ¡NÚMERO {val}!"
         else:
             win = 0
-            message += " - PERDISTE."
 
     # 3. Pagar premio si existe
     new_balance = res_cobro["new_balance"]
