@@ -536,10 +536,10 @@ body {
 
         <div class="controls">
             <div class="chips-tray">
-                <div class="c-btn sel" style="background-image:url('/assets/chips/chip_red.png')" onclick="setC(100, this)"><div class="c-val">100</div></div>
-                <div class="c-btn" style="background-image:url('/assets/chips/chip_blue.png')" onclick="setC(200, this)"><div class="c-val">200</div></div>
-                <div class="c-btn" style="background-image:url('/assets/chips/chip_green.png')" onclick="setC(300, this)"><div class="c-val">300</div></div>
-                <div class="c-btn" style="background-image:url('/assets/chips/chip_black.png')" onclick="setC(500, this)"><div class="c-val">500</div></div>
+                <div class="c-btn sel" style="background-image:url('/assets/chips/chip_red.png')" onclick="setC(0, this)"><div class="c-val">100</div></div>
+                <div class="c-btn" style="background-image:url('/assets/chips/chip_blue.png')" onclick="setC(1, this)"><div class="c-val">200</div></div>
+                <div class="c-btn" style="background-image:url('/assets/chips/chip_green.png')" onclick="setC(2, this)"><div class="c-val">300</div></div>
+                <div class="c-btn" style="background-image:url('/assets/chips/chip_black.png')" onclick="setC(3, this)"><div class="c-val">500</div></div>
             </div>
             <button class="roll-btn" id="rollBtn" onclick="forceRoll()">LANZAR</button>
         </div>
@@ -554,16 +554,49 @@ let isRolling = false;
 let bettingTime = 12;
 let timerInterval;
 let timerStart = 0;
+let tableMinimum = 100;
+let chipValues = [100, 200, 300, 500];
 
 const chipImages = { 100: '/assets/chips/chip_red.png', 200: '/assets/chips/chip_blue.png', 300: '/assets/chips/chip_green.png', 500: '/assets/chips/chip_black.png' };
+
+function getChipValuesForMinimum(minimum) {
+    if (minimum <= 100) return [100, 200, 300, 500];
+    if (minimum <= 500) return [500, 1000, 2000, 5000];
+    if (minimum <= 1000) return [1000, 2000, 5000, 10000];
+    if (minimum <= 5000) return [5000, 10000, 25000, 50000];
+    return [10000, 25000, 50000, 100000];
+}
+
+function updateChipDisplay() {
+    const buttons = document.querySelectorAll('.c-btn');
+    buttons.forEach((btn, idx) => {
+        const val = chipValues[idx];
+        const valDisplay = btn.querySelector('.c-val');
+        if (valDisplay) {
+            if (val >= 1000) {
+                valDisplay.textContent = (val / 1000).toFixed(0) + 'k';
+            } else {
+                valDisplay.textContent = val.toLocaleString();
+            }
+        }
+    });
+}
 
 async function init() {
     try {
         balance = await WalletAPI.getBalance();
+        const params = new URLSearchParams(window.location.search);
+        tableMinimum = parseInt(params.get('minimum')) || 100;
     } catch (e) {
         console.warn('WalletAPI no disponible:', e);
         balance = 10000;
+        tableMinimum = 100;
     }
+    
+    chipValues = getChipValuesForMinimum(tableMinimum);
+    updateChipDisplay();
+    currentC = chipValues[0];
+    
     updateUI();
     startNewRound();
 }
@@ -626,9 +659,9 @@ function forceRoll() {
     if (bets['pass'] || bets['dont_pass']) doRoll();
 }
 
-function setC(v, el) {
+function setC(idx, el) {
     if (isRolling) return;
-    currentC = v;
+    currentC = chipValues[idx];
     document.querySelectorAll('.c-btn').forEach(b => b.classList.remove('sel'));
     el.classList.add('sel');
 }
@@ -651,7 +684,9 @@ function placeBet(type, el) {
         stack.className = 'chip-stack';
         el.appendChild(stack);
     }
-    stack.innerHTML = `<div class="bet-tag">${bets[type].toLocaleString()}</div>`;
+    const betAmount = bets[type];
+    let betDisplay = betAmount >= 1000 ? (betAmount / 1000).toFixed(0) + 'k' : betAmount.toLocaleString();
+    stack.innerHTML = `<div class="bet-tag">${betDisplay}</div>`;
     const cImg = document.createElement('div');
     cImg.className = 'chip-img';
     cImg.style.backgroundImage = `url('${chipImages[currentC] || chipImages[100]}')`;
@@ -741,7 +776,8 @@ async function doRoll() {
 
             if (totalWin > 0) {
                 const winPop = document.getElementById('winDisplay');
-                winPop.textContent = `+${totalWin.toLocaleString()}`;
+                const winDisplay = totalWin >= 1000 ? '+' + (totalWin / 1000).toFixed(0) + 'k' : '+' + totalWin.toLocaleString();
+                winPop.textContent = winDisplay;
                 winPop.style.animation = 'none';
                 setTimeout(() => {
                     winPop.style.animation = 'winShow 2.5s forwards';
