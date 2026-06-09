@@ -74,15 +74,38 @@ body {
 }
 
 .table-card {
-    background: linear-gradient(135deg, rgba(26, 107, 143, 0.8), rgba(13, 59, 79, 0.8));
+    background: linear-gradient(135deg, rgba(26, 107, 143, 0.9), rgba(13, 59, 79, 0.9));
     border: 3px solid var(--gold);
     border-radius: 20px;
-    padding: 30px;
+    padding: 0;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(244, 196, 48, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-image {
+    width: 100%;
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 3px solid var(--gold);
+    position: relative;
+}
+
+.table-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7));
+}
+
+.table-content {
+    padding: 20px;
+    flex: 1;
 }
 
 .table-card::before {
@@ -292,26 +315,37 @@ function renderTables(tables) {
         const cardDiv = document.createElement('div');
         cardDiv.className = `table-card ${!canAfford ? 'insufficient-balance' : ''}`;
         
+        const tableImages = {
+            'craps_low_stakes': '/assets/tables/table_low.jpg',
+            'craps_mid_stakes': '/assets/tables/table_mid.jpg',
+            'craps_high_roller': '/assets/tables/table_high.jpg'
+        };
+        const tableImg = tableImages[table.id] || tableImages['craps_low_stakes'];
+
         cardDiv.innerHTML = `
-            <div class="table-status">● ACTIVA</div>
-            <div class="table-name">${table.name}</div>
-            <div class="table-info">
-                <div class="info-row">
-                    <span class="info-label">Apuesta Mínima:</span>
-                    <span class="info-value">$${table.minimum_bet.toLocaleString()}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Jugadores Máx:</span>
-                    <span class="info-value">${table.max_players}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Tu Saldo:</span>
-                    <span class="info-value" style="color: ${canAfford ? 'var(--green)' : '#ff6b6b'}">$${userBalance.toLocaleString()}</span>
-                </div>
+            <div class="table-image" style="background-image: url('${tableImg}')">
+                <div class="table-status" style="position: absolute; top: 15px; left: 15px; z-index: 5;">● ACTIVA</div>
             </div>
-            <button class="join-btn" onclick="joinTable('${table.id}')" ${!canAfford ? 'disabled' : ''}>
-                ${canAfford ? '⚡ ENTRAR A LA MESA' : '💰 SALDO INSUFICIENTE'}
-            </button>
+            <div class="table-content">
+                <div class="table-name">${table.name}</div>
+                <div class="table-info">
+                    <div class="info-row">
+                        <span class="info-label">Apuesta Mínima:</span>
+                        <span class="info-value">$${table.minimum_bet.toLocaleString()}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Jugadores Máx:</span>
+                        <span class="info-value">${table.max_players}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tu Saldo:</span>
+                        <span class="info-value" style="color: ${canAfford ? 'var(--green)' : '#ff6b6b'}">$${userBalance.toLocaleString()}</span>
+                    </div>
+                </div>
+                <button class="join-btn" onclick="joinTable('${table.id}')" ${!canAfford ? 'disabled' : ''}>
+                    ${canAfford ? '⚡ ENTRAR A LA MESA' : '💰 SALDO INSUFICIENTE'}
+                </button>
+            </div>
         `;
         
         container.appendChild(cardDiv);

@@ -684,6 +684,12 @@ async function init() {
     currentC = chipValues[0];
     
     updateUI();
+    
+    // Ejecutar efecto de entrada épico
+    if (window.curtainEffect) {
+        await window.curtainEffect.play(window.tableId);
+    }
+    
     startNewRound();
 }
 
