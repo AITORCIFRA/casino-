@@ -7,13 +7,75 @@ from routers.wallet import transaction, WalletTransactionRequest
 
 router = APIRouter(prefix="/api/games/craps", tags=["craps"])
 
+# --- Simulación de la base de datos de mesas de Craps ---
+class CrapsTable(BaseModel):
+    table_id: str
+    minimum_bet: int
+    max_players: int = 8
+    status: str = "open"
+
+craps_tables_db = {
+    "craps_low_stakes": CrapsTable(table_id="craps_low_stakes", minimum_bet=100),
+    "craps_mid_stakes": CrapsTable(table_id="craps_mid_stakes", minimum_bet=1000),
+    "craps_high_roller": CrapsTable(table_id="craps_high_roller", minimum_bet=10000),
+}
+
 class CrapsPlayRequest(BaseModel):
     username: str
     bet_amount: int
     bet_type: str  # "pass", "field", "any7", "craps", "yo11", "hard4", "num4", etc.
+    table_id: Optional[str] = None # Añadir table_id a la solicitud de apuesta
 
+# --- Endpoints para la gestión de mesas ---
+@router.post("/tables")
+async def create_table(table: CrapsTable):
+    if table.table_id in craps_tables_db:
+        raise HTTPException(status_code=400, detail="Table ID already exists")
+    craps_tables_db[table.table_id] = table
+    return table
+
+@router.get("/tables/{table_id}")
+async def get_table(table_id: str):
+    if table_id not in craps_tables_db:
+        raise HTTPException(status_code=404, detail="Table not found")
+    return craps_tables_db[table_id]
+
+@router.get("/tables")
+async def list_tables():
+    return list(craps_tables_db.values())
+
+@router.put("/tables/{table_id}")
+async def update_table(table_id: str, updated_table: CrapsTable):
+    if table_id not in craps_tables_db:
+        raise HTTPException(status_code=404, detail="Table not found")
+    if table_id != updated_table.table_id:
+        raise HTTPException(status_code=400, detail="Table ID in path and body must match")
+    craps_tables_db[table_id] = updated_table
+    return updated_table
+
+@router.delete("/tables/{table_id}")
+async def delete_table(table_id: str):
+    if table_id not in craps_tables_db:
+        raise HTTPException(status_code=404, detail="Table not found")
+    del craps_tables_db[table_id]
+    return {"message": "Table deleted successfully"}
+
+# --- Endpoint de tirada de dados (modificado para usar table_id) ---
 @router.post("/roll")
 async def roll_dice(req: CrapsPlayRequest):
+    username = req.username
+    bet_amount = req.bet_amount
+    bet_type = req.bet_type
+    table_id = req.table_id
+
+    # Validar que el usuario existe (simulado)
+    # if username not in user_balances:
+    #     raise HTTPException(status_code=404, detail="User not found")
+
+    # Validar que la mesa existe si se proporciona un table_id
+    if table_id and table_id not in craps_tables_db:
+        raise HTTPException(status_code=404, detail="Table not found")
+
     # 1. Cobrar apuesta
     res_cobro = await transaction(WalletTransactionRequest(
         username=req.username,
@@ -62,28 +124,28 @@ async def roll_dice(req: CrapsPlayRequest):
         else:
             win = 0
             message += " - FIELD PERDEDOR."
-
+    
     elif req.bet_type == "any7":
         if total == 7:
             win = req.bet_amount * 5 # 4 a 1
             message += " - ¡ANY SEVEN!"
         else:
             win = 0
-
+    
     elif req.bet_type == "craps":
         if total in [2, 3, 12]:
             win = req.bet_amount * 8 # 7 a 1
             message += " - ¡ANY CRAPS!"
         else:
             win = 0
-
+    
     elif req.bet_type == "yo11":
         if total == 11:
             win = req.bet_amount * 16 # 15 a 1
             message += " - ¡YO-LEVEN!"
         else:
             win = 0
-
+    
     elif req.bet_type == "boxcars": # 12 específico
         if total == 12:
             win = req.bet_amount * 31 # 30 a 1
