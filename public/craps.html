@@ -176,7 +176,7 @@ body {
 .ce-column {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
 }
 
@@ -271,6 +271,27 @@ body {
     gap: 2px;
 }
 .dice-icon { font-size: 22px; }
+
+.puck {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fff, #ccc);
+    border: 3px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 24px;
+    z-index: 50;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+.puck.active { opacity: 1; }
+.puck.off { background: linear-gradient(135deg, #333, #111); color: #fff; }
+.puck.on { background: linear-gradient(135deg, #fff, #ccc); color: #000; }
 
 .chip-stack { 
     position: absolute; 
@@ -428,6 +449,8 @@ body {
 
             <div class="table-container">
                 <div class="table-wrapper">
+                    <div class="puck off" id="puck">OFF</div>
+                    
                     <div class="main-area">
                         <!-- LAY -->
                         <div class="num-row">
@@ -556,8 +579,17 @@ let timerInterval;
 let timerStart = 0;
 let tableMinimum = 100;
 let chipValues = [100, 200, 300, 500];
+let currentPoint = 0;
 
 const chipImages = { 100: '/assets/chips/chip_red.png', 200: '/assets/chips/chip_blue.png', 300: '/assets/chips/chip_green.png', 500: '/assets/chips/chip_black.png' };
+const numberPositions = {
+    4: { row: 1, col: 0 },
+    5: { row: 1, col: 1 },
+    6: { row: 1, col: 2 },
+    8: { row: 1, col: 3 },
+    9: { row: 1, col: 4 },
+    10: { row: 1, col: 5 }
+};
 
 function getChipValuesForMinimum(minimum) {
     if (minimum <= 100) return [100, 200, 300, 500];
@@ -580,6 +612,28 @@ function updateChipDisplay() {
             }
         }
     });
+}
+
+function movePuck(number) {
+    const puck = document.getElementById('puck');
+    if (number === 0) {
+        puck.textContent = 'OFF';
+        puck.classList.remove('active', 'on');
+        puck.classList.add('off');
+        currentPoint = 0;
+    } else {
+        puck.textContent = number;
+        puck.classList.remove('off');
+        puck.classList.add('active', 'on');
+        currentPoint = number;
+        const numCell = document.querySelector(`[data-bet="num${number}"]`);
+        if (numCell) {
+            const rect = numCell.getBoundingClientRect();
+            const tableRect = document.querySelector('.table-wrapper').getBoundingClientRect();
+            puck.style.left = (rect.left - tableRect.left + rect.width / 2 - 25) + 'px';
+            puck.style.top = (rect.top - tableRect.top + rect.height / 2 - 25) + 'px';
+        }
+    }
 }
 
 async function init() {
@@ -611,6 +665,7 @@ function updateUI() {
 function startNewRound() {
     isRolling = false;
     bets = {};
+    movePuck(0);
     document.querySelectorAll('.bet-cell').forEach(a => {
         a.classList.remove('active', 'winning');
         const s = a.querySelector('.chip-stack');
@@ -747,6 +802,12 @@ async function doRoll() {
 
         setTimeout(() => {
             document.getElementById('statusMsg').textContent = "PAGANDO...";
+            
+            // Mover puck si es punto establecido
+            const total = lastDice[0] + lastDice[1];
+            if ([4, 5, 6, 8, 9, 10].includes(total)) {
+                movePuck(total);
+            }
             
             results.forEach(r => {
                 if (r.win > 0) {
