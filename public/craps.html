@@ -564,6 +564,7 @@ body {
         </div>
 
         <div class="controls">
+            <button class="roll-btn" style="background: linear-gradient(135deg, #666, #444); margin-right: auto;" onclick="goBackToLobby()">← VOLVER AL LOBBY</button>
             <div class="chips-tray">
                 <div class="c-btn sel" style="background-image:url('/assets/chips/chip_red.png')" onclick="setC(0, this)"><div class="c-val">100</div></div>
                 <div class="c-btn" style="background-image:url('/assets/chips/chip_blue.png')" onclick="setC(1, this)"><div class="c-val">200</div></div>
@@ -743,6 +744,10 @@ function startBettingTimer() {
 
 function forceRoll() {
     if (bets['pass'] || bets['dont_pass']) doRoll();
+}
+
+function goBackToLobby() {
+    window.location.href = '/lobby.html';
 }
 
 function setC(idx, el) {

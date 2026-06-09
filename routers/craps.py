@@ -91,6 +91,12 @@ async def roll_dice(req: CrapsPlayRequest):
     # Validar que la mesa existe si se proporciona un table_id
     if table_id and table_id not in craps_tables_db:
         raise HTTPException(status_code=404, detail="Table not found")
+    
+    # Validar que la apuesta cumple con el mínimo de la mesa
+    if table_id:
+        table = craps_tables_db[table_id]
+        if bet_amount < table.minimum_bet:
+            raise HTTPException(status_code=400, detail=f"Bet amount must be at least ${table.minimum_bet}")
 
     # 1. Cobrar apuesta
     res_cobro = await transaction(WalletTransactionRequest(
