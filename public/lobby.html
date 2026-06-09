@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRAPS LOBBY - Selecciona tu Mesa</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/js/wallet.js"></script>
+<style>
+:root { 
+    --felt: #1a6b8f; 
+    --gold: #f4c430; 
+    --border: rgba(255, 255, 255, 0.3);
+    --green: #00ff99;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body { 
+    background: linear-gradient(135deg, #050a0f 0%, #1a3a4a 100%); 
+    color: #fff; 
+    font-family: 'Rajdhani', sans-serif; 
+    display: flex; 
+    flex-direction: column;
+}
+
+.lobby-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 40px;
+}
+
+.lobby-header {
+    text-align: center;
+    animation: fadeIn 0.8s ease-in;
+}
+
+.lobby-title {
+    font-family: 'Bebas Neue';
+    font-size: 72px;
+    color: var(--gold);
+    text-shadow: 0 0 30px var(--gold), 0 0 60px rgba(244, 196, 48, 0.5);
+    margin-bottom: 10px;
+    letter-spacing: 3px;
+}
+
+.lobby-subtitle {
+    font-family: 'Orbitron';
+    font-size: 20px;
+    color: var(--green);
+    text-shadow: 0 0 20px var(--green);
+}
+
+.lobby-balance {
+    font-family: 'Orbitron';
+    font-size: 24px;
+    color: var(--green);
+    background: rgba(0, 255, 153, 0.1);
+    padding: 15px 30px;
+    border: 2px solid var(--green);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 255, 153, 0.3);
+}
+
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.table-card {
+    background: linear-gradient(135deg, rgba(26, 107, 143, 0.8), rgba(13, 59, 79, 0.8));
+    border: 3px solid var(--gold);
+    border-radius: 20px;
+    padding: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(244, 196, 48, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.table-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(244, 196, 48, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.table-card:hover::before {
+    left: 100%;
+}
+
+.table-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 60px rgba(244, 196, 48, 0.4), inset 0 0 30px rgba(244, 196, 48, 0.2);
+    border-color: var(--green);
+}
+
+.table-name {
+    font-family: 'Orbitron';
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.table-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-label {
+    color: var(--border);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.info-value {
+    color: var(--green);
+    font-family: 'Orbitron';
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.table-status {
+    display: inline-block;
+    background: rgba(0, 255, 153, 0.2);
+    color: var(--green);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid var(--green);
+    margin-bottom: 15px;
+}
+
+.join-btn {
+    width: 100%;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--gold), #d4a520);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Orbitron';
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 8px 20px rgba(244, 196, 48, 0.4);
+}
+
+.join-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(244, 196, 48, 0.6);
+    background: linear-gradient(135deg, #f4c430, #e6b800);
+}
+
+.join-btn:active {
+    transform: scale(0.98);
+}
+
+.insufficient-balance {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.insufficient-balance .join-btn {
+    background: linear-gradient(135deg, #666, #444);
+    color: #999;
+    cursor: not-allowed;
+}
+
+.insufficient-balance .join-btn:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 153, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(0, 255, 153, 0.6); }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+.error-msg {
+    color: #ff6b6b;
+    text-align: center;
+    font-size: 18px;
+    padding: 20px;
+    background: rgba(255, 107, 107, 0.1);
+    border: 2px solid #ff6b6b;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.success-msg {
+    color: var(--green);
+    text-align: center;
+    font-size: 18px;
+    padding: 20px;
+    background: rgba(0, 255, 153, 0.1);
+    border: 2px solid var(--green);
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 600px;
+}
+</style>
+</head>
+<body>
+
+<div class="lobby-container">
+    <div class="lobby-header">
+        <div class="lobby-title">🎰 CRAPS LOBBY</div>
+        <div class="lobby-subtitle">Selecciona tu Mesa y Comienza a Jugar</div>
+    </div>
+
+    <div class="lobby-balance">
+        SALDO: <span id="balance">0</span>
+    </div>
+
+    <div id="tablesContainer" class="tables-grid">
+        <!-- Las mesas se cargarán aquí dinámicamente -->
+    </div>
+
+    <div id="errorMsg" class="error-msg" style="display: none;"></div>
+    <div id="successMsg" class="success-msg" style="display: none;"></div>
+</div>
+
+<script>
+let userBalance = 0;
+
+async function loadTables() {
+    try {
+        // Cargar saldo del usuario
+        try {
+            userBalance = await WalletAPI.getBalance();
+        } catch (e) {
+            console.warn('WalletAPI no disponible, usando saldo de prueba');
+            userBalance = 50000;
+        }
+        document.getElementById('balance').textContent = userBalance.toLocaleString();
+
+        // Cargar las mesas disponibles desde el backend
+        const response = await fetch('/api/games/craps/tables');
+        if (!response.ok) throw new Error('Error al cargar las mesas');
+        
+        const tables = await response.json();
+        renderTables(tables);
+    } catch (error) {
+        console.error('Error:', error);
+        showError('Error al cargar las mesas. Intenta de nuevo.');
+    }
+}
+
+function renderTables(tables) {
+    const container = document.getElementById('tablesContainer');
+    container.innerHTML = '';
+
+    tables.forEach(table => {
+        const canAfford = userBalance >= table.minimum_bet;
+        const cardDiv = document.createElement('div');
+        cardDiv.className = `table-card ${!canAfford ? 'insufficient-balance' : ''}`;
+        
+        cardDiv.innerHTML = `
+            <div class="table-status">● ACTIVA</div>
+            <div class="table-name">${table.name}</div>
+            <div class="table-info">
+                <div class="info-row">
+                    <span class="info-label">Apuesta Mínima:</span>
+                    <span class="info-value">$${table.minimum_bet.toLocaleString()}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Jugadores Máx:</span>
+                    <span class="info-value">${table.max_players}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tu Saldo:</span>
+                    <span class="info-value" style="color: ${canAfford ? 'var(--green)' : '#ff6b6b'}">$${userBalance.toLocaleString()}</span>
+                </div>
+            </div>
+            <button class="join-btn" onclick="joinTable('${table.id}')" ${!canAfford ? 'disabled' : ''}>
+                ${canAfford ? '⚡ ENTRAR A LA MESA' : '💰 SALDO INSUFICIENTE'}
+            </button>
+        `;
+        
+        container.appendChild(cardDiv);
+    });
+}
+
+function joinTable(tableId) {
+    // Redirigir al juego con el table_id como parámetro
+    window.location.href = `/craps.html?table_id=${tableId}`;
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('errorMsg');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 5000);
+}
+
+function showSuccess(message) {
+    const successDiv = document.getElementById('successMsg');
+    successDiv.textContent = message;
+    successDiv.style.display = 'block';
+    setTimeout(() => {
+        successDiv.style.display = 'none';
+    }, 5000);
+}
+
+// Cargar las mesas al iniciar la página
+window.onload = loadTables;
+</script>
+
+</body>
+</html>

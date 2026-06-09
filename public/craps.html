@@ -653,11 +653,28 @@ function movePuck(number) {
 async function init() {
     try {
         balance = await WalletAPI.getBalance();
-        const params = new URLSearchParams(window.location.search);
-        tableMinimum = parseInt(params.get('minimum')) || 100;
     } catch (e) {
         console.warn('WalletAPI no disponible:', e);
         balance = 10000;
+    }
+    
+    // Obtener table_id de la URL
+    const params = new URLSearchParams(window.location.search);
+    window.tableId = params.get('table_id') || 'craps_low_stakes';
+    
+    // Cargar configuración de la mesa desde el backend
+    try {
+        const tableResponse = await fetch(`/api/games/craps/tables/${window.tableId}`);
+        if (tableResponse.ok) {
+            const tableData = await tableResponse.json();
+            tableMinimum = tableData.minimum_bet;
+            console.log(`Mesa cargada: ${tableData.name} (Mínimo: $${tableMinimum})`);
+        } else {
+            console.warn('Mesa no encontrada, usando configuración por defecto');
+            tableMinimum = 100;
+        }
+    } catch (e) {
+        console.warn('Error al cargar configuración de mesa:', e);
         tableMinimum = 100;
     }
     
@@ -783,7 +800,8 @@ async function doRoll() {
                     body: JSON.stringify({ 
                         username: WalletAPI.getUsername ? WalletAPI.getUsername() : 'test_user', 
                         bet_amount: bets[type], 
-                        bet_type: type 
+                        bet_type: type,
+                        table_id: window.tableId
                     })
                 });
                 const data = await res.json();

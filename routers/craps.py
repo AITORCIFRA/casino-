@@ -38,11 +38,27 @@ async def create_table(table: CrapsTable):
 async def get_table(table_id: str):
     if table_id not in craps_tables_db:
         raise HTTPException(status_code=404, detail="Table not found")
-    return craps_tables_db[table_id]
+    table = craps_tables_db[table_id]
+    return {
+        "id": table.table_id,
+        "name": table.table_id.replace('_', ' ').title(),
+        "minimum_bet": table.minimum_bet,
+        "max_players": table.max_players,
+        "status": table.status
+    }
 
 @router.get("/tables")
 async def list_tables():
-    return list(craps_tables_db.values())
+    tables = []
+    for table_id, table in craps_tables_db.items():
+        tables.append({
+            "id": table.table_id,
+            "name": f"Mesa {table.table_id.replace('_', ' ').title()}",
+            "minimum_bet": table.minimum_bet,
+            "max_players": table.max_players,
+            "status": table.status
+        })
+    return tables
 
 @router.put("/tables/{table_id}")
 async def update_table(table_id: str, updated_table: CrapsTable):
