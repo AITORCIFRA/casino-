@@ -292,6 +292,47 @@ body {
         </div>
     </div>
 
+    <style>
+    /* Tags de categoría para los nuevos juegos */
+    .tag-slot { background: rgba(244,196,48,.15); color: var(--gold); border: 1px solid var(--gold); border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+    .tag-hot { background: rgba(255,68,0,.15); color: #ff4400; border: 1px solid #ff4400; border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+    .tag-new { background: rgba(0,255,153,.15); color: var(--green); border: 1px solid var(--green); border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+    .tag-arcade { background: rgba(0,255,136,.15); color: #00ff88; border: 1px solid #00ff88; border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+    .tag-seasonal { background: rgba(100,200,255,.15); color: #64c8ff; border: 1px solid #64c8ff; border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+    .tag-exclusive { background: rgba(201,168,76,.2); color: #C9A84C; border: 1px solid #C9A84C; border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+    .tag-link { background: rgba(0,210,255,.15); color: #00d2ff; border: 1px solid #00d2ff; border-radius: 3px; padding: 2px 6px; font-size: .65rem; font-family: 'Rajdhani'; letter-spacing: 1px; }
+
+    /* Animaciones extra */
+    @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-10px) } }
+    @keyframes flicker { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+    @keyframes shake { 0%,100% { transform:rotate(-5deg) } 50% { transform:rotate(5deg) } }
+    @keyframes bounce { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-15px) } }
+    @keyframes slide { 0% { transform:translateX(-10px) } 100% { transform:translateX(10px) } }
+    @keyframes spin { from { transform:rotate(0deg) } to { transform:rotate(360deg) } }
+
+    /* Arte específico de cada card */
+    .slot-art { height: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .pigs-art, .xmas-art { background: linear-gradient(135deg, #1a1a40, #2a1a50); }
+    .penalty-art { background: linear-gradient(135deg, #001a00, #003300); }
+    .mine-art { background: linear-gradient(135deg, #1a0f00, #2a1a00); }
+    .phoenix-art { background: linear-gradient(135deg, #1a0500, #2a0800); }
+    .trophy-art { background: linear-gradient(135deg, #0a0a00, #1a1500); }
+    .train-art { background: linear-gradient(135deg, #0f0800, #1a1000); }
+    .witch-art { background: linear-gradient(135deg, #0a0015, #150030); }
+    .ufo-art { background: linear-gradient(135deg, #000a05, #001a0a); }
+    .eagle-art { background: linear-gradient(135deg, #0f0800, #1a1000); }
+    .viking-art { background: linear-gradient(135deg, #000a15, #001530); }
+    .genie-art { background: linear-gradient(135deg, #0f000f, #1a001a); }
+    .biker-art { background: linear-gradient(135deg, #150000, #200000); }
+
+    .card-info { padding: 15px; }
+    .card-title { font-family: 'Orbitron'; font-size: 1.1rem; font-weight: 900; margin-bottom: 5px; color: #fff; }
+    .card-sub { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
+    .card-tags { display: flex; gap: 5px; margin-bottom: 10px; }
+    .card-jackpot { font-family: 'Orbitron'; color: #ff4400; font-weight: 900; font-size: 1.2rem; }
+    .card-jackpot::before { content: '$'; margin-right: 2px; }
+    </style>
+
     <div class="footer">
         &copy; 2026 Premium Casino Ultimate. Todos los derechos reservados. Juega con responsabilidad.
     </div>
@@ -361,6 +402,22 @@ function renderNewGames(games) {
     const grid = document.getElementById('newGamesGrid');
     grid.innerHTML = '';
     
+    const artConfigs = {
+        'triad_pigs_olympus': '<div class="slot-art pigs-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite">🐷</span><span style="font-size:2rem;animation:float 2.3s ease-in-out infinite 0.3s">🏛️</span><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite 0.6s">🐷</span></div>',
+        'penalty_pro_championship': '<div class="slot-art penalty-art"><span style="font-size:3rem;animation:bounce 1s ease-in-out infinite">⚽</span><span style="font-size:1.5rem">🥅</span></div>',
+        'jolly_pigs_christmas': '<div class="slot-art xmas-art"><span style="font-size:2rem;animation:float 2s ease-in-out infinite">🐷</span><span style="font-size:2.5rem;animation:float 2.5s ease-in-out infinite 0.4s">🎅</span><span style="font-size:2rem;animation:float 2s ease-in-out infinite 0.8s">🐷</span></div>',
+        'gold_mine_blast': '<div class="slot-art mine-art"><span style="font-size:2.5rem;animation:shake 0.5s ease-in-out infinite">💣</span><span style="font-size:2rem">💎</span><span style="font-size:2rem;animation:float 2s ease-in-out infinite">⛏️</span></div>',
+        'inferno_phoenix_blaze': '<div class="slot-art phoenix-art"><span style="font-size:3rem;animation:float 1.5s ease-in-out infinite;filter:drop-shadow(0 0 10px #ff4400)">🦅</span><span style="font-size:1.8rem;animation:flicker 0.5s ease-in-out infinite">🔥</span></div>',
+        'golden_goal_nations': '<div class="slot-art trophy-art"><span style="font-size:3rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 10px #C9A84C)">🏆</span><span style="font-size:1.5rem">⚽</span></div>',
+        'steam_train_tycoon': '<div class="slot-art train-art"><span style="font-size:3rem;animation:slide 2s linear infinite">🚂</span><span style="font-size:1.5rem">💰</span></div>',
+        'witchs_wicked_wares': '<div class="slot-art witch-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 8px #9933ff)">🧙</span><span style="font-size:2rem;animation:spin 3s linear infinite">🔮</span></div>',
+        'ufo_farm_abduction': '<div class="slot-art ufo-art"><span style="font-size:2.5rem;animation:float 1.5s ease-in-out infinite;filter:drop-shadow(0 0 10px #00ff88)">🛸</span><span style="font-size:2rem;animation:float 2s ease-in-out infinite 0.5s">🐄</span></div>',
+        'sky_eagle_cash': '<div class="slot-art eagle-art"><span style="font-size:3rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 10px #ff8800)">🦅</span><span style="font-size:1.5rem">💰</span></div>',
+        'viking_raidmark': '<div class="slot-art viking-art"><span style="font-size:2.5rem;filter:drop-shadow(0 0 8px #4488ff)">⚔️</span><span style="font-size:2rem;animation:shake 2s ease-in-out infinite">🛡️</span></div>',
+        'mystic_genie_dreams': '<div class="slot-art genie-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 10px #cc44ff)">🧞</span><span style="font-size:2rem;animation:float 2.5s ease-in-out infinite 0.5s">🪔</span></div>',
+        'outlaw_roadquake': '<div class="slot-art biker-art"><span style="font-size:2.5rem;animation:slide 1.5s linear infinite">🏍️</span><span style="font-size:1.5rem;animation:flicker 0.4s ease-in-out infinite">🔥</span></div>'
+    };
+
     games.forEach(g => {
         const card = document.createElement('div');
         card.className = 'game-card';
@@ -368,18 +425,49 @@ function renderNewGames(games) {
         card.onclick = () => playNewGame(g.game_id);
         
         const thumb = `/assets/slots/${g.game_id.replace(/_olympus|_championship|_christmas|_blast|_blaze|_nations|_tycoon|_wicked|_abduction|_cash|_raidmark|_dreams|_roadquake/g, '')}.png`;
+        const art = artConfigs[g.game_id] || `<div class="game-thumb" style="background-image: url('${thumb}')"></div>`;
 
         card.innerHTML = `
-            <div class="game-thumb" style="background-image: url('${thumb}')">
-                ${g.jackpot > 0 ? `<div class="jackpot-badge">JACKPOT: $${g.jackpot.toLocaleString()}</div>` : ''}
-                <div class="game-overlay">
-                    <div class="game-name">${g.name}</div>
-                    <div class="game-category">${g.category}</div>
+            <div class="card-art" style="height: 200px; position: relative; overflow: hidden;">
+                ${art}
+                ${g.jackpot > 0 ? `<div class="jackpot-badge">JACKPOT</div>` : ''}
+            </div>
+            <div class="card-info">
+                <div class="card-title">${g.name}</div>
+                <div class="card-sub">${g.category}</div>
+                <div class="card-tags">
+                    <span class="tag-${g.category.toLowerCase().replace(' ', '-')}">${g.category}</span>
+                    ${g.game_id.includes('pigs') || g.game_id.includes('phoenix') ? '<span class="tag-hot">🔥 HOT</span>' : ''}
                 </div>
+                <div class="card-jackpot" id="jp-${g.game_id}">${g.jackpot.toLocaleString()}</div>
             </div>
         `;
         grid.appendChild(card);
     });
+
+    // Iniciar actualización de jackpots
+    startJackpotUpdates();
+}
+
+function startJackpotUpdates() {
+    if (window.jackpotInterval) clearInterval(window.jackpotInterval);
+    
+    async function fetchJackpots() {
+        try {
+            const res = await fetch('/api/games/new/jackpots');
+            if (!res.ok) return;
+            const data = await res.json();
+            for (const [gid, val] of Object.entries(data.jackpots)) {
+                const el = document.getElementById('jp-' + gid);
+                if (el) el.textContent = Number(val).toLocaleString();
+            }
+        } catch (e) {
+            console.warn('Error fetching jackpots:', e);
+        }
+    }
+
+    fetchJackpots();
+    window.jackpotInterval = setInterval(fetchJackpots, 3000);
 }
 
 function filterGames(cat) {
