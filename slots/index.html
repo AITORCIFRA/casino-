@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classic Slots | Casino del Pana</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .back-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.9);
+      border-bottom: 2px solid #B8860B;
+    }
+    .back-link {
+      color: #FFD700;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 14px;
+      border: 1px solid #B8860B;
+      border-radius: 6px;
+    }
+    .back-link:hover { background: #B8860B; color: #000; }
+  </style>
+</head>
+<body>
+
+  <div class="back-header">
+    <a href="../index.html" class="back-link">← Volver al Casino</a>
+    <span style="color:#FFD700; font-weight:bold; font-family:Arial;">🎰 Classic Slots</span>
+  </div>
+
+  <div class="machine">
+    <div class="header">🏛️ Casino del Pana</div>
+
+    <div class="screen">
+      <div class="reels">
+        <div class="reel" id="reel1"></div>
+        <div class="reel" id="reel2"></div>
+        <div class="reel" id="reel3"></div>
+      </div>
+      <div class="message" id="message">Inserta apuesta y pulsa GIRAR</div>
+    </div>
+
+    <div class="controls">
+      <input type="number" id="bet" placeholder="Apuesta (€)" min="1">
+      <button id="spinBtn">GIRAR</button>
+    </div>
+
+    <div class="bottom-panel">
+      <div class="left">👤 <span id="nickDisplay">Invitado</span></div>
+      <div class="right">💰 <span id="saldo">100</span>€</div>
+    </div>
+
+    <button id="changeNick">Cambiar Nick</button>
+    <button id="openShop">🛒 Tienda</button>
+  </div>
+
+  <!-- TIENDA -->
+  <div id="shop" class="shop hidden">
+    <h2>🛒 Tienda</h2>
+    <p>Compra saldo extra:</p>
+
+    <button class="shop-btn" data-amount="50">+50€</button>
+    <button class="shop-btn" data-amount="100">+100€</button>
+    <button class="shop-btn" data-amount="250">+250€</button>
+
+    <br><br>
+    <button id="closeShop">Cerrar</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

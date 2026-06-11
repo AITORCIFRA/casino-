@@ -1,0 +1,666 @@
+/* ===== CASINO DEL PANA - ESTILOS PRINCIPALES ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --gold: #FFD700;
+  --gold-dark: #B8860B;
+  --gold-light: #FFF0A0;
+  --red: #DC2626;
+  --green: #16A34A;
+  --bg-dark: #0A0A0F;
+  --bg-card: #12121A;
+  --bg-section: #0D0D15;
+  --text: #F0F0F0;
+  --text-muted: #888;
+  --border: rgba(255,215,0,0.15);
+}
+
+html, body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Cinzel', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== FONDO ===== */
+.casino-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 20%, rgba(220,38,38,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(255,215,0,0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #0A0A0F 0%, #0D0D15 100%);
+  z-index: 0;
+}
+
+.bg-lights {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 40px,
+    rgba(255,215,0,0.01) 40px,
+    rgba(255,215,0,0.01) 41px
+  );
+  pointer-events: none;
+}
+
+/* ===== HEADER ===== */
+.casino-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: rgba(10,10,15,0.95);
+  border-bottom: 2px solid var(--gold-dark);
+  backdrop-filter: blur(10px);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-main {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.3);
+  line-height: 1;
+}
+
+.logo-sub {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+.header-player {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.player-badge, .balance-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,215,0,0.08);
+  border: 1px solid var(--gold-dark);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.change-nick-btn, .add-balance-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.change-nick-btn:hover, .add-balance-btn:hover {
+  background: rgba(255,215,0,0.2);
+}
+
+.add-balance-btn {
+  color: var(--green);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* ===== JACKPOT TICKER ===== */
+.jackpot-ticker {
+  position: relative;
+  z-index: 5;
+  background: linear-gradient(90deg, #1a0000, #2d0000, #1a0000);
+  border-bottom: 1px solid rgba(220,38,38,0.3);
+  padding: 8px 0;
+  overflow: hidden;
+}
+
+.ticker-content {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 0 24px;
+  animation: tickerScroll 30s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-label {
+  font-size: 11px;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+.ticker-amount {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+
+.ticker-winner, .ticker-spins {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.ticker-sep {
+  color: rgba(255,215,0,0.3);
+}
+
+/* ===== NAVEGACIÓN DE CATEGORÍAS ===== */
+.category-nav {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.category-nav::-webkit-scrollbar { display: none; }
+
+.cat-btn {
+  flex-shrink: 0;
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.cat-btn:hover {
+  background: rgba(255,215,0,0.1);
+  border-color: var(--gold-dark);
+  color: var(--gold);
+}
+
+.cat-btn.active {
+  background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(184,134,11,0.1));
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 10px rgba(255,215,0,0.2);
+}
+
+/* ===== HERO BANNER ===== */
+.hero-banner {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 40px;
+  background: linear-gradient(135deg, rgba(107,33,168,0.3), rgba(30,64,175,0.2), rgba(0,0,0,0.5));
+  border-bottom: 2px solid rgba(255,215,0,0.2);
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,215,0,0.05)" stroke-width="0.5"/></svg>') center/cover;
+  pointer-events: none;
+}
+
+.hero-content {
+  z-index: 1;
+}
+
+.hero-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(255,215,0,0.5);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #7C3AED, #4C1D95);
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  color: var(--gold);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+  box-shadow: 0 0 20px rgba(124,58,237,0.4);
+  animation: ctaPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes ctaPulse {
+  0% { box-shadow: 0 0 20px rgba(124,58,237,0.4); }
+  100% { box-shadow: 0 0 35px rgba(124,58,237,0.7), 0 0 50px rgba(255,215,0,0.2); }
+}
+
+.hero-cta:hover {
+  background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+  transform: translateY(-2px);
+}
+
+.hero-featured {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-game-img {
+  max-width: 320px;
+  width: 100%;
+  filter: drop-shadow(0 0 20px rgba(255,215,0,0.3));
+  animation: heroFloat 4s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #DC2626, #991B1B);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ===== SECCIONES DE JUEGOS ===== */
+.games-section {
+  position: relative;
+  z-index: 5;
+  padding: 32px 24px;
+}
+
+.games-section + .games-section {
+  border-top: 1px solid var(--border);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(255,215,0,0.3);
+}
+
+.section-badge {
+  background: linear-gradient(135deg, #DC2626, #991B1B);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  animation: badgePulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes badgePulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; box-shadow: 0 0 8px rgba(220,38,38,0.5); }
+}
+
+/* ===== GRID DE JUEGOS ===== */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+/* ===== TARJETA DE JUEGO ===== */
+.game-card {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold-dark);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 15px rgba(255,215,0,0.1);
+}
+
+.game-card.featured {
+  border-color: var(--gold-dark);
+  box-shadow: 0 0 15px rgba(255,215,0,0.1);
+}
+
+.game-card.featured:hover {
+  border-color: var(--gold);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 25px rgba(255,215,0,0.2);
+}
+
+/* Thumbnail */
+.game-thumb {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+}
+
+.game-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.game-card:hover .game-thumb img {
+  transform: scale(1.05);
+}
+
+/* Overlay al hover */
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.game-card:hover .game-overlay {
+  opacity: 1;
+}
+
+.play-btn {
+  background: linear-gradient(135deg, #7C3AED, #4C1D95);
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  transform: scale(0.9);
+  transition: transform 0.2s;
+}
+
+.game-card:hover .play-btn {
+  transform: scale(1);
+}
+
+/* Badges */
+.game-badge {
+  position: absolute;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.game-badge.new {
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #7C3AED, #4C1D95);
+  color: var(--gold);
+  border: 1px solid var(--gold-dark);
+}
+
+.game-badge.hot {
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #DC2626, #991B1B);
+  color: white;
+}
+
+/* Info del juego */
+.game-info {
+  padding: 12px;
+}
+
+.game-info h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-info p {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.game-rtp {
+  font-size: 10px;
+  color: var(--green);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ===== FOOTER ===== */
+.casino-footer {
+  position: relative;
+  z-index: 5;
+  background: rgba(0,0,0,0.5);
+  border-top: 1px solid var(--border);
+  padding: 24px;
+  margin-top: 32px;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  color: var(--gold-dark);
+  margin-bottom: 8px;
+}
+
+.footer-disclaimer {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border: 2px solid var(--gold-dark);
+  border-radius: 16px;
+  padding: 28px;
+  text-align: center;
+  min-width: 280px;
+}
+
+.modal-box h3 {
+  font-family: 'Cinzel Decorative', serif;
+  color: var(--gold);
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+}
+
+.balance-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.bal-btn {
+  padding: 14px;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid var(--gold-dark);
+  border-radius: 8px;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bal-btn:hover {
+  background: rgba(255,215,0,0.2);
+  border-color: var(--gold);
+}
+
+.close-modal {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-modal:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text);
+}
+
+/* ===== FILTRADO DE JUEGOS ===== */
+.game-card.hidden-by-filter {
+  display: none;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .casino-header {
+    padding: 10px 16px;
+  }
+
+  .logo-main {
+    font-size: 1rem;
+  }
+
+  .hero-banner {
+    flex-direction: column;
+    padding: 24px 16px;
+    text-align: center;
+  }
+
+  .hero-game-img {
+    max-width: 240px;
+    margin-top: 16px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .games-section {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header-player {
+    gap: 8px;
+  }
+
+  .player-badge, .balance-badge {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}

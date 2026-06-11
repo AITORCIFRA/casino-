@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta Europea | Casino del Pana</title>
+  <link rel="stylesheet" href="ruleta.css">
+  <style>
+    .back-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.8);
+      border-bottom: 2px solid #B8860B;
+      font-family: Arial, sans-serif;
+    }
+    .back-link {
+      color: #FFD700;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 6px 14px;
+      border: 1px solid #B8860B;
+      border-radius: 6px;
+    }
+    .back-link:hover { background: #B8860B; color: #000; }
+  </style>
+</head>
+<body>
+
+  <div class="back-header">
+    <a href="../index.html" class="back-link">← Volver al Casino</a>
+    <span style="color:#FFD700; font-weight:bold;">🎡 Ruleta Europea</span>
+  </div>
+
+  <div class="ruleta-container">
+
+    <h1 class="titulo">🎡 Ruleta del Pana</h1>
+
+    <div class="panel-superior">
+      <div class="left">👤 <span id="nickDisplay">Invitado</span></div>
+      <div class="right">💰 <span id="saldo">100</span>€</div>
+    </div>
+
+    <div class="ruleta">
+      <img src="../assets/img/ruleta_wheel.png" class="ruleta-img" id="ruletaImg" onerror="this.style.display='none'">
+      <div class="bola" id="bola"></div>
+    </div>
+
+    <button id="lanzarBtn" class="btn">LANZAR BOLA</button>
+
+    <h2>RESULTADOS</h2>
+    <div id="historial" class="historial"></div>
+
+    <h2>Apuesta</h2>
+    <input type="number" id="apuesta" placeholder="Cantidad (€)" min="1">
+
+    <h2>Selecciona tu número</h2>
+    <div class="tapete" id="tapete">
+    <!-- Se generan los 37 números automáticamente -->
+    </div>
+
+    <button id="apostarBtn" class="btn">APOSTAR</button>
+
+  </div>
+
+  <script src="ruleta.js"></script>
+</body>
+</html>

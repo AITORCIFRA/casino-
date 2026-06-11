@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aztec Treasures | Casino del Pana</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0A0A0F;
+      color: #F0F0F0;
+      font-family: 'Cinzel', serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(0,0,0,0.8);
+      border-bottom: 2px solid #B8860B;
+    }
+    .back-btn {
+      color: #FFD700;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border: 1px solid #B8860B;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    .back-btn:hover { background: #B8860B; color: #000; }
+    .balance { color: #FFD700; font-weight: 700; }
+    .coming-soon {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+    }
+    .game-icon { font-size: 5rem; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+    h1 { font-family: 'Cinzel Decorative', serif; font-size: 2rem; color: #FFD700; margin-bottom: 12px; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+    p { color: #888; font-size: 1rem; margin-bottom: 24px; }
+    .progress-bar { width: 300px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #7C3AED, #FFD700); border-radius: 4px; animation: progressAnim 2s ease-in-out infinite alternate; }
+    @keyframes progressAnim { 0%{width:60%} 100%{width:90%} }
+    .progress-label { font-size: 12px; color: #888; }
+    .back-home-btn {
+      margin-top: 24px;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #7C3AED, #4C1D95);
+      border: 2px solid #FFD700;
+      border-radius: 10px;
+      color: #FFD700;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .back-home-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(124,58,237,0.4); }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../../index.html" class="back-btn">← Volver al Casino</a>
+    <div class="balance">💰 <span id="saldo">100</span>€</div>
+  </header>
+  <div class="coming-soon">
+    <div class="game-icon">🏛️</div>
+    <h1>Aztec Treasures</h1>
+    <p>Este juego está en desarrollo. ¡Vuelve pronto!</p>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+    <span class="progress-label">Cargando contenido...</span>
+    <a href="../../index.html" class="back-home-btn">🎰 Explorar otros juegos</a>
+  </div>
+  <script>
+    const s = localStorage.getItem('saldo') || 100;
+    document.getElementById('saldo').textContent = Number(s).toLocaleString('es-ES');
+  </script>
+</body>
+</html>

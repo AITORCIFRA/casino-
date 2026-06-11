@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casino del Pana 🎰</title>
+  <link rel="stylesheet" href="casino.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- FONDO ANIMADO -->
+  <div class="casino-bg"></div>
+  <div class="bg-lights"></div>
+
+  <!-- HEADER -->
+  <header class="casino-header">
+    <div class="header-logo">
+      <span class="logo-icon">🎰</span>
+      <div class="logo-text">
+        <span class="logo-main">Casino del Pana</span>
+        <span class="logo-sub">Tu suerte empieza aquí</span>
+      </div>
+    </div>
+    <div class="header-player">
+      <div class="player-badge">
+        <span class="player-icon">👤</span>
+        <span id="nickDisplay">Invitado</span>
+        <button class="change-nick-btn" id="changeNickBtn">✏️</button>
+      </div>
+      <div class="balance-badge">
+        <span class="balance-icon">💰</span>
+        <span id="saldoDisplay">100</span>€
+        <button class="add-balance-btn" id="addBalanceBtn">+</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- JACKPOT TICKER -->
+  <div class="jackpot-ticker">
+    <div class="ticker-content">
+      <span class="ticker-label">🏆 JACKPOT PROGRESIVO:</span>
+      <span class="ticker-amount" id="tickerJackpot">€ 1,250,000</span>
+      <span class="ticker-sep">|</span>
+      <span class="ticker-label">⚡ ÚLTIMO GANADOR:</span>
+      <span class="ticker-winner">Jugador_777 ganó €4,250</span>
+      <span class="ticker-sep">|</span>
+      <span class="ticker-label">🎯 GIROS HOY:</span>
+      <span class="ticker-spins">128,432</span>
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN DE CATEGORÍAS -->
+  <nav class="category-nav">
+    <button class="cat-btn active" data-cat="all">🎮 Todos</button>
+    <button class="cat-btn" data-cat="clasicos">⭐ Clásicos</button>
+    <button class="cat-btn" data-cat="novedades">🆕 Novedades</button>
+    <button class="cat-btn" data-cat="mesa">🃏 Mesa</button>
+    <button class="cat-btn" data-cat="slots">🎰 Slots</button>
+  </nav>
+
+  <!-- BANNER PRINCIPAL -->
+  <section class="hero-banner">
+    <div class="hero-content">
+      <h1 class="hero-title">¡JUEGA Y GANA!</h1>
+      <p class="hero-subtitle">Más de 13 juegos épicos te esperan</p>
+      <a href="triad-pigs/index.html" class="hero-cta">
+        ⚡ JUGAR AHORA ⚡
+      </a>
+    </div>
+    <div class="hero-featured">
+      <img src="triad-pigs/assets/bg/game_logo.png" alt="The Triad Pigs of Olympus" class="hero-game-img">
+      <span class="hero-badge">🔥 DESTACADO</span>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: NOVEDADES -->
+  <section class="games-section" data-section="novedades">
+    <div class="section-header">
+      <h2 class="section-title">🆕 Novedades</h2>
+      <span class="section-badge">NUEVO</span>
+    </div>
+    <div class="games-grid">
+
+      <!-- The Triad Pigs of Olympus -->
+      <a href="triad-pigs/index.html" class="game-card featured" data-cat="novedades slots">
+        <div class="game-thumb">
+          <img src="triad-pigs/assets/bg/game_thumbnail.png" alt="The Triad Pigs of Olympus">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+          <span class="game-badge new">NUEVO</span>
+          <span class="game-badge hot">🔥 HOT</span>
+        </div>
+        <div class="game-info">
+          <h3>The Triad Pigs of Olympus</h3>
+          <p>5 rodillos · Jackpot 50,000€</p>
+          <div class="game-rtp">RTP: 96.5%</div>
+        </div>
+      </a>
+
+      <!-- Diamond Heist -->
+      <a href="games/diamond-heist/index.html" class="game-card" data-cat="novedades slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/diamond_rush.png" alt="Diamond Heist">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+          <span class="game-badge new">NUEVO</span>
+        </div>
+        <div class="game-info">
+          <h3>Diamond Heist</h3>
+          <p>5 rodillos · Wild Multiplicador</p>
+          <div class="game-rtp">RTP: 95.8%</div>
+        </div>
+      </a>
+
+      <!-- Galaxy Fortune -->
+      <a href="games/galaxy-fortune/index.html" class="game-card" data-cat="novedades slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/space_slots.png" alt="Galaxy Fortune">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+          <span class="game-badge new">NUEVO</span>
+        </div>
+        <div class="game-info">
+          <h3>Galaxy Fortune</h3>
+          <p>1024 formas de ganar</p>
+          <div class="game-rtp">RTP: 96.2%</div>
+        </div>
+      </a>
+
+      <!-- Dragon's Fortune -->
+      <a href="games/dragons-fortune/index.html" class="game-card" data-cat="novedades slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/dragon_slots.png" alt="Dragon's Fortune">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+          <span class="game-badge hot">🔥 HOT</span>
+        </div>
+        <div class="game-info">
+          <h3>Dragon's Fortune</h3>
+          <p>243 formas de ganar</p>
+          <div class="game-rtp">RTP: 96.0%</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- SECCIÓN: CLÁSICOS -->
+  <section class="games-section" data-section="clasicos">
+    <div class="section-header">
+      <h2 class="section-title">⭐ Clásicos</h2>
+    </div>
+    <div class="games-grid">
+
+      <!-- Slots Clásico -->
+      <a href="slots/index.html" class="game-card" data-cat="clasicos slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/slots_classic.png" alt="Classic Slots">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Classic Slots</h3>
+          <p>3 rodillos · Clásico</p>
+          <div class="game-rtp">RTP: 95.0%</div>
+        </div>
+      </a>
+
+      <!-- Ruleta Europea -->
+      <a href="ruleta/index.html" class="game-card" data-cat="clasicos mesa">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/ruleta.png" alt="Ruleta Europea">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Ruleta Europea</h3>
+          <p>0-36 · Apuestas múltiples</p>
+          <div class="game-rtp">RTP: 97.3%</div>
+        </div>
+      </a>
+
+      <!-- Blackjack -->
+      <a href="games/blackjack/index.html" class="game-card" data-cat="clasicos mesa">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/blackjack.png" alt="Blackjack">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Blackjack 21</h3>
+          <p>Vence al croupier</p>
+          <div class="game-rtp">RTP: 99.5%</div>
+        </div>
+      </a>
+
+      <!-- Poker -->
+      <a href="games/poker/index.html" class="game-card" data-cat="clasicos mesa">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/poker.png" alt="Royal Flush Poker">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Royal Flush Poker</h3>
+          <p>Video Poker · 5 cartas</p>
+          <div class="game-rtp">RTP: 99.2%</div>
+        </div>
+      </a>
+
+      <!-- Baccarat -->
+      <a href="games/baccarat/index.html" class="game-card" data-cat="clasicos mesa">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/baccarat.png" alt="Baccarat">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Baccarat</h3>
+          <p>Jugador vs Banca</p>
+          <div class="game-rtp">RTP: 98.9%</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- SECCIÓN: MÁS JUEGOS -->
+  <section class="games-section" data-section="mas">
+    <div class="section-header">
+      <h2 class="section-title">🎰 Más Slots</h2>
+    </div>
+    <div class="games-grid">
+
+      <!-- Pirate's Treasure -->
+      <a href="games/pirates-treasure/index.html" class="game-card" data-cat="slots novedades">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/pirate_slots.png" alt="Pirate's Treasure">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Pirate's Treasure</h3>
+          <p>5000x tu apuesta</p>
+          <div class="game-rtp">RTP: 96.1%</div>
+        </div>
+      </a>
+
+      <!-- Aztec Treasures -->
+      <a href="games/aztec-treasures/index.html" class="game-card" data-cat="slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/aztec_gold.png" alt="Aztec Treasures">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Aztec Treasures</h3>
+          <p>243 formas · x10 multiplicador</p>
+          <div class="game-rtp">RTP: 95.9%</div>
+        </div>
+      </a>
+
+      <!-- Irish Luck -->
+      <a href="games/irish-luck/index.html" class="game-card" data-cat="slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/lucky_clover.png" alt="Irish Luck">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Irish Luck</h3>
+          <p>5000x · Free Spins</p>
+          <div class="game-rtp">RTP: 96.3%</div>
+        </div>
+      </a>
+
+      <!-- Secrets of Egypt -->
+      <a href="games/secrets-of-egypt/index.html" class="game-card" data-cat="slots">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/egyptian_slots.png" alt="Secrets of Egypt">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+        </div>
+        <div class="game-info">
+          <h3>Secrets of Egypt</h3>
+          <p>Expanding Wilds · Free Spins</p>
+          <div class="game-rtp">RTP: 96.0%</div>
+        </div>
+      </a>
+
+      <!-- Wheel of Fortune -->
+      <a href="games/wheel-of-fortune/index.html" class="game-card" data-cat="slots novedades">
+        <div class="game-thumb">
+          <img src="assets/thumbnails/fortune_wheel.png" alt="Wheel of Fortune">
+          <div class="game-overlay">
+            <span class="play-btn">▶ JUGAR</span>
+          </div>
+          <span class="game-badge hot">🔥 HOT</span>
+        </div>
+        <div class="game-info">
+          <h3>Wheel of Fortune</h3>
+          <p>Jackpot 25M · Gira y gana</p>
+          <div class="game-rtp">RTP: 95.5%</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="casino-footer">
+    <div class="footer-content">
+      <div class="footer-logo">🎰 Casino del Pana</div>
+      <p class="footer-disclaimer">Este casino es solo para entretenimiento. Juega con responsabilidad.</p>
+      <div class="footer-links">
+        <span>18+</span>
+        <span>Juego Responsable</span>
+        <span>Términos y Condiciones</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL AÑADIR SALDO -->
+  <div class="modal hidden" id="balanceModal">
+    <div class="modal-box">
+      <h3>💰 Añadir Saldo</h3>
+      <div class="balance-options">
+        <button class="bal-btn" data-amount="50">+50€</button>
+        <button class="bal-btn" data-amount="100">+100€</button>
+        <button class="bal-btn" data-amount="250">+250€</button>
+        <button class="bal-btn" data-amount="500">+500€</button>
+      </div>
+      <button class="close-modal" id="closeBalanceModal">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="casino.js"></script>
+</body>
+</html>
