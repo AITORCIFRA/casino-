@@ -577,14 +577,8 @@ body {
 }
 
 @keyframes modal-pop {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
 }
 
 .panel-close {
@@ -772,13 +766,11 @@ body {
     <span class="panel-close" onclick="closeModal('shopModal')">&times;</span>
     <h2 style="font-family:'Orbitron'; color:#FFD700; text-align:center; letter-spacing:2px;">🛒 TIENDA</h2>
 
-    <!-- TABS -->
     <div style="display:flex; gap:10px; margin:20px 0 25px; border-bottom:2px solid rgba(255,255,255,0.1); padding-bottom:0;">
       <button id="shopTabFichas" onclick="switchShopTab('fichas')" style="font-family:'Orbitron'; font-size:12px; font-weight:900; padding:10px 22px; background:linear-gradient(135deg,#00FF99,#00BFFF); color:#000; border:none; border-radius:8px 8px 0 0; cursor:pointer; letter-spacing:1px;">🪙 FICHAS</button>
       <button id="shopTabRubies" onclick="switchShopTab('rubies')" style="font-family:'Orbitron'; font-size:12px; font-weight:900; padding:10px 22px; background:rgba(255,255,255,0.07); color:#a855f7; border:2px solid rgba(168,85,247,0.4); border-bottom:none; border-radius:8px 8px 0 0; cursor:pointer; letter-spacing:1px;">💎 RUBÍES</button>
     </div>
 
-    <!-- TAB FICHAS -->
     <div id="shopPanelFichas">
       <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
         <div style="background:rgba(205,127,50,0.1); padding:25px; border-radius:15px; text-align:center; border:2px solid rgba(205,127,50,0.3);">
@@ -802,7 +794,6 @@ body {
       </div>
     </div>
 
-    <!-- TAB RUBÍES -->
     <div id="shopPanelRubies" style="display:none;">
       <p style="text-align:center; color:rgba(255,255,255,0.5); font-size:12px; font-family:'Orbitron'; margin-bottom:20px; letter-spacing:1px;">💎 LOS RUBÍES SE USAN PARA COMPRAR NIVELES DEL PASE DE BATALLA</p>
       <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
@@ -851,43 +842,78 @@ let carouselIndex = 0;
 let hudInterval = null;
 const winAnim = new WinAnimation();
 
+// ═══════════════════════════════════════════════════════
+//  GAMES ARRAY — 11 originales + 13 nuevos = 24 juegos
+// ═══════════════════════════════════════════════════════
 const GAMES = [
-  { id: 'slots',    title: 'LUCKY SEVENS',   file: 'slots.html',    cat: 'slots',  color: '#00FF99', img: '/assets/games/0fHpJdYkysVc.jpg' },
-  { id: 'keno',     title: 'KENO TURBO',     file: 'keno.html',     cat: 'arcade', color: '#00BFFF', img: '/assets/games/6IpXKW058UDZ.jpg' },
-  { id: 'mines',    title: 'MINES ARCADE',   file: 'mines.html',    cat: 'arcade', color: '#A855F7', img: '/assets/games/wY7BOFGHFma4.jpg' },
-  { id: 'blackjack',title: 'BLACKJACK VIP',  file: 'blackjack.html',cat: 'mesa',   color: '#FACC15', img: '/assets/games/ctMqgVaaG9Cs.jpg' },
-  { id: 'crash',    title: 'ROCKET CRASH',   file: 'crash.html',    cat: 'arcade', color: '#22C55E', img: '/assets/games/upFumWw48aLz.jpg' },
-  { id: '3_en_1',   title: '3 EN 1 ARCADE',  file: '3_en_1.html',   cat: 'arcade', color: '#A855F7', img: '/assets/games/DZAqgKJyKLIe.jpg' },
-  { id: 'plinko',   title: 'PLINKO EXTREME', file: 'plinko.html',   cat: 'arcade', color: '#FF9F43', img: '/assets/games/LzigdfqGJqBH.jpg' },
-  { id: 'roulette', title: 'ROULETTE ELITE',  file: 'roulette.html', cat: 'mesa',   color: '#FF1744', img: '/assets/games/ueFafQNyPKsD.jpg' },
-  { id: 'poker',    title: 'POKER TEXAS',    file: 'poker.html',    cat: 'mesa',   color: '#FF6B35', img: '/assets/games/ctMqgVaaG9Cs.jpg', minPlayers: 2 },
-  { id: 'magic_trakka', title: 'MAGIC TRAKKA', file: 'magic_trakka.html', cat: 'arcade', color: '#A855F7', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=magic' },
-  { id: 'craps', title: 'CRAPS ELITE', file: 'craps.html', cat: 'mesa', color: '#C9A84C', img: 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=300' }
+  // ─── ORIGINALES ───────────────────────────────────────────────────────────
+  { id: 'slots',        title: 'LUCKY SEVENS',    file: 'slots.html',         cat: 'slots',  color: '#00FF99', img: '/assets/games/0fHpJdYkysVc.jpg' },
+  { id: 'keno',         title: 'KENO TURBO',      file: 'keno.html',          cat: 'arcade', color: '#00BFFF', img: '/assets/games/6IpXKW058UDZ.jpg' },
+  { id: 'mines',        title: 'MINES ARCADE',    file: 'mines.html',         cat: 'arcade', color: '#A855F7', img: '/assets/games/wY7BOFGHFma4.jpg' },
+  { id: 'blackjack',    title: 'BLACKJACK VIP',   file: 'blackjack.html',     cat: 'mesa',   color: '#FACC15', img: '/assets/games/ctMqgVaaG9Cs.jpg' },
+  { id: 'crash',        title: 'ROCKET CRASH',    file: 'crash.html',         cat: 'arcade', color: '#22C55E', img: '/assets/games/upFumWw48aLz.jpg' },
+  { id: '3_en_1',       title: '3 EN 1 ARCADE',   file: '3_en_1.html',        cat: 'arcade', color: '#A855F7', img: '/assets/games/DZAqgKJyKLIe.jpg' },
+  { id: 'plinko',       title: 'PLINKO EXTREME',  file: 'plinko.html',        cat: 'arcade', color: '#FF9F43', img: '/assets/games/LzigdfqGJqBH.jpg' },
+  { id: 'roulette',     title: 'ROULETTE ELITE',  file: 'roulette.html',      cat: 'mesa',   color: '#FF1744', img: '/assets/games/ueFafQNyPKsD.jpg' },
+  { id: 'poker',        title: 'POKER TEXAS',     file: 'poker.html',         cat: 'mesa',   color: '#FF6B35', img: '/assets/games/ctMqgVaaG9Cs.jpg', minPlayers: 2 },
+  { id: 'magic_trakka', title: 'MAGIC TRAKKA',    file: 'magic_trakka.html',  cat: 'arcade', color: '#A855F7', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=magic' },
+  { id: 'craps',        title: 'CRAPS ELITE',     file: 'craps.html',         cat: 'mesa',   color: '#C9A84C', img: 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=300' },
+
+  // ─── FILA 1: CLÁSICOS / LEYENDAS ─────────────────────────────────────────
+  { id: 'triad_pigs_olympus',        title: 'TRIAD PIGS OLYMPUS',    file: 'triad_pigs_olympus.html',        cat: 'slots',  color: '#C9A84C', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=pigs'    },
+  { id: 'penalty_pro_championship',  title: 'PENALTY PRO',           file: 'penalty_pro_championship.html',  cat: 'arcade', color: '#4488FF', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=penalty' },
+  { id: 'jolly_pigs_christmas',      title: 'JOLLY PIGS XMAS',       file: 'jolly_pigs_christmas.html',      cat: 'slots',  color: '#FF4444', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=xmas'    },
+  { id: 'gold_mine_blast',           title: 'GOLD MINE BLAST',       file: 'gold_mine_blast.html',           cat: 'slots',  color: '#FF6600', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=mine'    },
+
+  // ─── FILA 2: NOVEDADES ────────────────────────────────────────────────────
+  { id: 'inferno_phoenix_blaze',     title: 'INFERNO PHOENIX 333',   file: 'inferno_phoenix_blaze.html',     cat: 'slots',  color: '#FF4400', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=phoenix' },
+  { id: 'golden_goal_nations',       title: 'GOLDEN GOAL NATIONS',   file: 'golden_goal_nations.html',       cat: 'slots',  color: '#C9A84C', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=trophy'  },
+  { id: 'steam_train_tycoon',        title: 'STEAM TRAIN TYCOON',    file: 'steam_train_tycoon.html',        cat: 'arcade', color: '#884422', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=train'   },
+  { id: 'witchs_wicked_wares',       title: "WITCH'S WICKED WARES",  file: 'witchs_wicked_wares.html',       cat: 'slots',  color: '#9933FF', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=witch'   },
+  { id: 'ufo_farm_abduction',        title: 'UFO FARM ABDUCTION',    file: 'ufo_farm_abduction.html',        cat: 'arcade', color: '#00FF88', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=ufo'     },
+
+  // ─── FILA 3: EXCLUSIVOS ───────────────────────────────────────────────────
+  { id: 'sky_eagle_cash',            title: 'SKY EAGLE CASH',        file: 'sky_eagle_cash.html',            cat: 'slots',  color: '#FF8800', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=eagle'   },
+  { id: 'viking_raidmark',           title: 'VIKING RAIDMARK',       file: 'viking_raidmark.html',           cat: 'slots',  color: '#4488FF', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=viking'  },
+  { id: 'mystic_genie_dreams',       title: 'MYSTIC GENIE DREAMS',   file: 'mystic_genie_dreams.html',       cat: 'slots',  color: '#CC44FF', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=genie'   },
+  { id: 'outlaw_roadquake',          title: 'OUTLAW ROADQUAKE',      file: 'outlaw_roadquake.html',          cat: 'slots',  color: '#FF2200', img: 'https://api.dicebear.com/7.x/shapes/svg?seed=biker'   }
 ];
 
 const GAME_DEFAULT_LIMITS = {
-  'blackjack.html': { min: 10, max: 500 },
-  'roulette.html': { min: 1, max: 100 },
-  'poker.html': { min: 10, max: 40 },
-  'crash.html': { min: 10, max: 1000 },
-  'mines.html': { min: 10, max: 1000 },
-  'keno.html': { min: 1, max: 100 },
-  'plinko.html': { min: 1, max: 100 },
-  'slots.html': { min: 1, max: 100 },
-  '3_en_1.html': { min: 1, max: 100 },
-  'magic_trakka.html': { min: 5, max: 1000 },
-  'craps.html': { min: 10, max: 1000 }
+  'blackjack.html':                { min: 10,  max: 500  },
+  'roulette.html':                 { min: 1,   max: 100  },
+  'poker.html':                    { min: 10,  max: 40   },
+  'crash.html':                    { min: 10,  max: 1000 },
+  'mines.html':                    { min: 10,  max: 1000 },
+  'keno.html':                     { min: 1,   max: 100  },
+  'plinko.html':                   { min: 1,   max: 100  },
+  'slots.html':                    { min: 1,   max: 100  },
+  '3_en_1.html':                   { min: 1,   max: 100  },
+  'magic_trakka.html':             { min: 5,   max: 1000 },
+  'craps.html':                    { min: 10,  max: 1000 },
+  // nuevos
+  'triad_pigs_olympus.html':       { min: 1,   max: 100  },
+  'penalty_pro_championship.html': { min: 1,   max: 100  },
+  'jolly_pigs_christmas.html':     { min: 1,   max: 100  },
+  'gold_mine_blast.html':          { min: 1,   max: 100  },
+  'inferno_phoenix_blaze.html':    { min: 1,   max: 100  },
+  'golden_goal_nations.html':      { min: 1,   max: 100  },
+  'steam_train_tycoon.html':       { min: 1,   max: 100  },
+  'witchs_wicked_wares.html':      { min: 1,   max: 100  },
+  'ufo_farm_abduction.html':       { min: 1,   max: 100  },
+  'sky_eagle_cash.html':           { min: 1,   max: 100  },
+  'viking_raidmark.html':          { min: 1,   max: 100  },
+  'mystic_genie_dreams.html':      { min: 1,   max: 100  },
+  'outlaw_roadquake.html':         { min: 1,   max: 100  }
 };
 
 function getGameBetLimits(file, balance) {
   const defaults = GAME_DEFAULT_LIMITS[file] || { min: 1, max: 100 };
   let minBet = defaults.min;
   let maxBet = defaults.max;
-
   if (balance > 0) {
     maxBet = Math.min(defaults.max, Math.max(defaults.min, balance));
   }
-
   return { min: minBet, max: maxBet };
 }
 
@@ -942,7 +968,6 @@ async function updateHUD() {
       document.getElementById("lobbyLevel").innerText = p.level;
       document.getElementById("lobbyAvatar").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${p.username}`;
       document.getElementById("lobbyLeagueBadge").innerText = p.league.toUpperCase();
-      
       document.getElementById("lobbyRubies").innerText = Math.floor(p.rubies || 0).toLocaleString();
       const resW = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
       if(resW.ok) {
@@ -987,7 +1012,6 @@ async function openProfileModal() {
     document.getElementById("profID").innerText = `ID: ${p.unique_id}`;
     document.getElementById("profAvatar").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${p.username}`;
     document.getElementById("profLeague").innerText = `LIGA: ${p.league.toUpperCase()}`;
-    
     loadFriends();
     loadRecommendations();
     openModal("profileModal");
@@ -1067,11 +1091,7 @@ function closeModal(id) { document.getElementById(id).classList.remove("open"); 
 
 function openBattlePass() {
   const user = localStorage.getItem('arcade_user') || currentUser;
-  if (!user) {
-    alert('❌ Inicia sesión primero para abrir el pase.');
-    return;
-  }
-  
+  if (!user) { alert('❌ Inicia sesión primero para abrir el pase.'); return; }
   if (window.battlePassBrawl && typeof window.battlePassBrawl.loadBattlePass === 'function') {
     window.battlePassBrawl.loadBattlePass(user);
   } else {
@@ -1079,13 +1099,10 @@ function openBattlePass() {
     alert('❌ Error: El sistema del pase no está listo. Por favor, recarga la página.');
   }
 }
-
 window.openBattlePass = openBattlePass;
-
 
 window.openTableLobby = async function(gameId, gameFile) {
   if (!currentUser) { alert('Inicia sesión primero'); return; }
-  // Obtener balance actual
   let balance = 0;
   try {
     const res = await fetch(`${API_URL}/wallet/balance/${currentUser}`);
@@ -1119,14 +1136,13 @@ window.launchGame = async function(file, roomId, mesa) {
   }
   gameFrame.src = url;
   document.getElementById("gameContainer").style.display = "flex";
-  
+
   gameFrame.onerror = function() {
     const msg = 'No se pudo cargar el juego. Revisa tu conexión o inténtalo de nuevo.';
     const banner = document.getElementById('gameErrorBanner');
     if (banner) { banner.innerText = msg; banner.style.display = 'block'; }
   };
 
-  // Enviar créditos al iframe cuando cargue
   gameFrame.onload = function() {
     const banner = document.getElementById('gameErrorBanner');
     if (banner) { banner.style.display = 'none'; banner.innerText = ''; }
@@ -1170,17 +1186,15 @@ async function buyCredits(amount) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: currentUser, amount })
     });
-    if(res.ok) { 
+    if(res.ok) {
       const data = await res.json();
       const newBalance = Math.floor(data.new_balance || 0);
       localStorage.setItem('arcade_credits', newBalance);
       document.getElementById('lobbyCredits').innerText = newBalance.toLocaleString();
-      
       const gameFrame = document.getElementById('gameFrame');
       if(gameFrame && gameFrame.contentWindow) {
         gameFrame.contentWindow.postMessage({ type: 'credits_updated', balance: newBalance }, '*');
       }
-      
       closeModal('shopModal');
       winAnim.fountainEffect(amount);
     } else {
@@ -1224,13 +1238,9 @@ async function buyRubiesPackage(packageKey) {
       body: JSON.stringify({ package_key: packageKey })
     });
     const data = await res.json();
-    if(!res.ok) {
-      alert('❌ ' + (data.detail || 'No se pudieron comprar rubíes'));
-      return;
-    }
+    if(!res.ok) { alert('❌ ' + (data.detail || 'No se pudieron comprar rubíes')); return; }
     document.getElementById('lobbyRubies').innerText = Math.floor(data.new_rubies || 0).toLocaleString();
     closeModal('shopModal');
-    // Show animated confirmation
     const boom = document.createElement('div');
     boom.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid #a855f7;border-radius:16px;padding:16px 32px;z-index:99999;font-family:Orbitron,sans-serif;color:#e9d5ff;font-size:14px;font-weight:900;letter-spacing:1px;box-shadow:0 0 30px rgba(168,85,247,0.5);animation:bpSlideUp 0.3s ease;white-space:nowrap;';
     boom.innerHTML = `<style>@keyframes bpSlideUp{from{transform:translateX(-50%) translateY(30px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}</style>💎 +${packageAmounts[packageKey]} rubíes añadidos`;
@@ -1251,10 +1261,7 @@ async function buyBattlepassLevels(levels = 1) {
       body: JSON.stringify({ levels })
     });
     const data = await res.json();
-    if(!res.ok) {
-      alert('❌ ' + (data.detail || 'No se pudieron comprar niveles'));
-      return;
-    }
+    if(!res.ok) { alert('❌ ' + (data.detail || 'No se pudieron comprar niveles')); return; }
     document.getElementById('lobbyRubies').innerText = Math.floor(data.new_rubies || 0).toLocaleString();
     closeModal('rubiesModal');
     alert(`✅ Compraste ${levels} nivel(es)`);
@@ -1271,10 +1278,7 @@ async function buyBattlepassPremiumWithRubies() {
       headers: { 'Content-Type': 'application/json' }
     });
     const data = await res.json();
-    if(!res.ok) {
-      alert('❌ ' + (data.detail || 'No se pudo comprar el pase premium'));
-      return;
-    }
+    if(!res.ok) { alert('❌ ' + (data.detail || 'No se pudo comprar el pase premium')); return; }
     document.getElementById('lobbyRubies').innerText = Math.floor(data.new_rubies || 0).toLocaleString();
     closeModal('rubiesModal');
     alert('✅ Pase premium comprado con rubíes');
@@ -1288,13 +1292,12 @@ async function buyBattlepassPremiumWithRubies() {
 
 function doLogout() { localStorage.clear(); window.location.reload(); }
 
-window.onload = () => { 
-  if(currentUser) { 
-    document.getElementById("authScreen").classList.add("hidden"); 
-    document.getElementById("lobbyScreen").classList.remove("hidden"); 
-    initLobby(); 
+window.onload = () => {
+  if(currentUser) {
+    document.getElementById("authScreen").classList.add("hidden");
+    document.getElementById("lobbyScreen").classList.remove("hidden");
+    initLobby();
   }
-  // Forzar inicialización del Pase de Batalla si no se ha hecho
   if (typeof _initBattlePassBrawl === 'function') {
     _initBattlePassBrawl();
   }
