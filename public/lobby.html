@@ -686,7 +686,7 @@ function playCraps(id) {
 
 function playNewGame(id) {
     // Redirigir al archivo HTML específico del juego
-    startLoading(() => window.location.href = `/${id}.html?game_id=${id}`);
+    startLoading(() => window.location.href = `/${id}.html`);
 }
 
 function startLoading(callback) {
