@@ -1,242 +1,381 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>penalty pro championship | Casino del Pana</title>
-  <link rel="stylesheet" href="triad-pigs/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penalty Pro Championship | Casino del Pana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #f4c430;
+            --green: #00ff99;
+            --red: #ff4d4d;
+            --bg-dark: #050a0f;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-dark);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 2px solid var(--gold);
+            z-index: 100;
+        }
+        .back-btn {
+            color: var(--gold);
+            text-decoration: none;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            border: 1px solid var(--gold);
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: var(--gold); color: #000; }
+        .stats { display: flex; gap: 30px; font-family: 'Orbitron'; }
+        .stat-item span { color: var(--gold); }
+
+        /* GAME AREA */
+        .game-container {
+            flex: 1;
+            position: relative;
+            background: url('penalty-pro/assets/bg/stadium.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* PORTERÍA Y PORTERO */
+        .goal-area {
+            position: absolute;
+            bottom: 20%;
+            width: 600px;
+            height: 300px;
+            /* border: 10px solid #fff; border-bottom: none; */
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .goalkeeper {
+            width: 180px;
+            height: 180px;
+            background: url('penalty-pro/assets/players/goalkeeper.png') no-repeat center center;
+            background-size: contain;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        /* BALÓN */
+        .ball-container {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+        .football {
+            width: 80px;
+            height: 80px;
+            background: url('penalty-pro/assets/ui/football.png') no-repeat center center;
+            background-size: contain;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .football:hover { transform: scale(1.1); }
+
+        /* DIANAS DE TIRO */
+        .target {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 255, 153, 0.2);
+            border: 3px dashed var(--green);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--green);
+            transition: all 0.3s;
+            z-index: 5;
+        }
+        .target:hover { background: rgba(0, 255, 153, 0.5); transform: scale(1.2); }
+        .t-top-left { top: 10%; left: 5%; }
+        .t-top-right { top: 10%; right: 5%; }
+        .t-mid-left { top: 45%; left: 10%; }
+        .t-mid-right { top: 45%; right: 10%; }
+        .t-center { top: 30%; left: 50%; transform: translateX(-50%); }
+
+        /* CONTROLES */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        .difficulty-selector { display: flex; gap: 10px; }
+        .diff-btn {
+            flex: 1;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Orbitron';
+            font-size: 12px;
+            border-radius: 5px;
+        }
+        .diff-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(244, 196, 48, 0.1); }
+        
+        .bet-input {
+            background: #111;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px;
+            text-align: center;
+            font-family: 'Orbitron';
+            font-size: 18px;
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        /* ANIMACIONES */
+        @keyframes shoot {
+            0% { bottom: 50px; left: 50%; transform: translateX(-50%) scale(1); }
+            100% { bottom: 250px; left: var(--target-x); transform: translateX(-50%) scale(0.4) rotate(720deg); }
+        }
+        .ball-shooting { animation: shoot 0.6s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+        /* OVERLAYS */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .overlay.active { display: flex; }
+        .overlay-title { font-family: 'Orbitron'; font-size: 64px; margin-bottom: 20px; }
+        .win { color: var(--green); text-shadow: 0 0 30px var(--green); }
+        .lose { color: var(--red); text-shadow: 0 0 30px var(--red); }
+        .overlay-btn {
+            padding: 15px 40px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- FONDO ANIMADO -->
-  <div class="bg-overlay"></div>
-  <div class="particles" id="particles"></div>
+    <header class="game-header">
+        <a href="/lobby.html" class="back-btn">← LOBBY</a>
+        <div class="stats">
+            <div class="stat-item">SALDO: <span id="balance">100,000</span>€</div>
+            <div class="stat-item">PREMIO: <span id="potential-win">2.0</span>x</div>
+        </div>
+    </header>
 
-  <!-- HEADER -->
-  <header class="game-header">
-    <a href="/lobby.html" class="back-btn">← Volver al Casino</a>
-    <div class="header-info">
-      <span class="player-info">👤 <span id="nickDisplay">Invitado</span></span>
-      <span class="balance-info">💰 <span id="saldoDisplay">100</span>€</span>
-    </div>
-  </header>
-
-  <!-- LOGO DEL JUEGO -->
-  <div class="game-logo-container">
-    <img src="triad-pigs/assets/bg/game_logo.png" alt="penalty pro championship" class="game-logo">
-  </div>
-
-  <!-- MÁQUINA DE SLOTS -->
-  <div class="slot-machine">
-
-    <!-- MARCO DE LA MÁQUINA -->
-    <div class="machine-frame">
-
-      <!-- INDICADOR DE LÍNEAS DE PAGO -->
-      <div class="paylines-left">
-        <div class="payline-indicator" data-line="1">1</div>
-        <div class="payline-indicator" data-line="2">2</div>
-        <div class="payline-indicator" data-line="3">3</div>
-        <div class="payline-indicator" data-line="4">4</div>
-        <div class="payline-indicator" data-line="5">5</div>
-      </div>
-
-      <!-- RODILLOS -->
-      <div class="reels-container">
-        <div class="reels-window">
-          <div class="reel-column" id="reel-0">
-            <div class="reel-strip" id="strip-0"></div>
-          </div>
-          <div class="reel-column" id="reel-1">
-            <div class="reel-strip" id="strip-1"></div>
-          </div>
-          <div class="reel-column" id="reel-2">
-            <div class="reel-strip" id="strip-2"></div>
-          </div>
-          <div class="reel-column" id="reel-3">
-            <div class="reel-strip" id="strip-3"></div>
-          </div>
-          <div class="reel-column" id="reel-4">
-            <div class="reel-strip" id="strip-4"></div>
-          </div>
+    <div class="game-container">
+        <div class="goal-area">
+            <div class="target t-top-left" data-pos="TL">x3.5</div>
+            <div class="target t-top-right" data-pos="TR">x3.5</div>
+            <div class="target t-mid-left" data-pos="ML">x2.0</div>
+            <div class="target t-mid-right" data-pos="MR">x2.0</div>
+            <div class="target t-center" data-pos="C">x1.5</div>
+            <div class="goalkeeper" id="keeper"></div>
         </div>
 
-        <!-- LÍNEA DE PAGO CENTRAL -->
-        <div class="payline-overlay">
-          <div class="payline-line active" id="payline-center"></div>
+        <div class="ball-container" id="ballContainer">
+            <div class="football" id="ball"></div>
         </div>
 
-        <!-- OVERLAY DE VICTORIA -->
-        <div class="win-overlay hidden" id="winOverlay">
-          <div class="win-text" id="winText">¡VICTORIA!</div>
-          <div class="win-amount" id="winAmount">+0€</div>
+        <div class="controls">
+            <div style="font-size: 12px; color: #888; text-align: center;">DIFICULTAD DEL PORTERO</div>
+            <div class="difficulty-selector">
+                <button class="diff-btn" onclick="setDifficulty('easy')">AMATEUR</button>
+                <button class="diff-btn active" onclick="setDifficulty('medium')">PRO</button>
+                <button class="diff-btn" onclick="setDifficulty('hard')">LEYENDA</button>
+            </div>
+            <input type="number" class="bet-input" id="betAmount" value="10" min="1">
+            <div style="font-size: 10px; color: #555; text-align: center;">HAZ CLIC EN UNA DIANA PARA TIRAR</div>
         </div>
-      </div>
-
-      <!-- INDICADOR DE LÍNEAS DERECHA -->
-      <div class="paylines-right">
-        <div class="payline-indicator" data-line="1">1</div>
-        <div class="payline-indicator" data-line="2">2</div>
-        <div class="payline-indicator" data-line="3">3</div>
-        <div class="payline-indicator" data-line="4">4</div>
-        <div class="payline-indicator" data-line="5">5</div>
-      </div>
     </div>
 
-    <!-- PANEL DE INFORMACIÓN -->
-    <div class="info-panel">
-      <div class="info-box">
-        <span class="info-label">APUESTA</span>
-        <span class="info-value" id="betDisplay">1</span>
-      </div>
-      <div class="info-box jackpot-box">
-        <span class="info-label">JACKPOT</span>
-        <span class="info-value jackpot-value" id="jackpotDisplay">50,000</span>
-      </div>
-      <div class="info-box">
-        <span class="info-label">GANANCIA</span>
-        <span class="info-value" id="winDisplay">0</span>
-      </div>
+    <div class="overlay" id="resultOverlay">
+        <div class="overlay-title" id="resultTitle">¡GOLAZO!</div>
+        <div style="font-size: 32px; margin-bottom: 40px;" id="resultAmount">+20.00€</div>
+        <button class="overlay-btn" onclick="resetGame()">CONTINUAR</button>
     </div>
 
-    <!-- CONTROLES -->
-    <div class="controls-panel">
-      <!-- Control de apuesta -->
-      <div class="bet-controls">
-        <button class="bet-btn" id="betMinus">−</button>
-        <div class="bet-display">
-          <span class="bet-label">APUESTA</span>
-          <span class="bet-value" id="betValue">1€</span>
-        </div>
-        <button class="bet-btn" id="betPlus">+</button>
-      </div>
+    <script>
+        let balance = Number(localStorage.getItem('arcade_credits') || 100000);
+        let difficulty = 'medium';
+        let isShooting = false;
 
-      <!-- Botón GIRAR -->
-      <button class="spin-btn" id="spinBtn">
-        <span class="spin-icon">⚡</span>
-        <span class="spin-text">GIRAR</span>
-      </button>
+        const ball = document.getElementById('ball');
+        const ballContainer = document.getElementById('ballContainer');
+        const keeper = document.getElementById('keeper');
+        const resultOverlay = document.getElementById('resultOverlay');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultAmount = document.getElementById('resultAmount');
+        const balanceDisplay = document.getElementById('balance');
 
-      <!-- Botón MAX BET -->
-      <button class="max-bet-btn" id="maxBetBtn">MAX BET</button>
-    </div>
+        function updateUI() {
+            balanceDisplay.textContent = balance.toLocaleString();
+            localStorage.setItem('arcade_credits', balance);
+        }
 
-    <!-- BOTONES EXTRA -->
-    <div class="extra-controls">
-      <button class="extra-btn" id="autoSpinBtn">AUTO</button>
-      <button class="extra-btn" id="paytableBtn">PREMIOS</button>
-      <button class="extra-btn" id="shopBtn">🛒 TIENDA</button>
-    </div>
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Actualizar multiplicadores visuales
+            const multipliers = {
+                easy: { TL: 2.5, TR: 2.5, ML: 1.5, MR: 1.5, C: 1.2 },
+                medium: { TL: 3.5, TR: 3.5, ML: 2.0, MR: 2.0, C: 1.5 },
+                hard: { TL: 5.0, TR: 5.0, ML: 3.0, MR: 3.0, C: 2.0 }
+            };
+            
+            document.querySelectorAll('.target').forEach(t => {
+                const pos = t.dataset.pos;
+                t.textContent = 'x' + multipliers[level][pos];
+            });
+        }
 
-  </div>
+        document.querySelectorAll('.target').forEach(target => {
+            target.addEventListener('click', () => {
+                if (isShooting) return;
+                
+                const bet = Number(document.getElementById('betAmount').value);
+                if (bet > balance) {
+                    alert('Saldo insuficiente');
+                    return;
+                }
 
-  <!-- TABLA DE PREMIOS -->
-  <div class="modal hidden" id="paytableModal">
-    <div class="modal-content paytable-content">
-      <h2 class="modal-title">⚡ TABLA DE PREMIOS ⚡</h2>
-      <div class="paytable-grid">
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/pig_zeus.png" alt="Zeus">
-          <div class="paytable-info">
-            <span class="symbol-name">ZEUS CERDO</span>
-            <span class="symbol-pays">5x = 500€ | 4x = 100€ | 3x = 25€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/pig_poseidon.png" alt="Poseidon">
-          <div class="paytable-info">
-            <span class="symbol-name">POSEIDÓN CERDO</span>
-            <span class="symbol-pays">5x = 400€ | 4x = 80€ | 3x = 20€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/pig_hades.png" alt="Hades">
-          <div class="paytable-info">
-            <span class="symbol-name">HADES CERDO</span>
-            <span class="symbol-pays">5x = 350€ | 4x = 70€ | 3x = 15€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/wild_symbol.png" alt="Wild">
-          <div class="paytable-info">
-            <span class="symbol-name">WILD (COMODÍN)</span>
-            <span class="symbol-pays">Sustituye cualquier símbolo</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/golden_apple.png" alt="Manzana">
-          <div class="paytable-info">
-            <span class="symbol-name">MANZANA DORADA</span>
-            <span class="symbol-pays">5x = 200€ | 4x = 40€ | 3x = 10€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/lightning_bolt.png" alt="Rayo">
-          <div class="paytable-info">
-            <span class="symbol-name">RAYO DE ZEUS</span>
-            <span class="symbol-pays">5x = 150€ | 4x = 30€ | 3x = 8€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/trident.png" alt="Tridente">
-          <div class="paytable-info">
-            <span class="symbol-name">TRIDENTE</span>
-            <span class="symbol-pays">5x = 120€ | 4x = 25€ | 3x = 6€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/olympus_coin.png" alt="Moneda">
-          <div class="paytable-info">
-            <span class="symbol-name">MONEDA OLÍMPICA</span>
-            <span class="symbol-pays">5x = 80€ | 4x = 15€ | 3x = 4€</span>
-          </div>
-        </div>
-      </div>
-      <button class="close-modal-btn" id="closePaytable">CERRAR</button>
-    </div>
-  </div>
+                shoot(target, bet);
+            });
+        });
 
-  <!-- TIENDA -->
-  <div class="modal hidden" id="shopModal">
-    <div class="modal-content shop-content">
-      <h2 class="modal-title">🛒 TIENDA OLÍMPICA</h2>
-      <div class="shop-grid">
-        <button class="shop-item" data-amount="50">
-          <span class="shop-icon">💰</span>
-          <span class="shop-amount">+50€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-        <button class="shop-item" data-amount="100">
-          <span class="shop-icon">💎</span>
-          <span class="shop-amount">+100€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-        <button class="shop-item" data-amount="250">
-          <span class="shop-icon">👑</span>
-          <span class="shop-amount">+250€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-        <button class="shop-item" data-amount="500">
-          <span class="shop-icon">⚡</span>
-          <span class="shop-amount">+500€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-      </div>
-      <button class="close-modal-btn" id="closeShop">CERRAR</button>
-    </div>
-  </div>
+        function shoot(target, bet) {
+            isShooting = true;
+            balance -= bet;
+            updateUI();
 
-  <!-- NOTIFICACIÓN DE VICTORIA ÉPICA -->
-  <div class="epic-win-screen hidden" id="epicWinScreen">
-    <div class="epic-win-content">
-      <div class="epic-win-title" id="epicWinTitle">MEGA WIN!</div>
-      <div class="epic-win-amount" id="epicWinAmount">0€</div>
-      <div class="epic-win-coins" id="epicCoins"></div>
-      <button class="epic-close-btn" id="closeEpicWin">¡COBRAR!</button>
-    </div>
-  </div>
+            const pos = target.dataset.pos;
+            const rect = target.getBoundingClientRect();
+            const containerRect = document.querySelector('.game-container').getBoundingClientRect();
+            
+            // Calcular destino del balón
+            const targetX = rect.left + rect.width / 2 - containerRect.left;
+            const targetY = rect.top + rect.height / 2 - containerRect.top;
 
-  <script src="triad-pigs/game.js"></script>
+            // Decisión del portero
+            const keeperPos = decideKeeper(pos);
+            moveKeeper(keeperPos);
+
+            // Animar balón
+            ballContainer.style.setProperty('--target-x', (targetX - containerRect.width / 2) + 'px');
+            ball.classList.add('ball-shooting');
+
+            setTimeout(() => {
+                checkResult(pos, keeperPos, bet, target);
+            }, 600);
+        }
+
+        function decideKeeper(playerPos) {
+            const positions = ['TL', 'TR', 'ML', 'MR', 'C'];
+            let chance = 0.5; // Medium
+            if (difficulty === 'easy') chance = 0.3;
+            if (difficulty === 'hard') chance = 0.7;
+
+            // El portero tiene una probabilidad de adivinar
+            if (Math.random() < chance) {
+                return playerPos;
+            } else {
+                return positions[Math.floor(Math.random() * positions.length)];
+            }
+        }
+
+        function moveKeeper(pos) {
+            const moves = {
+                'TL': { x: '-150%', y: '-100px', rotate: '-30deg' },
+                'TR': { x: '50%', y: '-100px', rotate: '30deg' },
+                'ML': { x: '-120%', y: '0', rotate: '-10deg' },
+                'MR': { x: '20%', y: '0', rotate: '10deg' },
+                'C': { x: '-50%', y: '0', rotate: '0' }
+            };
+            const move = moves[pos];
+            keeper.style.left = '50%';
+            keeper.style.transform = `translateX(${move.x}) translateY(${move.y}) rotate(${move.rotate})`;
+        }
+
+        function checkResult(playerPos, keeperPos, bet, target) {
+            const isGoal = playerPos !== keeperPos;
+            
+            if (isGoal) {
+                const mult = parseFloat(target.textContent.replace('x', ''));
+                const win = Math.floor(bet * mult);
+                balance += win;
+                resultTitle.textContent = '¡GOLAZO!';
+                resultTitle.className = 'overlay-title win';
+                resultAmount.textContent = '+' + win.toLocaleString() + '€';
+            } else {
+                resultTitle.textContent = '¡PARADÓN!';
+                resultTitle.className = 'overlay-title lose';
+                resultAmount.textContent = '-' + bet.toLocaleString() + '€';
+            }
+
+            setTimeout(() => {
+                resultOverlay.classList.add('active');
+                updateUI();
+            }, 200);
+        }
+
+        function resetGame() {
+            resultOverlay.classList.remove('active');
+            ball.classList.remove('ball-shooting');
+            keeper.style.transform = 'translateX(-50%)';
+            isShooting = false;
+        }
+
+        updateUI();
+        setDifficulty('medium');
+    </script>
 </body>
 </html>
