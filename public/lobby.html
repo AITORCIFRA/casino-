@@ -409,22 +409,6 @@ function renderNewGames(games) {
         groups[g.group].push(g);
     });
 
-    const artConfigs = {
-        'triad_pigs_olympus': '<div class="slot-art pigs-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite">🐷</span><span style="font-size:2rem;animation:float 2.3s ease-in-out infinite 0.3s">🏛️</span><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite 0.6s">🐷</span></div>',
-        'penalty_pro_championship': '<div class="slot-art penalty-art"><span style="font-size:3rem;animation:bounce 1s ease-in-out infinite">⚽</span><span style="font-size:1.5rem">🥅</span></div>',
-        'jolly_pigs_christmas': '<div class="slot-art xmas-art"><span style="font-size:2rem;animation:float 2s ease-in-out infinite">🐷</span><span style="font-size:2.5rem;animation:float 2.5s ease-in-out infinite 0.4s">🎅</span><span style="font-size:2rem;animation:float 2s ease-in-out infinite 0.8s">🐷</span></div>',
-        'gold_mine_blast': '<div class="slot-art mine-art"><span style="font-size:2.5rem;animation:shake 0.5s ease-in-out infinite">💣</span><span style="font-size:2rem">💎</span><span style="font-size:2rem;animation:float 2s ease-in-out infinite">⛏️</span></div>',
-        'inferno_phoenix_blaze': '<div class="slot-art phoenix-art"><span style="font-size:3rem;animation:float 1.5s ease-in-out infinite;filter:drop-shadow(0 0 10px #ff4400)">🦅</span><span style="font-size:1.8rem;animation:flicker 0.5s ease-in-out infinite">🔥</span></div>',
-        'golden_goal_nations': '<div class="slot-art trophy-art"><span style="font-size:3rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 10px #C9A84C)">🏆</span><span style="font-size:1.5rem">⚽</span></div>',
-        'steam_train_tycoon': '<div class="slot-art train-art"><span style="font-size:3rem;animation:slide 2s linear infinite">🚂</span><span style="font-size:1.5rem">💰</span></div>',
-        'witchs_wicked_wares': '<div class="slot-art witch-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 8px #9933ff)">🧙</span><span style="font-size:2rem;animation:spin 3s linear infinite">🔮</span></div>',
-        'ufo_farm_abduction': '<div class="slot-art ufo-art"><span style="font-size:2.5rem;animation:float 1.5s ease-in-out infinite;filter:drop-shadow(0 0 10px #00ff88)">🛸</span><span style="font-size:2rem;animation:float 2s ease-in-out infinite 0.5s">🐄</span></div>',
-        'sky_eagle_cash': '<div class="slot-art eagle-art"><span style="font-size:3rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 10px #ff8800)">🦅</span><span style="font-size:1.5rem">💰</span></div>',
-        'viking_raidmark': '<div class="slot-art viking-art"><span style="font-size:2.5rem;filter:drop-shadow(0 0 8px #4488ff)">⚔️</span><span style="font-size:2rem;animation:shake 2s ease-in-out infinite">🛡️</span></div>',
-        'mystic_genie_dreams': '<div class="slot-art genie-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 10px #cc44ff)">🧞</span><span style="font-size:2rem;animation:float 2.5s ease-in-out infinite 0.5s">🪔</span></div>',
-        'outlaw_roadquake': '<div class="slot-art biker-art"><span style="font-size:2.5rem;animation:slide 1.5s linear infinite">🏍️</span><span style="font-size:1.5rem;animation:flicker 0.4s ease-in-out infinite">🔥</span></div>'
-    };
-
     games.forEach(g => {
         const card = document.createElement('div');
         card.className = 'game-card';
@@ -432,12 +416,28 @@ function renderNewGames(games) {
         card.setAttribute('data-group', g.group);
         card.onclick = () => playNewGame(g.game_id);
         
-        const thumb = `/assets/slots/${g.game_id.replace(/_olympus|_championship|_christmas|_blast|_blaze|_nations|_tycoon|_wicked|_abduction|_cash|_raidmark|_dreams|_roadquake/g, '')}.png`;
-        const art = artConfigs[g.game_id] || `<div class="game-thumb" style="background-image: url('${thumb}')"></div>`;
+        // Mapeo de IDs a nombres de archivos de imagen generados
+        const imgMap = {
+            'triad_pigs_olympus': 'triad_pigs.png',
+            'penalty_pro_championship': 'penalty_pro.png',
+            'jolly_pigs_christmas': 'jolly_pigs.png',
+            'gold_mine_blast': 'gold_mine.png',
+            'inferno_phoenix_blaze': 'inferno_phoenix.png',
+            'golden_goal_nations': 'golden_goal.png',
+            'steam_train_tycoon': 'steam_train.png',
+            'witchs_wicked_wares': 'witch_wicked.png',
+            'ufo_farm_abduction': 'ufo_farm.png',
+            'sky_eagle_cash': 'sky_eagle.png',
+            'viking_raidmark': 'viking_raidmark.png',
+            'mystic_genie_dreams': 'mystic_genie.png',
+            'outlaw_roadquake': 'outlaw_roadquake.png'
+        };
+
+        const thumb = `/assets/slots/${imgMap[g.game_id] || 'default_slot.png'}`;
 
         card.innerHTML = `
-            <div class="card-art" style="height: 200px; position: relative; overflow: hidden;">
-                ${art}
+            <div class="card-art" style="height: 220px; position: relative; overflow: hidden; background-image: url('${thumb}'); background-size: cover; background-position: center;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.8));"></div>
                 ${g.jackpot > 0 ? `<div class="jackpot-badge">JACKPOT</div>` : ''}
             </div>
             <div class="card-info">
