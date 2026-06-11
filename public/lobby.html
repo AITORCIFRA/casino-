@@ -686,7 +686,7 @@ function playCraps(id) {
 
 function playNewGame(id) {
     // Redirigir al archivo HTML específico del juego
-    startLoading(() => window.location.href = `/${id}.html`);
+    startLoading(() => { let url = `/${id}.html`; if(id === 'triad_pigs_olympus') url = '/triad_pigs_olympus.html'; window.location.href = url; });
 }
 
 function startLoading(callback) {

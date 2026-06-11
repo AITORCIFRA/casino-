@@ -2,14 +2,14 @@
 
 // Símbolos del juego con sus valores
 const SYMBOLS = [
-  { id: 'pig_zeus',     img: 'assets/symbols/pig_zeus.png',     name: 'Zeus Cerdo',       pays: [0, 0, 25, 100, 500],  weight: 2 },
-  { id: 'pig_poseidon', img: 'assets/symbols/pig_poseidon.png', name: 'Poseidón Cerdo',   pays: [0, 0, 20, 80,  400],  weight: 2 },
-  { id: 'pig_hades',    img: 'assets/symbols/pig_hades.png',    name: 'Hades Cerdo',      pays: [0, 0, 15, 70,  350],  weight: 3 },
-  { id: 'wild_symbol',  img: 'assets/symbols/wild_symbol.png',  name: 'WILD',             pays: [0, 0, 50, 200, 1000], weight: 1 },
-  { id: 'golden_apple', img: 'assets/symbols/golden_apple.png', name: 'Manzana Dorada',   pays: [0, 0, 10, 40,  200],  weight: 4 },
-  { id: 'lightning',    img: 'assets/symbols/lightning_bolt.png',name: 'Rayo de Zeus',    pays: [0, 0, 8,  30,  150],  weight: 5 },
-  { id: 'trident',      img: 'assets/symbols/trident.png',      name: 'Tridente',         pays: [0, 0, 6,  25,  120],  weight: 5 },
-  { id: 'olympus_coin', img: 'assets/symbols/olympus_coin.png', name: 'Moneda Olímpica',  pays: [0, 0, 4,  15,  80],   weight: 8 },
+  { id: 'pig_zeus',     img: 'triad-pigs/assets/symbols/pig_zeus.png',     name: 'Zeus Cerdo',       pays: [0, 0, 25, 100, 500],  weight: 2 },
+  { id: 'pig_poseidon', img: 'triad-pigs/assets/symbols/pig_poseidon.png', name: 'Poseidón Cerdo',   pays: [0, 0, 20, 80,  400],  weight: 2 },
+  { id: 'pig_hades',    img: 'triad-pigs/assets/symbols/pig_hades.png',    name: 'Hades Cerdo',      pays: [0, 0, 15, 70,  350],  weight: 3 },
+  { id: 'wild_symbol',  img: 'triad-pigs/assets/symbols/wild_symbol.png',  name: 'WILD',             pays: [0, 0, 50, 200, 1000], weight: 1 },
+  { id: 'golden_apple', img: 'triad-pigs/assets/symbols/golden_apple.png', name: 'Manzana Dorada',   pays: [0, 0, 10, 40,  200],  weight: 4 },
+  { id: 'lightning',    img: 'triad-pigs/assets/symbols/lightning_bolt.png',name: 'Rayo de Zeus',    pays: [0, 0, 8,  30,  150],  weight: 5 },
+  { id: 'trident',      img: 'triad-pigs/assets/symbols/trident.png',      name: 'Tridente',         pays: [0, 0, 6,  25,  120],  weight: 5 },
+  { id: 'olympus_coin', img: 'triad-pigs/assets/symbols/olympus_coin.png', name: 'Moneda Olímpica',  pays: [0, 0, 4,  15,  80],   weight: 8 },
 ];
 
 // Construir array de símbolos ponderado
