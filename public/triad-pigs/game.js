@@ -2,9 +2,9 @@
 
 // Símbolos del juego con sus valores
 const SYMBOLS = [
-  { id: 'pig_zeus',     img: 'triad-pigs/assets/symbols/pig_zeus.png',     name: 'Zeus Cerdo',       pays: [0, 0, 25, 100, 500],  weight: 2 },
-  { id: 'pig_poseidon', img: 'triad-pigs/assets/symbols/pig_poseidon.png', name: 'Poseidón Cerdo',   pays: [0, 0, 20, 80,  400],  weight: 2 },
-  { id: 'pig_hades',    img: 'triad-pigs/assets/symbols/pig_hades.png',    name: 'Hades Cerdo',      pays: [0, 0, 15, 70,  350],  weight: 3 },
+  { id: 'pig_zeus',     img: 'triad-pigs/assets/symbols/pig_zeus_v2.png',     name: 'Zeus Cerdo',       pays: [0, 0, 25, 100, 500],  weight: 2, fx: 'lightning-fx' },
+  { id: 'pig_poseidon', img: 'triad-pigs/assets/symbols/pig_poseidon_v2.png', name: 'Poseidón Cerdo',   pays: [0, 0, 20, 80,  400],  weight: 2, fx: 'water-fx' },
+  { id: 'pig_hades',    img: 'triad-pigs/assets/symbols/pig_hades_v2.png',    name: 'Hades Cerdo',      pays: [0, 0, 15, 70,  350],  weight: 3, fx: 'fire-fx' },
   { id: 'wild_symbol',  img: 'triad-pigs/assets/symbols/wild_symbol.png',  name: 'WILD',             pays: [0, 0, 50, 200, 1000], weight: 1 },
   { id: 'golden_apple', img: 'triad-pigs/assets/symbols/golden_apple.png', name: 'Manzana Dorada',   pays: [0, 0, 10, 40,  200],  weight: 4 },
   { id: 'lightning',    img: 'triad-pigs/assets/symbols/lightning_bolt.png',name: 'Rayo de Zeus',    pays: [0, 0, 8,  30,  150],  weight: 5 },
@@ -351,8 +351,13 @@ function highlightWinners(cells) {
     const visibleStart = allCells.length - 3;
     const cell = allCells[visibleStart + row];
     if (cell) {
+      const sym = SYMBOLS.find(s => s.id === cell.dataset.symbolId);
       cell.classList.add('winning');
-      setTimeout(() => cell.classList.remove('winning'), 3000);
+      if (sym && sym.fx) cell.classList.add(sym.fx);
+      setTimeout(() => {
+        cell.classList.remove('winning');
+        if (sym && sym.fx) cell.classList.remove(sym.fx);
+      }, 3000);
     }
   });
 }
