@@ -576,10 +576,13 @@ function startJackpotUpdates() {
 let currentRotation = 0;
 function renderCarousel3D(games) {
     const carousel = document.getElementById('carousel3D');
+    if (!carousel) return;
     carousel.innerHTML = '';
     
     // Seleccionar 8 juegos destacados para el carrusel
     const featured = games.slice(0, 8);
+    if (featured.length === 0) return;
+
     const angleStep = 360 / featured.length;
     const radius = 500; // Radio del círculo 3D
 
@@ -604,13 +607,18 @@ function renderCarousel3D(games) {
         item.className = 'carousel-item';
         const angle = i * angleStep;
         item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-        item.onclick = () => playNewGame(g.game_id);
+        
+        // Hacer que todo el item sea clickeable
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playNewGame(g.game_id);
+        });
         
         const thumb = `/assets/slots/${imgMap[g.game_id] || 'default_slot.png'}`;
         
         item.innerHTML = `
-            <img src="${thumb}" alt="${g.name}">
-            <div class="item-info">
+            <img src="${thumb}" alt="${g.name}" style="pointer-events: none;">
+            <div class="item-info" style="pointer-events: none;">
                 <h3>${g.name}</h3>
                 <p>${g.category} | ${g.group}</p>
             </div>
@@ -648,8 +656,8 @@ function playCraps(id) {
 }
 
 function playNewGame(id) {
-    // Por ahora redirigimos a una plantilla de slot genérica
-    startLoading(() => window.location.href = `/slot_template.html?game_id=${id}`);
+    // Redirigir al archivo HTML específico del juego
+    startLoading(() => window.location.href = `/${id}.html?game_id=${id}`);
 }
 
 function startLoading(callback) {
