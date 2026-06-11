@@ -1,242 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>viking raidmark | Casino del Pana</title>
-  <link rel="stylesheet" href="triad-pigs/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASINO GAME | Casino del Pana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050a0f; color: #fff; font-family: 'Rajdhani', sans-serif; text-align: center; padding-top: 50px; }
+        .back-btn { color: #f4c430; text-decoration: none; border: 1px solid #f4c430; padding: 10px 20px; border-radius: 5px; }
+        .game-area { margin-top: 100px; padding: 50px; border: 2px solid #333; display: inline-block; border-radius: 20px; background: #111; }
+        h1 { font-family: 'Orbitron'; color: #f4c430; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-
-  <!-- FONDO ANIMADO -->
-  <div class="bg-overlay"></div>
-  <div class="particles" id="particles"></div>
-
-  <!-- HEADER -->
-  <header class="game-header">
-    <a href="/lobby.html" class="back-btn">← Volver al Casino</a>
-    <div class="header-info">
-      <span class="player-info">👤 <span id="nickDisplay">Invitado</span></span>
-      <span class="balance-info">💰 <span id="saldoDisplay">100</span>€</span>
+    <a href="/lobby.html" class="back-btn">← VOLVER AL LOBBY</a>
+    <div class="game-area">
+        <h1 id="gameTitle">GAME NAME</h1>
+        <p>Este juego está en mantenimiento o es una versión clásica.</p>
+        <div style="margin-top: 30px; font-size: 24px;">SALDO: <span id="balance">100,000</span>€</div>
+        <div style="margin-top: 20px;">
+            APUESTA: <span id="betValue">10€</span>
+            <button style="padding: 10px 30px; background: #f4c430; border: none; font-weight: bold; cursor: pointer; margin-left: 20px;">GIRAR</button>
+        </div>
     </div>
-  </header>
-
-  <!-- LOGO DEL JUEGO -->
-  <div class="game-logo-container">
-    <img src="triad-pigs/assets/bg/game_logo.png" alt="viking raidmark" class="game-logo">
-  </div>
-
-  <!-- MÁQUINA DE SLOTS -->
-  <div class="slot-machine">
-
-    <!-- MARCO DE LA MÁQUINA -->
-    <div class="machine-frame">
-
-      <!-- INDICADOR DE LÍNEAS DE PAGO -->
-      <div class="paylines-left">
-        <div class="payline-indicator" data-line="1">1</div>
-        <div class="payline-indicator" data-line="2">2</div>
-        <div class="payline-indicator" data-line="3">3</div>
-        <div class="payline-indicator" data-line="4">4</div>
-        <div class="payline-indicator" data-line="5">5</div>
-      </div>
-
-      <!-- RODILLOS -->
-      <div class="reels-container">
-        <div class="reels-window">
-          <div class="reel-column" id="reel-0">
-            <div class="reel-strip" id="strip-0"></div>
-          </div>
-          <div class="reel-column" id="reel-1">
-            <div class="reel-strip" id="strip-1"></div>
-          </div>
-          <div class="reel-column" id="reel-2">
-            <div class="reel-strip" id="strip-2"></div>
-          </div>
-          <div class="reel-column" id="reel-3">
-            <div class="reel-strip" id="strip-3"></div>
-          </div>
-          <div class="reel-column" id="reel-4">
-            <div class="reel-strip" id="strip-4"></div>
-          </div>
-        </div>
-
-        <!-- LÍNEA DE PAGO CENTRAL -->
-        <div class="payline-overlay">
-          <div class="payline-line active" id="payline-center"></div>
-        </div>
-
-        <!-- OVERLAY DE VICTORIA -->
-        <div class="win-overlay hidden" id="winOverlay">
-          <div class="win-text" id="winText">¡VICTORIA!</div>
-          <div class="win-amount" id="winAmount">+0€</div>
-        </div>
-      </div>
-
-      <!-- INDICADOR DE LÍNEAS DERECHA -->
-      <div class="paylines-right">
-        <div class="payline-indicator" data-line="1">1</div>
-        <div class="payline-indicator" data-line="2">2</div>
-        <div class="payline-indicator" data-line="3">3</div>
-        <div class="payline-indicator" data-line="4">4</div>
-        <div class="payline-indicator" data-line="5">5</div>
-      </div>
-    </div>
-
-    <!-- PANEL DE INFORMACIÓN -->
-    <div class="info-panel">
-      <div class="info-box">
-        <span class="info-label">APUESTA</span>
-        <span class="info-value" id="betDisplay">1</span>
-      </div>
-      <div class="info-box jackpot-box">
-        <span class="info-label">JACKPOT</span>
-        <span class="info-value jackpot-value" id="jackpotDisplay">50,000</span>
-      </div>
-      <div class="info-box">
-        <span class="info-label">GANANCIA</span>
-        <span class="info-value" id="winDisplay">0</span>
-      </div>
-    </div>
-
-    <!-- CONTROLES -->
-    <div class="controls-panel">
-      <!-- Control de apuesta -->
-      <div class="bet-controls">
-        <button class="bet-btn" id="betMinus">−</button>
-        <div class="bet-display">
-          <span class="bet-label">APUESTA</span>
-          <span class="bet-value" id="betValue">1€</span>
-        </div>
-        <button class="bet-btn" id="betPlus">+</button>
-      </div>
-
-      <!-- Botón GIRAR -->
-      <button class="spin-btn" id="spinBtn">
-        <span class="spin-icon">⚡</span>
-        <span class="spin-text">GIRAR</span>
-      </button>
-
-      <!-- Botón MAX BET -->
-      <button class="max-bet-btn" id="maxBetBtn">MAX BET</button>
-    </div>
-
-    <!-- BOTONES EXTRA -->
-    <div class="extra-controls">
-      <button class="extra-btn" id="autoSpinBtn">AUTO</button>
-      <button class="extra-btn" id="paytableBtn">PREMIOS</button>
-      <button class="extra-btn" id="shopBtn">🛒 TIENDA</button>
-    </div>
-
-  </div>
-
-  <!-- TABLA DE PREMIOS -->
-  <div class="modal hidden" id="paytableModal">
-    <div class="modal-content paytable-content">
-      <h2 class="modal-title">⚡ TABLA DE PREMIOS ⚡</h2>
-      <div class="paytable-grid">
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/pig_zeus.png" alt="Zeus">
-          <div class="paytable-info">
-            <span class="symbol-name">ZEUS CERDO</span>
-            <span class="symbol-pays">5x = 500€ | 4x = 100€ | 3x = 25€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/pig_poseidon.png" alt="Poseidon">
-          <div class="paytable-info">
-            <span class="symbol-name">POSEIDÓN CERDO</span>
-            <span class="symbol-pays">5x = 400€ | 4x = 80€ | 3x = 20€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/pig_hades.png" alt="Hades">
-          <div class="paytable-info">
-            <span class="symbol-name">HADES CERDO</span>
-            <span class="symbol-pays">5x = 350€ | 4x = 70€ | 3x = 15€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/wild_symbol.png" alt="Wild">
-          <div class="paytable-info">
-            <span class="symbol-name">WILD (COMODÍN)</span>
-            <span class="symbol-pays">Sustituye cualquier símbolo</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/golden_apple.png" alt="Manzana">
-          <div class="paytable-info">
-            <span class="symbol-name">MANZANA DORADA</span>
-            <span class="symbol-pays">5x = 200€ | 4x = 40€ | 3x = 10€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/lightning_bolt.png" alt="Rayo">
-          <div class="paytable-info">
-            <span class="symbol-name">RAYO DE ZEUS</span>
-            <span class="symbol-pays">5x = 150€ | 4x = 30€ | 3x = 8€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/trident.png" alt="Tridente">
-          <div class="paytable-info">
-            <span class="symbol-name">TRIDENTE</span>
-            <span class="symbol-pays">5x = 120€ | 4x = 25€ | 3x = 6€</span>
-          </div>
-        </div>
-        <div class="paytable-row">
-          <img src="triad-pigs/assets/symbols/olympus_coin.png" alt="Moneda">
-          <div class="paytable-info">
-            <span class="symbol-name">MONEDA OLÍMPICA</span>
-            <span class="symbol-pays">5x = 80€ | 4x = 15€ | 3x = 4€</span>
-          </div>
-        </div>
-      </div>
-      <button class="close-modal-btn" id="closePaytable">CERRAR</button>
-    </div>
-  </div>
-
-  <!-- TIENDA -->
-  <div class="modal hidden" id="shopModal">
-    <div class="modal-content shop-content">
-      <h2 class="modal-title">🛒 TIENDA OLÍMPICA</h2>
-      <div class="shop-grid">
-        <button class="shop-item" data-amount="50">
-          <span class="shop-icon">💰</span>
-          <span class="shop-amount">+50€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-        <button class="shop-item" data-amount="100">
-          <span class="shop-icon">💎</span>
-          <span class="shop-amount">+100€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-        <button class="shop-item" data-amount="250">
-          <span class="shop-icon">👑</span>
-          <span class="shop-amount">+250€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-        <button class="shop-item" data-amount="500">
-          <span class="shop-icon">⚡</span>
-          <span class="shop-amount">+500€</span>
-          <span class="shop-price">Gratis</span>
-        </button>
-      </div>
-      <button class="close-modal-btn" id="closeShop">CERRAR</button>
-    </div>
-  </div>
-
-  <!-- NOTIFICACIÓN DE VICTORIA ÉPICA -->
-  <div class="epic-win-screen hidden" id="epicWinScreen">
-    <div class="epic-win-content">
-      <div class="epic-win-title" id="epicWinTitle">MEGA WIN!</div>
-      <div class="epic-win-amount" id="epicWinAmount">0€</div>
-      <div class="epic-win-coins" id="epicCoins"></div>
-      <button class="epic-close-btn" id="closeEpicWin">¡COBRAR!</button>
-    </div>
-  </div>
-
-  <script src="triad-pigs/game.js"></script>
+    <script>
+        let balance = Number(localStorage.getItem('arcade_credits') || 100000);
+        document.getElementById('balance').textContent = balance.toLocaleString();
+        const urlParams = new URLSearchParams(window.location.search);
+        const title = window.location.pathname.split('/').pop().replace('.html', '').replace(/_/g, ' ').toUpperCase();
+        document.getElementById('gameTitle').textContent = title;
+    </script>
 </body>
 </html>
