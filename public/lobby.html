@@ -399,15 +399,14 @@ function renderCraps(tables) {
 }
 
 function renderNewGames(games) {
+    console.log("Rendering games:", games);
     const grid = document.getElementById('newGamesGrid');
     grid.innerHTML = '';
     
-    // Agrupar juegos por su propiedad 'group'
-    const groups = {};
-    games.forEach(g => {
-        if (!groups[g.group]) groups[g.group] = [];
-        groups[g.group].push(g);
-    });
+    if (!games || games.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-family: Orbitron; color: #555;">NO HAY JUEGOS DISPONIBLES</div>';
+        return;
+    }
 
     games.forEach(g => {
         const card = document.createElement('div');
@@ -416,7 +415,6 @@ function renderNewGames(games) {
         card.setAttribute('data-group', g.group);
         card.onclick = () => playNewGame(g.game_id);
         
-        // Mapeo de IDs a nombres de archivos de imagen generados
         const imgMap = {
             'triad_pigs_olympus': 'triad_pigs.png',
             'penalty_pro_championship': 'penalty_pro.png',
@@ -436,24 +434,23 @@ function renderNewGames(games) {
         const thumb = `/assets/slots/${imgMap[g.game_id] || 'default_slot.png'}`;
 
         card.innerHTML = `
-            <div class="card-art" style="height: 220px; position: relative; overflow: hidden; background-image: url('${thumb}'); background-size: cover; background-position: center;">
+            <div class="card-art" style="height: 220px; position: relative; overflow: hidden; background-image: url('${thumb}'); background-size: cover; background-position: center; border-bottom: 1px solid #333;">
                 <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.8));"></div>
                 ${g.jackpot > 0 ? `<div class="jackpot-badge">JACKPOT</div>` : ''}
             </div>
             <div class="card-info">
                 <div class="card-title">${g.name}</div>
-                <div class="card-sub">${g.category}</div>
-                <div class="card-tags">
-                    <span class="tag-${g.category.toLowerCase().replace(' ', '-')}">${g.category}</span>
-                    ${g.game_id.includes('pigs') || g.game_id.includes('phoenix') ? '<span class="tag-hot">🔥 HOT</span>' : ''}
+                <div class="card-sub">${g.category} | ${g.group}</div>
+                <div class="card-tags" style="margin-top: 10px; display: flex; gap: 5px;">
+                    <span class="tag-slot">${g.rtp}% RTP</span>
+                    <span class="tag-new">NUEVO</span>
                 </div>
-                <div class="card-jackpot" id="jp-${g.game_id}">${g.jackpot.toLocaleString()}</div>
+                <div class="card-jackpot" id="jp-${g.game_id}">${Number(g.jackpot).toLocaleString()}</div>
             </div>
         `;
         grid.appendChild(card);
     });
 
-    // Iniciar actualización de jackpots
     startJackpotUpdates();
 }
 
