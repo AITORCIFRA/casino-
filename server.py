@@ -3,6 +3,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from routers import auth, wallet, games, battlepass_leagues, tables, craps, games_new
 
 app = FastAPI(
@@ -27,6 +28,10 @@ app.include_router(battlepass_leagues.router)
 app.include_router(tables.router)
 app.include_router(craps.router)
 app.include_router(games_new.router)
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url="/lobby.html")
 
 # Servir archivos estáticos desde public/
 app.mount("/css", StaticFiles(directory="public/css"), name="css")
