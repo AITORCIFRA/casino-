@@ -227,15 +227,21 @@ async function init() {
     }
 
     try {
+        // Cargar información del juego desde el backend
         const res = await fetch(`/api/games/new/info/${gameId}`);
         const info = await res.json();
         document.getElementById('gameTitle').textContent = info.name;
         
+        // Cargar saldo del jugador
         playerBalance = await WalletAPI.getBalance();
         updateBalance();
         
-        // Inicializar rodillos con símbolos aleatorios
-        const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "💎", "7️⃣"];
+        // Obtener configuración completa del juego (símbolos, pesos, etc.)
+        const gameConfigRes = await fetch(`/api/games/new/config/${gameId}`);
+        const gameConfig = await gameConfigRes.json();
+        
+        // Inicializar rodillos con símbolos del juego
+        const symbols = gameConfig.symbols || ["🍒", "🍋", "🍇", "🔔", "⭐", "💎", "7️⃣"];
         for(let i=0; i<5; i++) {
             const reel = document.getElementById(`reel${i}`);
             reel.innerHTML = '';
@@ -247,7 +253,19 @@ async function init() {
             }
         }
     } catch (e) {
-        console.error(e);
+        console.error('Init error:', e);
+        // Fallback a símbolos por defecto
+        const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "💎", "7️⃣"];
+        for(let i=0; i<5; i++) {
+            const reel = document.getElementById(`reel${i}`);
+            reel.innerHTML = '';
+            for(let j=0; j<10; j++) {
+                const sym = document.createElement('div');
+                sym.className = 'symbol';
+                sym.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                reel.appendChild(sym);
+            }
+        }
     }
 }
 

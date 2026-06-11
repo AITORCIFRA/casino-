@@ -311,3 +311,20 @@ async def spin_slot(req: SpinRequest):
         jackpot_contribution=jackpot_contrib,
         message=messages.get(win_type, ""),
     )
+
+@router.get("/config/{game_id}")
+async def get_game_config(game_id: str):
+    """Configuracion completa del juego (simbolos, pesos, etc.)."""
+    if game_id not in GAMES_CONFIG:
+        raise HTTPException(status_code=404, detail=f"Juego '{game_id}' no encontrado")
+    cfg = GAMES_CONFIG[game_id]
+    return {
+        "game_id": game_id,
+        "name": cfg["name"],
+        "symbols": cfg.get("symbols", []),
+        "weights": cfg.get("weights", []),
+        "pays": cfg.get("pays", {}),
+        "category": cfg["category"],
+        "group": cfg.get("group", "Otros"),
+        "rtp": cfg["rtp"],
+    }

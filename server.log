@@ -8,3 +8,11 @@ INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 Error conectando a MySQL: 2003 (HY000): Can't connect to MySQL server on 'localhost:3306' (111)
 INFO:     127.0.0.1:50422 - "GET /api/games/new/list HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'routers/games_new.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11587]
+INFO:     Started server process [12160]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
