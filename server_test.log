@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/casino-/server.py", line 6, in <module>
+    from routers import auth, wallet, games, battlepass_leagues, tables, craps, games_new
+  File "/home/ubuntu/casino-/routers/auth.py", line 4, in <module>
+    from core.database import get_db_connection, ensure_user, set_balance, get_balance
+  File "/home/ubuntu/casino-/core/database.py", line 2, in <module>
+    import mysql.connector
+ModuleNotFoundError: No module named 'mysql'
