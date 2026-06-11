@@ -381,10 +381,26 @@ body {
         </div>
     </div>
 
-    <!-- Sección de Nuevos Juegos -->
-    <div class="games-section">
-        <div class="section-title">NUEVOS SLOTS & ARCADE</div>
-        <div class="games-grid" id="newGamesGrid">
+    <!-- Sección de Clásicos -->
+    <div class="games-section" id="classicsSection">
+        <div class="section-title">CLÁSICOS</div>
+        <div class="games-grid" id="classicsGrid">
+            <!-- Cargado vía JS -->
+        </div>
+    </div>
+
+    <!-- Sección de Novedades -->
+    <div class="games-section" id="noveltiesSection">
+        <div class="section-title">NOVEDADES</div>
+        <div class="games-grid" id="noveltiesGrid">
+            <!-- Cargado vía JS -->
+        </div>
+    </div>
+
+    <!-- Sección de Exclusivos -->
+    <div class="games-section" id="exclusivesSection">
+        <div class="section-title">EXCLUSIVOS</div>
+        <div class="games-grid" id="exclusivesGrid">
             <!-- Cargado vía JS -->
         </div>
     </div>
@@ -498,59 +514,72 @@ function renderCraps(tables) {
 
 function renderNewGames(games) {
     console.log("Rendering games:", games);
-    const grid = document.getElementById('newGamesGrid');
-    grid.innerHTML = '';
     
     if (!games || games.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-family: Orbitron; color: #555;">NO HAY JUEGOS DISPONIBLES</div>';
+        document.getElementById('classicsGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; font-family: Orbitron; color: #555;">NO HAY JUEGOS DISPONIBLES</div>';
         return;
     }
 
-    games.forEach(g => {
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        card.setAttribute('data-category', g.category);
-        card.setAttribute('data-group', g.group);
-        card.onclick = () => playNewGame(g.game_id);
+    // Separar juegos por categoria
+    const classics = games.filter(g => g.group === 'Clásicos');
+    const novelties = games.filter(g => g.group === 'Novedades');
+    const exclusives = games.filter(g => g.group === 'Exclusivos');
+
+    const imgMap = {
+        'triad_pigs_olympus': 'triad_pigs.png',
+        'penalty_pro_championship': 'penalty_pro.png',
+        'jolly_pigs_christmas': 'jolly_pigs.png',
+        'gold_mine_blast': 'gold_mine.png',
+        'inferno_phoenix_blaze': 'inferno_phoenix.png',
+        'golden_goal_nations': 'golden_goal.png',
+        'steam_train_tycoon': 'steam_train.png',
+        'witchs_wicked_wares': 'witch_wicked.png',
+        'ufo_farm_abduction': 'ufo_farm.png',
+        'sky_eagle_cash': 'sky_eagle.png',
+        'viking_raidmark': 'viking_raidmark.png',
+        'mystic_genie_dreams': 'mystic_genie.png',
+        'outlaw_roadquake': 'outlaw_roadquake.png'
+    };
+
+    function renderGamesInGrid(gamesList, gridId) {
+        const grid = document.getElementById(gridId);
+        grid.innerHTML = '';
         
-        const imgMap = {
-            'triad_pigs_olympus': 'triad_pigs.png',
-            'penalty_pro_championship': 'penalty_pro.png',
-            'jolly_pigs_christmas': 'jolly_pigs.png',
-            'gold_mine_blast': 'gold_mine.png',
-            'inferno_phoenix_blaze': 'inferno_phoenix.png',
-            'golden_goal_nations': 'golden_goal.png',
-            'steam_train_tycoon': 'steam_train.png',
-            'witchs_wicked_wares': 'witch_wicked.png',
-            'ufo_farm_abduction': 'ufo_farm.png',
-            'sky_eagle_cash': 'sky_eagle.png',
-            'viking_raidmark': 'viking_raidmark.png',
-            'mystic_genie_dreams': 'mystic_genie.png',
-            'outlaw_roadquake': 'outlaw_roadquake.png'
-        };
+        gamesList.forEach(g => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.setAttribute('data-category', g.category);
+            card.setAttribute('data-group', g.group);
+            card.onclick = () => playNewGame(g.game_id);
+            
+            const thumb = `/assets/slots/${imgMap[g.game_id] || 'default_slot.png'}`;
 
-        const thumb = `/assets/slots/${imgMap[g.game_id] || 'default_slot.png'}`;
-
-        card.innerHTML = `
-            <div class="card-art" style="height: 220px; position: relative; overflow: hidden; background-image: url('${thumb}'); background-size: cover; background-position: center; border-bottom: 1px solid #333;">
-                <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.8));"></div>
-                ${g.jackpot > 0 ? `<div class="jackpot-badge">JACKPOT</div>` : ''}
-            </div>
-            <div class="card-info">
-                <div class="card-title">${g.name}</div>
-                <div class="card-sub">${g.category} | ${g.group}</div>
-                <div class="card-tags" style="margin-top: 10px; display: flex; gap: 5px;">
-                    <span class="tag-slot">${g.rtp}% RTP</span>
-                    <span class="tag-new">NUEVO</span>
+            card.innerHTML = `
+                <div class="card-art" style="height: 220px; position: relative; overflow: hidden; background-image: url('${thumb}'); background-size: cover; background-position: center; border-bottom: 1px solid #333;">
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.8));"></div>
+                    ${g.jackpot > 0 ? `<div class="jackpot-badge">JACKPOT</div>` : ''}
                 </div>
-                <div class="card-jackpot" id="jp-${g.game_id}">${Number(g.jackpot).toLocaleString()}</div>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
+                <div class="card-info">
+                    <div class="card-title">${g.name}</div>
+                    <div class="card-sub">${g.category} | ${g.group}</div>
+                    <div class="card-tags" style="margin-top: 10px; display: flex; gap: 5px;">
+                        <span class="tag-slot">${g.rtp}% RTP</span>
+                        <span class="tag-new">NUEVO</span>
+                    </div>
+                    <div class="card-jackpot" id="jp-${g.game_id}">${Number(g.jackpot).toLocaleString()}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    renderGamesInGrid(classics, 'classicsGrid');
+    renderGamesInGrid(novelties, 'noveltiesGrid');
+    renderGamesInGrid(exclusives, 'exclusivesGrid');
 
     startJackpotUpdates();
 }
+
 
 function startJackpotUpdates() {
     if (window.jackpotInterval) clearInterval(window.jackpotInterval);
