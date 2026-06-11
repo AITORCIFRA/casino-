@@ -52,6 +52,7 @@ GAMES_CONFIG = {
     "triad_pigs_olympus": {
         "name": "The Triad Pigs of Olympus",
         "category": "Video Slot",
+        "group": "Clásicos",
         "rtp": 96.5,
         "symbols": ["🐷","🏛️","⚡","🪙","🍇","🍋","🍒","⭐"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -62,6 +63,7 @@ GAMES_CONFIG = {
     "penalty_pro_championship": {
         "name": "Penalty Pro Championship",
         "category": "Arcade",
+        "group": "Clásicos",
         "rtp": 95.0,
         "jackpot_base": 5000,
         "description": "5 tiros a portería — consigue goles y multiplica"
@@ -69,6 +71,7 @@ GAMES_CONFIG = {
     "jolly_pigs_christmas": {
         "name": "Jolly Pigs Christmas Pot",
         "category": "Video Slot",
+        "group": "Clásicos",
         "rtp": 96.0,
         "symbols": ["🐷","🎅","🎁","🪙","⭐","🔔","🍬","❄️"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -79,6 +82,7 @@ GAMES_CONFIG = {
     "gold_mine_blast": {
         "name": "Gold Mine Blast",
         "category": "Video Slot",
+        "group": "Clásicos",
         "rtp": 96.2,
         "symbols": ["💎","🥇","💣","⛏️","🪨","🔦","🪣","🧱"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -89,6 +93,7 @@ GAMES_CONFIG = {
     "inferno_phoenix_blaze": {
         "name": "Inferno Phoenix Blaze",
         "category": "Video Slot",
+        "group": "Novedades",
         "rtp": 97.0,
         "symbols": ["🦅","🔥","3️⃣","⚡","💀","🌋","🌊","💎"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -99,6 +104,7 @@ GAMES_CONFIG = {
     "golden_goal_nations": {
         "name": "Golden Goal Nations",
         "category": "Video Slot",
+        "group": "Novedades",
         "rtp": 95.8,
         "symbols": ["🏆","⚽","🥇","🌟","🎽","🏟️","🎯","🏅"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -109,6 +115,7 @@ GAMES_CONFIG = {
     "steam_train_tycoon": {
         "name": "Steam Train Tycoon",
         "category": "Hold & Win",
+        "group": "Novedades",
         "rtp": 96.8,
         "symbols": ["🚂","💰","🥇","🎩","🔧","⚙️","🪙","🎫"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -119,6 +126,7 @@ GAMES_CONFIG = {
     "witchs_wicked_wares": {
         "name": "Witch's Wicked Wares",
         "category": "Video Slot",
+        "group": "Novedades",
         "rtp": 96.3,
         "symbols": ["🧙","🔮","🧪","⚗️","📜","🕯️","🦇","🌙"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -129,6 +137,7 @@ GAMES_CONFIG = {
     "ufo_farm_abduction": {
         "name": "UFO Farm Abduction",
         "category": "Tapper",
+        "group": "Novedades",
         "rtp": 95.5,
         "symbols": ["🛸","🐄","👽","⭐","🌽","🌾","🐖","🚜"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -139,6 +148,7 @@ GAMES_CONFIG = {
     "sky_eagle_cash": {
         "name": "Sky Eagle Cash Collect",
         "category": "Cash Collect",
+        "group": "Exclusivos",
         "rtp": 96.6,
         "symbols": ["🦅","💰","🌅","🏔️","🪶","🌵","🏜️","💎"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -149,6 +159,7 @@ GAMES_CONFIG = {
     "viking_raidmark": {
         "name": "Viking Raidmark",
         "category": "Video Slot",
+        "group": "Exclusivos",
         "rtp": 96.9,
         "symbols": ["⚔️","🛡️","🪓","⛵","🏰","🐉","🧊","💀"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -159,6 +170,7 @@ GAMES_CONFIG = {
     "mystic_genie_dreams": {
         "name": "Mystic Genie Dreams",
         "category": "Video Slot",
+        "group": "Exclusivos",
         "rtp": 96.4,
         "symbols": ["🧞","🪔","💜","👑","✨","🌙","🎭","💎"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -169,6 +181,7 @@ GAMES_CONFIG = {
     "outlaw_roadquake": {
         "name": "Outlaw Roadquake",
         "category": "Video Slot",
+        "group": "Exclusivos",
         "rtp": 95.7,
         "symbols": ["🏍️","💣","☠️","🔧","⛽","🔥","🌪️","💀"],
         "weights": [1,2,3,5,8,10,12,15],
@@ -222,16 +235,17 @@ async def list_new_games():
     """Lista todos los nuevos juegos con su info."""
     result = []
     for gid, cfg in GAMES_CONFIG.items():
-        result.append(GameInfoResponse(
-            game_id=gid,
-            name=cfg["name"],
-            category=cfg["category"],
-            rtp=cfg["rtp"],
-            min_bet=1,
-            max_bet=100,
-            jackpot=_jackpots[gid],
-            description=cfg["description"],
-        ))
+        result.append({
+            "game_id": gid,
+            "name": cfg["name"],
+            "category": cfg["category"],
+            "group": cfg.get("group", "Otros"),
+            "rtp": cfg["rtp"],
+            "min_bet": 1,
+            "max_bet": 100,
+            "jackpot": _jackpots[gid],
+            "description": cfg["description"],
+        })
     return result
 
 @router.get("/info/{game_id}", response_model=GameInfoResponse)

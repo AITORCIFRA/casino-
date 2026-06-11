@@ -269,10 +269,10 @@ body {
         </div>
         <div class="category-tabs">
             <div class="tab active" onclick="filterGames('all')">TODO</div>
-            <div class="tab" onclick="filterGames('Video Slot')">SLOTS</div>
-            <div class="tab" onclick="filterGames('Arcade')">ARCADE</div>
+            <div class="tab" onclick="filterGames('Clásicos')">CLÁSICOS</div>
+            <div class="tab" onclick="filterGames('Novedades')">NOVEDADES</div>
+            <div class="tab" onclick="filterGames('Exclusivos')">EXCLUSIVOS</div>
             <div class="tab" onclick="filterGames('Table')">MESAS</div>
-            <div class="tab" onclick="filterGames('Exclusive')">EXCLUSIVOS</div>
         </div>
     </div>
 
@@ -402,6 +402,13 @@ function renderNewGames(games) {
     const grid = document.getElementById('newGamesGrid');
     grid.innerHTML = '';
     
+    // Agrupar juegos por su propiedad 'group'
+    const groups = {};
+    games.forEach(g => {
+        if (!groups[g.group]) groups[g.group] = [];
+        groups[g.group].push(g);
+    });
+
     const artConfigs = {
         'triad_pigs_olympus': '<div class="slot-art pigs-art"><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite">🐷</span><span style="font-size:2rem;animation:float 2.3s ease-in-out infinite 0.3s">🏛️</span><span style="font-size:2.5rem;animation:float 2s ease-in-out infinite 0.6s">🐷</span></div>',
         'penalty_pro_championship': '<div class="slot-art penalty-art"><span style="font-size:3rem;animation:bounce 1s ease-in-out infinite">⚽</span><span style="font-size:1.5rem">🥅</span></div>',
@@ -422,6 +429,7 @@ function renderNewGames(games) {
         const card = document.createElement('div');
         card.className = 'game-card';
         card.setAttribute('data-category', g.category);
+        card.setAttribute('data-group', g.group);
         card.onclick = () => playNewGame(g.game_id);
         
         const thumb = `/assets/slots/${g.game_id.replace(/_olympus|_championship|_christmas|_blast|_blaze|_nations|_tycoon|_wicked|_abduction|_cash|_raidmark|_dreams|_roadquake/g, '')}.png`;
@@ -470,13 +478,16 @@ function startJackpotUpdates() {
     window.jackpotInterval = setInterval(fetchJackpots, 3000);
 }
 
-function filterGames(cat) {
+function filterGames(filter) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
 
     const cards = document.querySelectorAll('#newGamesGrid .game-card');
     cards.forEach(c => {
-        if (cat === 'all' || c.getAttribute('data-category') === cat) {
+        const category = c.getAttribute('data-category');
+        const group = c.getAttribute('data-group');
+        
+        if (filter === 'all' || category === filter || group === filter) {
             c.style.display = 'block';
         } else {
             c.style.display = 'none';
